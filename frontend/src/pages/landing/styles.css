@@ -1,0 +1,57 @@
+:root {
+  --transition-speed: 0.3s;
+}
+
+.landing-container {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: var(--color-gray1);
+  position: relative;
+  transition: background-color var(--transition-speed) ease;
+
+  /* Theme variables for landing page components */
+  --bg-color: var(--color-gray1);
+  --text-primary: var(--color-gray12);
+  --text-secondary: var(--color-gray8);
+  --ui-bg: var(--color-gray2);
+  --ui-border: var(--color-gray4);
+  --shadow-color: rgba(0, 0, 0, 0.2);
+
+  --btn-primary-bg: var(--color-gray12);
+  --btn-primary-text: var(--color-gray1);
+  --btn-secondary-bg: var(--color-gray3);
+  --btn-secondary-text: var(--color-gray12);
+
+  /* Border Gradients */
+  --border-start: rgba(255, 255, 255, 1);
+  --border-mid: rgba(255, 255, 255, 0.5);
+  --border-end: rgba(255, 255, 255, 0.2);
+  --border-hover: rgba(255, 255, 255, 0.8);
+
+  font-family: var(--font-family-persian);
+}
+
+.dark .landing-container {
+  --shadow-color: rgba(0, 0, 0, 0.6);
+  --ui-bg: rgba(255, 255, 255, 0.05);
+  --ui-border: rgba(255, 255, 255, 0.1);
+  --border-start: rgba(255, 255, 255, 0.8);
+  --border-mid: rgba(255, 255, 255, 0.1);
+  --border-end: rgba(255, 255, 255, 0.05);
+  --border-hover: rgba(255, 255, 255, 0.6);
+}
+
+.section-1 {
+  height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.section-2 {
+  width: 100%;
+  position: relative;
+  background-color: var(--bg-color);
+}

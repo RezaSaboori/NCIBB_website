@@ -12,6 +12,7 @@ import "./styles/header.css"
 
 const navigationItems: NavigationItem[] = [
   { value: "home", label: "خانه", checked: true },
+  { value: "portal", label: "درگاه" },
   { value: "dataset", label: "خدمات" },
   { value: "resources", label: "منابع" },
   { value: "about", label: "درباره ما" },

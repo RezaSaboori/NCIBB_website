@@ -7,7 +7,10 @@ export const ThemeToggle = ({
   className,
 }: ThemeToggleProps) => {
   return (
-    <fieldset className="header-nav header-nav--icon">
+    <fieldset
+      className="header-nav header-nav--icon"
+      style={{ paddingBottom: "0.4rem", paddingRight: "0.4rem" }}
+    >
       <legend className="header-nav__legend">Toggle Dark Mode</legend>
       <Around
         duration={750}

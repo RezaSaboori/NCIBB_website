@@ -1,0 +1,348 @@
+.services-section-wrapper {
+  width: 100%;
+  display: flex;
+  margin-bottom: 6rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: var(--bg-color);
+  position: relative;
+  z-index: 10;
+}
+
+.services-container {
+  width: 85vw;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rem;
+  padding: 2.5rem;
+  border-radius: var(--border-radius-container-xl);
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-gray1) 30%, transparent),
+    color-mix(in srgb, var(--color-gray5) 30%, transparent) 40%
+  );
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-gray1) 10%, transparent),
+    inset 1.8px 3px 0px -2px
+      color-mix(in srgb, var(--color-gray1) 90%, transparent),
+    inset -2px -2px 0px -2px
+      color-mix(in srgb, var(--color-gray1) 30%, transparent),
+    inset -3px -12px 1px -8px
+      color-mix(in srgb, var(--color-gray1) 10%, transparent),
+    inset -0.3px -1px 4px 0px
+      color-mix(in srgb, #000 calc(1 * 12%), transparent),
+    inset -1.5px 2.5px 0px -2px
+      color-mix(in srgb, #000 calc(1 * 20%), transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 20%), transparent),
+    inset 2px -6.5px 1px -4px
+      color-mix(in srgb, #000 calc(1 * 10%), transparent),
+    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 10%), transparent),
+    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 8%), transparent);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .services-container {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, rgba(255, 255, 255, 0.8) 20%, transparent),
+    color-mix(in srgb, rgba(255, 255, 255, 0.4) 20%, transparent) 30%
+  );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-gray8) 4%, transparent),
+    inset 1.8px 3px 0px -2px
+      color-mix(in srgb, var(--color-gray8) 12%, transparent),
+    inset -2px -2px 0px -2px
+      color-mix(in srgb, var(--color-gray8) 10%, transparent),
+    inset -3px -8px 1px -6px
+      color-mix(in srgb, var(--color-gray8) 8%, transparent),
+    inset -0.3px -1px 4px 0px
+      color-mix(in srgb, var(--color-gray7) calc(1 * 25%), transparent),
+    inset -1.5px 2.5px 0px -2px
+      color-mix(in srgb, #000000 calc(1 * 30%), transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 30%), transparent),
+    inset 2px -6.5px 1px -4px
+      color-mix(in srgb, #000000 calc(1 * 25%), transparent),
+    0px 1px 5px 0px color-mix(in srgb, #000000 calc(1 * 15%), transparent),
+    0px 6px 16px 0px color-mix(in srgb, #000000 calc(1 * 12%), transparent);
+}
+
+.services-header {
+  width: 100% !important;
+  display: flex;
+  margin: -0.5rem 0rem;
+  flex-direction: row;
+  justify-content: space-between !important;
+  align-items: center;
+  direction: rtl;
+  gap: 2rem;
+}
+
+.services-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  font-family: var(--font-family-persian);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Tab Slider - Header Like Style but Larger */
+.services-tabs-container {
+  display: flex;
+  justify-content: flex-end;
+  flex: 1;
+}
+
+.services-nav {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  height: 4rem;
+  box-sizing: border-box;
+  padding: 0;
+  border: none;
+  border-radius: var(--border-radius-pill);
+  font-family: var(--font-family-persian);
+  direction: ltr;
+}
+
+.services-nav::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.5),
+    rgba(0, 0, 0, 0.05) 60%
+  );
+  backdrop-filter: blur(8px) saturate(1.8) brightness(1.2);
+  -webkit-backdrop-filter: blur(8px) saturate(1.8) brightness(1.2);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, #fff calc(1 * 10%), transparent),
+    inset 1.8px 3px 0px -2px color-mix(in srgb, #fff calc(1 * 90%), transparent),
+    inset -2px -2px 0px -2px color-mix(in srgb, #fff calc(1 * 80%), transparent),
+    inset -3px -8px 1px -6px color-mix(in srgb, #fff calc(1 * 60%), transparent),
+    inset -0.3px -1px 4px 0px
+      color-mix(in srgb, #000 calc(1 * 12%), transparent),
+    inset -1.5px 2.5px 0px -2px
+      color-mix(in srgb, #000 calc(1 * 20%), transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 20%), transparent),
+    inset 2px -6.5px 1px -4px
+      color-mix(in srgb, #000 calc(1 * 10%), transparent),
+    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 10%), transparent),
+    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 8%), transparent);
+}
+
+.dark .services-nav::before {
+  background-image: linear-gradient(
+    135deg,
+    rgba(104, 104, 104, 0.3),
+    rgba(0, 0, 0, 0.3) 30%
+  );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-gray8) 4%, transparent),
+    inset 1.8px 3px 0px -2px
+      color-mix(in srgb, var(--color-gray8) 12%, transparent),
+    inset -2px -2px 0px -2px
+      color-mix(in srgb, var(--color-gray8) 10%, transparent),
+    inset -3px -8px 1px -6px
+      color-mix(in srgb, var(--color-gray8) 8%, transparent),
+    inset -0.3px -1px 4px 0px
+      color-mix(in srgb, #000 calc(1 * 25%), transparent),
+    inset -1.5px 2.5px 0px -2px
+      color-mix(in srgb, #000 calc(1 * 30%), transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 30%), transparent),
+    inset 2px -6.5px 1px -4px
+      color-mix(in srgb, #000 calc(1 * 25%), transparent),
+    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 15%), transparent),
+    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 12%), transparent);
+}
+
+.services-nav__menu {
+  display: flex;
+  height: 3.2rem;
+  margin: 0 0.4rem;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.services-nav__item {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 3rem;
+  height: 100%;
+  cursor: pointer;
+  color: var(--color-gray10);
+  font-weight: 700;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+  user-select: none;
+  z-index: 2;
+}
+
+.dark .services-nav__item {
+  color: var(--color-gray12);
+}
+
+.services-nav__item:hover {
+  color: var(--color-blue);
+}
+
+.services-nav__item.active {
+  color: var(--color-gray1);
+}
+
+.services-nav__indicator {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  left: 0;
+  background-color: color-mix(in srgb, var(--color-blue) 80%, transparent);
+  border-radius: var(--border-radius-pill);
+  z-index: 1;
+  transition:
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, #01eeff 20%, transparent),
+    inset 2px 1px 0px -1px color-mix(in srgb, #01eeff 90%, transparent),
+    inset -1.5px -1px 0px -1px color-mix(in srgb, #01eeff 80%, transparent),
+    inset -2px -6px 1px -5px color-mix(in srgb, #01eeff 60%, transparent),
+    inset -1px 2px 3px -1px color-mix(in srgb, #001130 25%, transparent),
+    inset 0px -4px 1px -2px color-mix(in srgb, #000820 15%, transparent),
+    inset 0px 3px 6px 0px color-mix(in srgb, #000820 10%, transparent);
+}
+
+/* Bento Grid Style like Dataset Cards */
+.services-bento-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-flow: dense;
+  gap: 2rem;
+  direction: rtl;
+}
+
+.service-card {
+  padding: 2.5rem;
+  border-radius: var(--border-radius-container-lg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  background-image: linear-gradient(
+    135deg,
+    var(--color-gray1),
+    var(--color-gray2) 40%
+  );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-gray1) 10%, transparent),
+    inset 1.8px 3px 0px -2px
+      color-mix(in srgb, var(--color-gray1) 90%, transparent),
+    inset -2px -2px 0px -2px
+      color-mix(in srgb, var(--color-gray1) 30%, transparent),
+    inset -3px -12px 1px -8px
+      color-mix(in srgb, var(--color-gray1) 10%, transparent),
+    inset -0.3px -1px 4px 0px
+      color-mix(in srgb, #000 calc(1 * 12%), transparent),
+    inset -1.5px 2.5px 0px -2px
+      color-mix(in srgb, #000 calc(1 * 20%), transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 20%), transparent),
+    inset 2px -6.5px 1px -4px
+      color-mix(in srgb, #000 calc(1 * 10%), transparent),
+    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 10%), transparent),
+    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 8%), transparent);
+  transition:
+    transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.4s ease;
+  text-align: right;
+  opacity: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dark .service-card {
+  background-image: linear-gradient(
+    135deg,
+    var(--color-gray3),
+    var(--color-gray2) 30%
+  );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-gray8) 4%, transparent),
+    inset 1.8px 3px 0px -2px
+      color-mix(in srgb, var(--color-gray8) 12%, transparent),
+    inset -2px -2px 0px -2px
+      color-mix(in srgb, var(--color-gray8) 10%, transparent),
+    inset -3px -8px 1px -6px
+      color-mix(in srgb, var(--color-gray8) 8%, transparent),
+    inset -0.3px -1px 4px 0px
+      color-mix(in srgb, var(--color-gray7) calc(1 * 25%), transparent),
+    inset -1.5px 2.5px 0px -2px
+      color-mix(in srgb, #000000 calc(1 * 30%), transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 30%), transparent),
+    inset 2px -6.5px 1px -4px
+      color-mix(in srgb, #000000 calc(1 * 25%), transparent),
+    0px 1px 5px 0px color-mix(in srgb, #000000 calc(1 * 15%), transparent),
+    0px 6px 16px 0px color-mix(in srgb, #000000 calc(1 * 12%), transparent);
+}
+
+.service-card-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1.25rem;
+}
+
+.service-card-description {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.service-card.reveal {
+  opacity: 0;
+  animation-name: reveal;
+  animation-duration: 0.8s;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (max-width: 1024px) {
+  .services-bento-grid {
+    grid-template-columns: repeat(2, 1fr);
+    width: 90vw;
+  }
+}
+
+@media (max-width: 768px) {
+  .services-bento-grid {
+    grid-template-columns: 1fr;
+  }
+  .service-card {
+    grid-column: span 1 !important;
+  }
+}

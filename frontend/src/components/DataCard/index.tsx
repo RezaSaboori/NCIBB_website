@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState, useRef, useEffect } from "react"
 import {
   Card,
   CardHeader,
@@ -9,17 +9,12 @@ import {
   Tooltip,
 } from "@nextui-org/react"
 import { Icon } from "@iconify/react"
+import { DatabaseInfo, DataType } from "@/types/database"
+import { InfoModal } from "@/components/InfoModal"
 import "./DataCard.css"
 
 interface DataCardProps {
-  size: number
-  year: number
-  rating: number
-  title: string
-  description: string
-  tags: string[]
-  dataTypes: (keyof typeof dataTypeIcons)[]
-  reference: string
+  database: DatabaseInfo
   isVisible?: boolean
   animationDelay?: number
 }
@@ -103,7 +98,7 @@ type IconData = {
   color?: string
 }
 
-const dataTypeIcons: { [key: string]: IconData } = {
+const dataTypeIcons: Record<DataType, IconData> = {
   image: {
     icon: "mynaui:image-solid",
     width: "20",
@@ -153,17 +148,48 @@ const dataTypeTooltipBg: { [key: string]: string } = {
 }
 
 export const DataCard: React.FC<DataCardProps> = ({
-  size,
-  year,
-  rating,
-  title,
-  description,
-  tags,
-  dataTypes,
-  reference,
+  database,
   isVisible,
   animationDelay,
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [openTooltips, setOpenTooltips] = useState<Record<string, boolean>>({})
+  const tooltipTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({})
+
+  useEffect(() => {
+    return () => {
+      Object.values(tooltipTimeoutRef.current).forEach(clearTimeout)
+    }
+  }, [])
+
+  const handleTooltipOpen = (key: string) => {
+    if (tooltipTimeoutRef.current[key]) {
+      clearTimeout(tooltipTimeoutRef.current[key])
+    }
+    setOpenTooltips((prev) => ({ ...prev, [key]: true }))
+    tooltipTimeoutRef.current[key] = setTimeout(() => {
+      setOpenTooltips((prev) => ({ ...prev, [key]: false }))
+    }, 2000)
+  }
+
+  const handleTooltipClose = (key: string) => {
+    if (tooltipTimeoutRef.current[key]) {
+      clearTimeout(tooltipTimeoutRef.current[key])
+    }
+    setOpenTooltips((prev) => ({ ...prev, [key]: false }))
+  }
+
+  const {
+    fileSizeKB: size,
+    year,
+    rating,
+    name: title,
+    shortDescription: description,
+    datasetVariables: tags,
+    dataTypes,
+    reference,
+  } = database
+
   const sizeColor = getSizeColor(size)
   const yearColor = getYearColor(year)
 
@@ -171,141 +197,168 @@ export const DataCard: React.FC<DataCardProps> = ({
     ? { animationDelay: `${animationDelay}ms` }
     : { opacity: 0 }
 
-  const cardClassName = `data-card w-full rounded-[var(--border-radius-container-lg)] p-5 ${
+  const cardClassName = `data-card w-full rounded-[var(--border-radius-container-lg)] p-6 ${
     isVisible ? "reveal" : ""
   }`
 
   return (
-    <Card className={cardClassName} style={cardStyle}>
-      <CardHeader className="flex justify-between">
-        <div className="flex" style={{ direction: "ltr" }}>
-          {[...Array(5)].map((_, i) => (
-            <StarIcon key={i} filled={i < rating} />
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <Chip
-            className="font-IRANSansX p-4 text-sm"
-            classNames={{
-              content: "relative top-px",
-            }}
-            style={{
-              backgroundColor: yearColor,
-              color: "var(--color-gray12)",
-              gap: "0.5rem",
-              cursor: "default",
-            }}
-            variant="flat"
-            endContent={
-              <Icon icon="lets-icons:date-fill" width={15} height={15} />
-            }
+    <>
+      <Card className={cardClassName} style={cardStyle}>
+        <CardHeader className="flex justify-between ">
+          <div className="flex" style={{ direction: "ltr" }}>
+            {[...Array(5)].map((_, i) => (
+              <StarIcon key={i} filled={i < rating} />
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <Chip
+              className="font-IRANSansX p-4"
+              classNames={{
+                content: "relative top-px",
+              }}
+              style={{
+                backgroundColor: yearColor,
+                color: "var(--color-gray12)",
+                gap: "0.3rem",
+                cursor: "default",
+                fontSize: "var(--font-size-xs)",
+                padding: "0.75rem 0.75rem 0.75rem 0.75rem",
+              }}
+              variant="flat"
+              endContent={
+                <Icon
+                  icon="lets-icons:date-fill"
+                  width={12}
+                  height={12}
+                  style={{ marginTop: "-1px" }}
+                />
+              }
+            >
+              {year}
+            </Chip>
+            <Chip
+              className="font-IRANSansX"
+              classNames={{
+                content: "relative top-px",
+              }}
+              style={{
+                backgroundColor: sizeColor,
+                color: "var(--color-gray12)",
+                direction: "ltr",
+                gap: "0.3rem",
+                textAlign: "center",
+                padding: "0.75rem 0.5rem 0.75rem 0.75rem",
+                cursor: "default",
+                fontSize: "var(--font-size-xs)",
+              }}
+              variant="flat"
+              startContent={
+                <Icon
+                  icon="material-symbols:folder-open-rounded"
+                  width={12}
+                  height={12}
+                />
+              }
+            >
+              {formatSize(size)}
+            </Chip>
+          </div>
+        </CardHeader>
+        <CardBody className="mt-8">
+          <h2
+            className="text-lg font-medium mb-0 force-ltr"
+            style={{ textAlign: "left" }}
           >
-            {year}
-          </Chip>
-          <Chip
-            className="font-IRANSansX text-sm"
-            classNames={{
-              content: "relative top-px",
-            }}
-            style={{
-              backgroundColor: sizeColor,
-              color: "var(--color-gray12)",
-              direction: "ltr",
-              gap: "0.5rem",
-              textAlign: "center",
-              padding: "1rem 0.75rem 1rem 1rem",
-              cursor: "default",
-            }}
-            variant="flat"
-            startContent={
-              <Icon
-                icon="material-symbols:folder-open-rounded"
-                width={15}
-                height={15}
-              />
-            }
+            {title}
+          </h2>
+          <div className="flex justify-end gap-2 mt-4 mb-6 ">
+            {(Object.keys(dataTypeIcons) as DataType[]).map((key) => {
+              const iconData = dataTypeIcons[key]
+              const isAvailable = dataTypes.includes(key)
+              const color = isAvailable
+                ? `var(${iconData.color})`
+                : "var(--color-gray5)"
+
+              const tooltipBgClass = isAvailable
+                ? dataTypeTooltipBg[key]
+                : "bg-[var(--color-gray5)]"
+
+              return (
+                <Tooltip
+                  key={key}
+                  isOpen={openTooltips[key] || false}
+                  content={key.charAt(0).toUpperCase() + key.slice(1)}
+                  classNames={{
+                    content: `text-white ${tooltipBgClass} text-xs pt-1.5 pb-0.5`,
+                  }}
+                >
+                  <div
+                    onMouseEnter={() => handleTooltipOpen(key)}
+                    onMouseLeave={() => handleTooltipClose(key)}
+                  >
+                    <Icon
+                      icon={iconData.icon}
+                      width={iconData.width}
+                      height={iconData.height}
+                      style={{ ...iconData.style, color }}
+                    />
+                  </div>
+                </Tooltip>
+              )
+            })}
+          </div>
+          <p
+            className="text-default-500 force-ltr"
+            style={{ textAlign: "justify", fontSize: "var(--font-size-sm)" }}
           >
-            {formatSize(size)}
-          </Chip>
-        </div>
-      </CardHeader>
-      <CardBody className="mt-8">
-        <h2 className="text-2xl font-medium mb-0" style={{ textAlign: "left" }}>
-          {title}
-        </h2>
-        <div className="flex justify-end gap-2 mt-4 mb-6">
-          {Object.entries(dataTypeIcons).map(([key, iconData]) => {
-            const isAvailable = dataTypes.includes(
-              key as keyof typeof dataTypeIcons
-            )
-            const color = isAvailable
-              ? `var(${iconData.color})`
-              : "var(--color-gray5)"
-
-            const tooltipBgClass = isAvailable
-              ? dataTypeTooltipBg[key]
-              : "bg-[var(--color-gray5)]"
-
-            return (
-              <Tooltip
-                key={key}
-                content={key.charAt(0).toUpperCase() + key.slice(1)}
-                classNames={{
-                  content: `text-white ${tooltipBgClass}`,
+            {description}
+          </p>
+          <div className="flex gap-2 mt-6 flex-wrap justify-end">
+            {tags.map((tag) => (
+              <Chip
+                key={tag}
+                variant="flat"
+                className="pt-0.5 cursor-default force-ltr"
+                style={{
+                  backgroundColor: "var(--color-gray9)",
+                  color: "var(--color-gray2)",
+                  fontSize: "var(--font-size-xs)",
                 }}
               >
-                <Icon
-                  icon={iconData.icon}
-                  width={iconData.width}
-                  height={iconData.height}
-                  style={{ ...iconData.style, color }}
-                />
-              </Tooltip>
-            )
-          })}
-        </div>
-        <p
-          className="text-default-500 text-sm"
-          style={{ textAlign: "justify", direction: "ltr" }}
-        >
-          {description}
-        </p>
-        <div className="flex gap-2 mt-6 flex-wrap justify-end">
-          {tags.map((tag) => (
-            <Chip
-              key={tag}
-              variant="flat"
-              className="pt-0.5 cursor-default text-var(--color-gray12)"
-              style={{
-                backgroundColor: "var(--color-gray10)",
-                color: "var(--color-gray3)",
-              }}
-            >
-              {tag}
-            </Chip>
-          ))}
-        </div>
-      </CardBody>
-      <CardFooter className="gap-3 mt-8 flex justify-center">
-        <Button
-          as="a"
-          href={reference}
-          target="_blank"
-          rel="noopener noreferrer"
-          color="primary"
-          variant="solid"
-          className="w-fit px-12 py-6 rounded-full text-sm cursor-pointer"
-        >
-          درخواست داده
-        </Button>
-        <Button
-          color="default"
-          variant="solid"
-          className="w-fit px-12 py-6 rounded-full text-sm cursor-pointer"
-        >
-          اطلاعات بیشتر
-        </Button>
-      </CardFooter>
-    </Card>
+                {tag}
+              </Chip>
+            ))}
+          </div>
+        </CardBody>
+        <CardFooter className="gap-3 mt-8 flex justify-center">
+          <Button
+            as="a"
+            href={reference}
+            target="_blank"
+            rel="noopener noreferrer"
+            color="primary"
+            variant="solid"
+            className="w-fit px-8 py-4 rounded-full cursor-pointer"
+            style={{ fontSize: "var(--font-size-sm)" }}
+          >
+            درخواست داده
+          </Button>
+          <Button
+            color="default"
+            variant="solid"
+            className="w-fit px-8 py-4 rounded-full cursor-pointer"
+            style={{ fontSize: "var(--font-size-sm)" }}
+            onClick={() => setIsModalOpen(true)}
+          >
+            اطلاعات بیشتر
+          </Button>
+        </CardFooter>
+      </Card>
+      <InfoModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        database={database}
+      />
+    </>
   )
 }

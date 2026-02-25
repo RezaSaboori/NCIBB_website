@@ -325,3 +325,26 @@ body {
   --gap: var(--spacing-xl);
   --radius: var(--border-radius-container-xl);
 }
+
+.force-ltr {
+  direction: ltr !important;
+  unicode-bidi: bidi-override !important;
+  text-align: justify !important;
+}
+
+.custom-scrollbar {
+  overflow-y: auto;
+  overflow-x: hidden;
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gray6) !important;
+  }
+
+  &::-webkit-scrollbar {
+    width: 5px;
+    background-color: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-gray5);
+    border-radius: 100px;
+  }
+}

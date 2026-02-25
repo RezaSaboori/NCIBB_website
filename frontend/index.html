@@ -2,24 +2,31 @@
 <html lang="fa" dir="rtl">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/NCIBB_logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + HeroUI</title>
-    <meta key="title" content="Vite + HeroUI" property="og:title" />
+    <title>NCIBB</title>
+    <meta key="title" content="NCIBB" property="og:title" />
     <meta
-      content="Make beautiful websites regardless of your design experience."
+      content="بانک ملی زیست داده یکپارچه قلب و عروق"
       property="og:description"
     />
-    <meta
-      content="Make beautiful websites regardless of your design experience."
-      name="description"
-    />
+    <meta content="بانک ملی زیست داده یکپارچه قلب و عروق" name="description" />
     <meta
       key="viewport"
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
       name="viewport"
     />
-    <link href="/favicon.ico" rel="icon" />
+
+    <!-- Preload Critical Assets -->
+    <link
+      rel="preload"
+      href="/landing/webgl_asset/mesh_data.json"
+      as="fetch"
+      crossorigin="anonymous"
+    />
+
+    <!-- Performance Optimization: Resource Hints -->
+    <link rel="preconnect" href="/" crossorigin />
   </head>
   <body>
     <div id="root"></div>

@@ -1,0 +1,29 @@
+.rotating-border-container {
+  position: relative;
+}
+
+.gradient-border-mask-container {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: var(--border-width, 2px);
+  --angle: 0deg;
+  background: linear-gradient(
+    var(--angle), 
+    var(--border-start) 0%, 
+    var(--border-mid) 30%, 
+    var(--border-end) 100%
+  );
+  -webkit-mask: linear-gradient(hwb(0 100% 0%) 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(hwb(0 100% 0%) 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+  transition: background 1s ease;
+}
+
+.rotating-border-container:hover .gradient-border-mask-container {
+  background: var(--border-hover);
+}
+

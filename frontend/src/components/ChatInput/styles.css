@@ -81,8 +81,9 @@
   color: var(--color-gray11);
   position: absolute;
   left: 0px;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
 }
+
 .wrapper
   .button-content
   .button-content-inner
@@ -93,6 +94,7 @@
   align-items: center;
   gap: 1px;
 }
+
 .wrapper
   .button-content
   .button-content-inner
@@ -131,6 +133,7 @@
   text-align: center;
   position: relative;
   left: 0px;
+  font-size: var(--font-size-sm);
 }
 .wrapper .button-content .button-content-inner .search-btn .search-input {
   width: 100%;
@@ -138,6 +141,7 @@
   outline: none;
   border: none;
   color: var(--color-gray11);
+  font-size: var(--font-size-sm);
 }
 .wrapper .button-content .button-content-inner .separate-element {
   position: absolute;

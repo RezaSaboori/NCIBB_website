@@ -1,0 +1,53 @@
+/* Global theme transitions */
+:root.theme-transition,
+:root.theme-transition *,
+:root.theme-transition *:before,
+:root.theme-transition *:after {
+  transition: 
+    background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important,
+    color 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important,
+    border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important,
+    box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* View Transition API styles */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.5s;
+}
+
+/* Landing page entry animations */
+.landing-content-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.landing-content-visible {
+  opacity: 1;
+  visibility: visible;
+  filter: blur(40px);
+  transition: 
+    opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* New class for the final reveal transition */
+.landing-content-revealed {
+  animation: 
+    clear-blur 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes clear-blur {
+  from { filter: blur(40px); }
+  to { filter: blur(0px); }
+}
+
+/* Optimize rendering performance */
+.optimize-gpu {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+.contain-paint {
+  contain: paint;
+}
+

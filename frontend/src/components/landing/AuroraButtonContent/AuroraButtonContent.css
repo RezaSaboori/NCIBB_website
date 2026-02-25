@@ -1,0 +1,53 @@
+@keyframes orbit-1   { from { transform: rotate(0deg) translateX(60px)  translateY(5px);} to { transform: rotate(360deg) translateX(60px)  translateY(5px);} }
+@keyframes orbit-2   { from { transform: rotate(0deg) translateX(30px)  translateY(85px);} to { transform: rotate(360deg) translateX(30px)  translateY(85px);} }
+@keyframes orbit-3   { from { transform: rotate(0deg) translateX(-70px) translateY(-20px);} to { transform: rotate(360deg) translateX(-70px) translateY(-20px);} }
+@keyframes orbit-4   { from { transform: rotate(0deg) translateX(90px)  translateY(-55px);} to { transform: rotate(360deg) translateX(90px)  translateY(-55px);} }
+@keyframes orbit-5   { from { transform: rotate(0deg) translateX(-98px) translateY(45px);} to { transform: rotate(360deg) translateX(-98px) translateY(45px);} }
+@keyframes orbit-L1  { from { transform: rotate(0deg) translateX(-140px)translateY(-10px);} to { transform: rotate(360deg) translateX(-140px)translateY(-10px);} }
+@keyframes orbit-L2  { from { transform: rotate(0deg) translateX(-115px)translateY(33px);} to { transform: rotate(360deg) translateX(-115px)translateY(33px);} }
+@keyframes orbit-L3  { from { transform: rotate(0deg) translateX(-80px) translateY(-38px);} to { transform: rotate(360deg) translateX(-80px) translateY(-38px);} }
+@keyframes orbit-L4  { from { transform: rotate(0deg) translateX(-152px)translateY(55px);} to { transform: rotate(360deg) translateX(-152px)translateY(55px);} }
+@keyframes orbit-L5  { from { transform: rotate(0deg) translateX(-95px) translateY(72px);} to { transform: rotate(360deg) translateX(-95px) translateY(72px);} }
+
+.aurora-container {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+  transition: filter 0.3s cubic-bezier(.55,.08,.36,1.14), 
+              opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.aurora-group:hover .aurora-container {
+  filter: saturate(2) brightness(2);
+}
+
+.aurora-orbit {
+  position: absolute;
+  left: 40%;
+  top: 50%;
+  width: 0; 
+  height: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(45px);
+  opacity: 0.8;
+  mix-blend-mode: var(--aurora-blend-mode, lighten);
+  pointer-events: none;
+  will-change: transform;
+}
+
+
+
+.aurora-group, .aurora-group * {
+  font-family: 'Inter', sans-serif;
+}
+

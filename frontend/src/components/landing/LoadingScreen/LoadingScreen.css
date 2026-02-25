@@ -1,0 +1,253 @@
+.loading-screen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-color, #070707);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow: hidden; /* Critical for scroll issues */
+  transition:
+    opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 1.2s,
+    backdrop-filter 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: all;
+}
+
+.loading-screen-overlay.assets-loading {
+  backdrop-filter: blur(0px);
+}
+
+.loading-screen-overlay.assets-ready {
+  backdrop-filter: blur(30px);
+  background-color: color-mix(
+    in srgb,
+    var(--bg-color, #070707) 70%,
+    transparent
+  );
+  transition:
+    opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    backdrop-filter 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loading-screen-overlay.fade-out {
+  opacity: 0;
+  backdrop-filter: blur(0px);
+  background-color: transparent;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-screen-overlay.fade-out .loading-content {
+  filter: blur(20px);
+  opacity: 0;
+  transform: scale(1.1);
+  transition:
+    filter 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  max-width: 400px;
+  width: 100%;
+  will-change: opacity, filter;
+  filter: blur(10px);
+  opacity: 0;
+  transition:
+    opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.assets-ready .loading-content {
+  filter: blur(0px);
+  opacity: 1;
+}
+
+.logo-animation-container {
+  position: relative;
+  width: 100px; /* 50% smaller (was 200px) */
+  height: 131px; /* 50% smaller (was 262px) */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translateY(-20%); /* 20% upper */
+  will-change: transform;
+}
+
+.logo-frame {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* Stacking Animation Logic - Removed breathe effect */
+.assets-ready .frame-1 {
+  animation: logo-frame-1-cycle 3.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+}
+
+.assets-ready .frame-2 {
+  animation: logo-frame-2-cycle 3.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.assets-ready .frame-3 {
+  animation: logo-frame-3-cycle 3.5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* Stop the infinite loop and hold the final state during transition */
+.fade-out .frame-1,
+.fade-out .frame-2,
+.fade-out .frame-3 {
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: forwards !important;
+}
+
+.logo-glow {
+  position: absolute;
+  bottom: 5%;
+  left: 10%;
+  width: 80%;
+  height: 60%;
+  background: radial-gradient(
+    circle,
+    rgba(208, 0, 117, 0.2) 0%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  filter: blur(15px);
+  opacity: 0;
+  z-index: -1;
+  transform: translateZ(0);
+}
+
+.assets-ready .logo-glow {
+  /* Simplified glow pulse without container breathing */
+  animation: logo-glow-pulse 3.5s ease-in-out infinite;
+}
+
+/* 
+  Removed blur from keyframes to prevent expensive re-paints
+*/
+
+@keyframes logo-frame-1-cycle {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+    filter: blur(15px);
+  }
+  17.14% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  97.14% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1; /* Stay visible at end of loop for transition */
+    transform: scale(1);
+    filter: blur(0px);
+  }
+}
+
+@keyframes logo-frame-2-cycle {
+  0%,
+  17.14% {
+    opacity: 0;
+    transform: translateY(0px) scale(0.8);
+    filter: blur(15px);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+  97.14% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1; /* Stay visible at end of loop for transition */
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+}
+
+@keyframes logo-frame-3-cycle {
+  0%,
+  40% {
+    opacity: 0;
+    transform: translateY(0px) scale(0.8);
+    filter: blur(15px);
+  }
+  62.85% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+  97.14% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1; /* Stay visible at end of loop for transition */
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+}
+
+@keyframes logo-breathe {
+  0%,
+  62.85%,
+  100% {
+    transform: scale(1);
+  }
+  80% {
+    transform: scale(1.03);
+  } /* Pulse during hold */
+}
+
+@keyframes logo-glow-pulse {
+  0%,
+  62.85%,
+  100% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 1;
+  }
+}
+
+.progress-container,
+.progress-bar-bg,
+.progress-bar-fill,
+.progress-percentage,
+.loading-message {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .logo-animation-container {
+    width: 75px;
+    height: 98px;
+  }
+}

@@ -1,0 +1,23 @@
+.floating-content-outer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  z-index: 12;
+  padding: 0;
+}
+
+.floating-content-inner {
+  width: 100vw;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: nowrap;
+  pointer-events: auto;
+  margin: 0 auto 0 0;
+  padding: 0 3vw;
+}
+
