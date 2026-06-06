@@ -180,3 +180,6 @@ temp/
 
 # Large data files (specifically exclude large JSON files)
 frontend/public/landing/cardio_particles/webgl_asset/mesh_data.json
+
+# General rule to exclude all mesh_data.json files (prevents large mesh data files from being committed)
+**/mesh_data.json
