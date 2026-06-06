@@ -348,7 +348,7 @@ export const DataCard: React.FC<DataCardProps> = ({
             variant="solid"
             className="w-fit px-8 py-4 rounded-full cursor-pointer"
             style={{ fontSize: "var(--font-size-sm)" }}
-            onClick={() => setIsModalOpen(true)}
+            onPress={() => setIsModalOpen(true)}
           >
             اطلاعات بیشتر
           </Button>
