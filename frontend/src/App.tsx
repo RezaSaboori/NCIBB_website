@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom"
-import MainLayout from "@/layouts/default"
+import MainLayout from "./layouts/default"
 import Page from "./pages/Page"
 import ProfileManager from "./components/profile/ProfileManager"
 import { DatasetPage } from "./pages/dataset"

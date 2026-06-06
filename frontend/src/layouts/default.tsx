@@ -1,7 +1,7 @@
-import { Header } from "@/components/header"
+import { Header } from "../components/header"
 import { useState } from "react"
 import { Outlet, useLocation } from "react-router-dom"
-import { Footer } from "@/components/global/Footer"
+import { Footer } from "../components/global/Footer"
 
 export default function DefaultLayout() {
   const [sidebar, setSidebar] = useState<React.ReactNode | null>(null)

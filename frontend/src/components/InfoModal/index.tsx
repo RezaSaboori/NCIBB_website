@@ -7,7 +7,7 @@ import {
   ModalFooter,
   Button,
 } from "@nextui-org/react"
-import { DatabaseInfo, DataType } from "@/types/database"
+import { DatabaseInfo, DataType } from "../../types/database"
 import { Icon } from "@iconify/react"
 import "./InfoModal.css"
 

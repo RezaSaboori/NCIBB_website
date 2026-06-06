@@ -9,8 +9,8 @@ import {
   Tooltip,
 } from "@nextui-org/react"
 import { Icon } from "@iconify/react"
-import { DatabaseInfo, DataType } from "@/types/database"
-import { InfoModal } from "@/components/InfoModal"
+import { DatabaseInfo, DataType } from "../../types/database"
+import { InfoModal } from "../InfoModal"
 import "./DataCard.css"
 
 interface DataCardProps {

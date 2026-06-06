@@ -1,5 +1,5 @@
-import { getDatabases } from "@/pages/dataset/utils/csv"
-import { DatabaseInfo } from "@/types/database"
+import { getDatabases } from "../../pages/dataset/utils/csv"
+import { DatabaseInfo } from "../../types/database"
 
 export const searchInCsv = async (
   query: string,

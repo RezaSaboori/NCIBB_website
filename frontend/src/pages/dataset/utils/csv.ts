@@ -1,4 +1,4 @@
-import { DatabaseInfo, DataType } from "@/types/database"
+import { DatabaseInfo, DataType } from "../../../types/database"
 
 const parseCsvRow = (row: string): string[] => {
   const fields: string[] = []
