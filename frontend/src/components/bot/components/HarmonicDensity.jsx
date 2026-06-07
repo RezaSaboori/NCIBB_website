@@ -7,29 +7,25 @@ import { OrbitSystem } from './OrbitSystem';
 import { PostProcessing } from './PostProcessing';
 import { useIntroAnimation } from '../hooks/useIntroAnimation';
 import { useCoreHideAnimation } from '../hooks/useCoreHideAnimation';
+import { useCssBackground } from '../hooks/useCssBackground';
 
-const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive }) => {
+const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive, cssBackground }) => {
     const intro = useIntroAnimation(3800, () => setIntroActive(false));
     const hideAnimation = useCoreHideAnimation(isCoreVisible);
-    const { currentTheme } = theme;
 
-    // Convert hex background to CSS/Three string for the background color
-    const bgColor = useMemo(() => {
-        // During intro, stay black. After intro, follow theme.
-        if (intro.active) return '#000000';
-        return `#${currentTheme.background.toString(16).padStart(6, '0')}`;
-    }, [intro.active, currentTheme.background]);
+    // Simple: black during intro, then follow the live CSS background
+    const bgColor = intro.active ? '#000000' : cssBackground.css;
 
     return (
         <>
-            <hemisphereLight 
-                args={[0xffffff, 0x444444, 0.5]} 
-                position={[0, 20, 0]} 
+            <hemisphereLight
+                args={[0xffffff, 0x444444, 0.5]}
+                position={[0, 20, 0]}
                 layers={[0, 1]}
             />
-            <directionalLight 
-                args={[0xffffff, 1.0]} 
-                position={[10, 50, 20]} 
+            <directionalLight
+                args={[0xffffff, 1.0]}
+                position={[10, 50, 20]}
                 layers={[0, 1]}
             />
 
@@ -39,7 +35,7 @@ const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroAc
             <color attach="background" args={[bgColor]} />
             
             <Suspense fallback={null}>
-                <EnvironmentMap color={currentTheme.envBackground} />
+                <EnvironmentMap color={theme.currentTheme.envBackground} />
             </Suspense>
 
             <CoreSphere
@@ -49,9 +45,9 @@ const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroAc
                 hideAnimation={hideAnimation}
             />
             
-            <OrbitSystem 
-                theme={theme} 
-                ignition={ignition} 
+            <OrbitSystem
+                theme={theme}
+                ignition={ignition}
                 intro={intro}
             />
 
@@ -70,6 +66,8 @@ const EnvironmentMap = memo(({ color }) => (
 ));
 
 export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive }) => {
+    const cssBackground = useCssBackground();
+
     const glConfig = useMemo(() => ({
         antialias: true,
         powerPreference: "high-performance",
@@ -84,8 +82,7 @@ export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, 
         <div style={{
             width: '100vw',
             height: '100vh',
-            // Update wrapper background to match theme for seamless edges
-            background: theme.isDarkMode ? '#000' : `#${theme.currentTheme.background.toString(16).padStart(6, '0')}`
+            background: cssBackground.css
         }}>
             <Canvas
                 gl={glConfig}
@@ -100,20 +97,21 @@ export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, 
                     }, false);
                 }}
             >
-                <PerspectiveCamera 
-                    makeDefault 
-                    fov={45} 
-                    near={0.1} 
+                <PerspectiveCamera
+                    makeDefault
+                    fov={45}
+                    near={0.1}
                     far={1000}
                     position={[35, 15, 35]}
                 />
 
-                <SceneContent 
-                    theme={theme} 
-                    isGlass={isGlass} 
+                <SceneContent
+                    theme={theme}
+                    isGlass={isGlass}
                     isCoreVisible={isCoreVisible}
-                    ignition={ignition} 
-                    setIntroActive={setIntroActive} 
+                    ignition={ignition}
+                    setIntroActive={setIntroActive}
+                    cssBackground={cssBackground}
                 />
             </Canvas>
         </div>

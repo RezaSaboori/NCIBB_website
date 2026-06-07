@@ -1,7 +1,7 @@
 export const THEMES = {
     dark: {
-        background:    0x050505,
-        fogColor:      0x050505,
+        background:    0x1b1b1b,
+        fogColor:      0x1b1b1b,
         envBackground: 0x222222,
         bloomStrength: 0.32,
         orbitColor:    0x4f5765,
@@ -13,8 +13,8 @@ export const THEMES = {
         buttonBg:      "rgba(180, 200, 230, 0.18)"
     },
     light: {
-        background:    0xe8ecf0,
-        fogColor:      0xe8ecf0,
+        background:    0xe4e4e4,
+        fogColor:      0xe4e4e4,
         envBackground: 0xffffff,
         bloomStrength: 0.12,
         orbitColor:    0x8899aa,
