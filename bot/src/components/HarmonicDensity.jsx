@@ -58,7 +58,7 @@ const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroAc
                 hideAnimation={hideAnimation}
             />
             <OrbitSystem theme={theme} ignition={ignition} intro={intro} />
-            <PostProcessing theme={theme} introActive={intro.active} />
+            <PostProcessing theme={theme} introActive={intro.active} cssBackground={cssBackground.css} />
         </>
     );
 });

@@ -1,27 +1,36 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect } from 'react';
 import { EffectComposer, Bloom, SMAA } from '@react-three/postprocessing';
+import { useThree } from '@react-three/fiber';
+import * as THREE from 'three';
 import { CONFIG } from '../config/sceneConfig';
 
-export const PostProcessing = memo(({ theme, introActive }) => {
+export const PostProcessing = memo(({ theme, introActive, cssBackground }) => {
+    const { gl } = useThree();
+
+    // Sync WebGL clear color with scene background so EffectComposer
+    // never reveals a black buffer underneath during transitions
+    useEffect(() => {
+        const color = new THREE.Color(introActive ? '#000000' : (cssBackground || '#000000'));
+        gl.setClearColor(color, 1);
+    }, [introActive, cssBackground, gl]);
+
     return (
-        <EffectComposer 
-            disableNormalPass 
+        <EffectComposer
+            disableNormalPass
             multisampling={0}
             stencilBuffer={false}
-            // CRITICAL: Disable depth buffer clearing if we're in the intro 
-            // to prevent subtle single-frame gaps during camera moves
             depthBuffer={true}
         >
-            <Bloom 
+            <Bloom
                 intensity={theme.currentTheme.bloomStrength}
                 luminanceThreshold={CONFIG.bloomThreshold}
                 luminanceSmoothing={0.9}
                 mipmapBlur
                 radius={CONFIG.bloomRadius}
             />
-            {/* Only run SMAA if we have enough light to see it, 
-                preventing artifacts in the dark beginning */}
-            {!introActive && <SMAA />}
+            {/* Use enabled prop — never conditionally mount/unmount effects
+                Mounting/unmounting forces EffectComposer to rebuild its pipeline → black flash */}
+            <SMAA enabled={!introActive} />
         </EffectComposer>
     );
 });
