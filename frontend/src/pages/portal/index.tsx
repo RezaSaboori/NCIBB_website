@@ -1,6 +1,7 @@
 // @ts-nocheck
-import { useState, useRef, useEffect, useMemo } from "react"
-import Spline from "@splinetool/react-spline"
+import { useState, useRef, useEffect, useMemo, useCallback } from "react"
+import { Canvas } from "@react-three/fiber"
+import { Environment, OrbitControls } from "@react-three/drei"
 import {
   Dropdown,
   DropdownTrigger,
@@ -19,11 +20,23 @@ import { DatabaseInfo } from "../../types/database"
 import { searchInCsv } from "../../components/Search"
 import { refreshButtonVariants } from "../../components/ChatInput/animations"
 import { RefreshIcon } from "../../components/ChatInput/icons/RefreshIcon"
-
+import * as THEME_CONFIG from "../../components/bot/config/themeConfig"
+import * as SCENE_CONFIG from "../../components/bot/config/sceneConfig"
+import { useTheme as useBotTheme } from "../../components/bot/hooks/useTheme"
+import { useIntroAnimation } from "../../components/bot/hooks/useIntroAnimation"
+import { useCoreHideAnimation } from "../../components/bot/hooks/useCoreHideAnimation"
+import { useAttentionTracking } from "../../components/bot/hooks/useAttentionTracking"
+import { useBlinkFSM } from "../../components/bot/hooks/useBlinkFSM"
+import { HarmonicDensity } from "../../components/bot/components/HarmonicDensity"
+import { UIControls } from "../../components/bot/components/UIControls"
+import { CoreSphere } from "../../components/bot/components/CoreSphere"
+import { Eyes } from "../../components/bot/components/Eyes"
+import { OrbitSystem } from "../../components/bot/components/OrbitSystem"
+import { ParticleInstances } from "../../components/bot/components/ParticleInstances"
+import { OrbitLines } from "../../components/bot/components/OrbitLines"
+import { PostProcessing } from "../../components/bot/components/PostProcessing"
 import "./styles.css"
 import generatedImage from "../../../data/Gemini_Generated_Image_sc72gssc72gssc72.png"
-
-const TARGET_ID = "b647ec01-9216-4d75-8e14-935351259d8f" // from Copy Development Object ID in Spline
 
 const chatInputConfig = {
   datasaz: {
@@ -70,6 +83,26 @@ export const PortalPage = () => {
   const objRef = useRef(null)
   const modesContainerRef = useRef(null)
 
+  // Bot state management
+  const botTheme = useBotTheme()
+  const intro = useIntroAnimation(3800, () => {
+    setIsTextVisible(true)
+    setIsDataVisible(true)
+    setChatInputAnimationClass("fade-in-up")
+  })
+  const hideAnimation = useCoreHideAnimation(true)
+  const attentionTracking = useAttentionTracking()
+  const blinkFSM = useBlinkFSM(attentionTracking)
+
+  const [ignitionValue, setIgnitionValue] = useState(0)
+  const [isGlass, setIsGlass] = useState(true)
+  const [isHidden, setIsHidden] = useState(false)
+
+  // Hide animation active state
+  const hideAnimationActive = useMemo(() => {
+    return !isHidden
+  }, [isHidden])
+
   const selectedFilterValue = useMemo(
     () => Array.from(selectedFilters).join(", ").replace(/_/g, " "),
     [selectedFilters]
@@ -84,16 +117,6 @@ export const PortalPage = () => {
     }
     loadDatabases()
   }, [])
-
-  const handleSplineLoad = (app) => {
-    appRef.current = app
-    objRef.current = app.findObjectById(TARGET_ID)
-    setTimeout(() => {
-      setIsTextVisible(true)
-      setIsDataVisible(true)
-      setChatInputAnimationClass("fade-in-up")
-    }, 2000)
-  }
 
   const toState = () => {
     if (!objRef.current) return
@@ -110,41 +133,44 @@ export const PortalPage = () => {
     objRef.current.transition({ to: "State 2", duration: 800 })
   }
 
-  const handleModeChange = (mode: string) => {
-    if (mode === activeMode) return
+  const handleModeChange = useCallback(
+    (mode: string) => {
+      if (mode === activeMode) return
 
-    setChatInputAnimationClass("fade-out")
-    setDataContainerAnimationClass("fade-out")
-    setTimeout(() => {
-      switch (mode) {
-        case "manual":
-          toState2()
-          break
-        case "datasaz":
-          toBase()
-          break
-        case "datayab":
-          toState()
-          break
-        default:
-          toBase()
-      }
-      setActiveMode(mode)
-      if (mode === "datasaz" || mode === "datayab") {
-        setSelectedSort(new Set(["سال"]))
-      } else if (mode === "manual") {
-        setSelectedSort(manualSort)
-      }
-      if (mode !== "manual") {
-        setSearchAttempted(false)
-        setSearchResults([])
-      }
+      setChatInputAnimationClass("fade-out")
+      setDataContainerAnimationClass("fade-out")
       setTimeout(() => {
-        setChatInputAnimationClass("fade-in")
-      }, 400)
-      setDataContainerAnimationClass("fade-in")
-    }, 300) // This duration should match the CSS animation duration
-  }
+        switch (mode) {
+          case "manual":
+            toState2()
+            break
+          case "datasaz":
+            toBase()
+            break
+          case "datayab":
+            toState()
+            break
+          default:
+            toBase()
+        }
+        setActiveMode(mode)
+        if (mode === "datasaz" || mode === "datayab") {
+          setSelectedSort(new Set(["سال"]))
+        } else if (mode === "manual") {
+          setSelectedSort(manualSort)
+        }
+        if (mode !== "manual") {
+          setSearchAttempted(false)
+          setSearchResults([])
+        }
+        setTimeout(() => {
+          setChatInputAnimationClass("fade-in")
+        }, 400)
+        setDataContainerAnimationClass("fade-in")
+      }, 300) // This duration should match the CSS animation duration
+    },
+    [activeMode, manualSort]
+  )
 
   const handleSearch = async (query: string) => {
     setSearchAttempted(true)
@@ -238,15 +264,51 @@ export const PortalPage = () => {
   return (
     <div className="holistic-page-wrapper">
       <div className="spline-container">
-        <Spline
-          className="spline-canvas"
-          onLoad={handleSplineLoad}
-          scene={
-            theme === "dark"
-              ? "/robot_dark.splinecode"
-              : "/robot_light.splinecode"
-          }
-        />
+        <Canvas
+          dpr={[1, 2]}
+          gl={{ antialias: false, alpha: false }}
+          shadowMap
+          toneMappingExposure={1}
+        >
+          <OrbitControls
+            enablePan={false}
+            enableZoom={false}
+            minDistance={10}
+            maxDistance={50}
+          />
+          <HarmonicDensity>
+            <CoreSphere
+              theme={botTheme}
+              intro={intro}
+              hideAnimation={hideAnimationActive ? hideAnimation : null}
+              isGlass={isGlass}
+            />
+            <Eyes
+              theme={botTheme}
+              intro={intro}
+              hideAnimation={hideAnimationActive ? hideAnimation : null}
+            />
+            <OrbitSystem
+              theme={botTheme}
+              intro={intro}
+              hideAnimation={hideAnimationActive ? hideAnimation : null}
+            />
+            <ParticleInstances
+              theme={botTheme}
+              intro={intro}
+              orbitIndex={0}
+              rippleOffset={0}
+            />
+            <OrbitLines
+              theme={botTheme}
+              intro={intro}
+              orbitIndex={0}
+              totalOrbits={SCENE_CONFIG.CONFIG.orbitCount}
+              rippleOffset={0}
+            />
+            <PostProcessing theme={botTheme} intro={intro} />
+          </HarmonicDensity>
+        </Canvas>
       </div>
 
       <div className="robot-container">
