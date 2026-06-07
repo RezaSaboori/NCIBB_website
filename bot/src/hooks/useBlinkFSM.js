@@ -1,10 +1,10 @@
-import { useState, useRef, useCallback } from 'react';
+import { useRef, useCallback } from 'react';
 import { useFrame } from '@react-three/fiber';
 
 const BLINK_STATES = { IDLE: 0, CLOSING: 1, OPENING: 2 };
 
 export const useBlinkFSM = () => {
-    const [eyeScaleY, setEyeScaleY] = useState(1.0);
+    const eyeScaleYRef = useRef(1.0);
     const blinkState = useRef({
         state: BLINK_STATES.IDLE,
         nextBlinkTime: 0,
@@ -29,9 +29,9 @@ export const useBlinkFSM = () => {
             if (progress >= 1.0) {
                 blinkState.current.state = BLINK_STATES.OPENING;
                 blinkState.current.phaseStartTime = now;
-                setEyeScaleY(0.0);
+                eyeScaleYRef.current = 0.0;
             } else {
-                setEyeScaleY(1.0 - easeOutCubic(progress));
+                eyeScaleYRef.current = 1.0 - easeOutCubic(progress);
             }
         } else if (blinkState.current.state === BLINK_STATES.OPENING) {
             const elapsed = now - blinkState.current.phaseStartTime;
@@ -39,13 +39,12 @@ export const useBlinkFSM = () => {
             if (progress >= 1.0) {
                 blinkState.current.state = BLINK_STATES.IDLE;
                 blinkState.current.nextBlinkTime = now + 2.0 + Math.random() * 4.0;
-                setEyeScaleY(1.0);
+                eyeScaleYRef.current = 1.0;
             } else {
-                setEyeScaleY(easeOutCubic(progress));
+                eyeScaleYRef.current = easeOutCubic(progress);
             }
         }
     });
 
-    return eyeScaleY;
+    return eyeScaleYRef;
 };
-

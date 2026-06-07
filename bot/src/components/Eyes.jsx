@@ -10,7 +10,7 @@ export const Eyes = ({ isGlass, theme, intro, hideAnimation }) => {
     const rightEyeRef = useRef();
     const { active: introActive, progressRef: introProgressRef } = intro;
     
-    const eyeScaleY = useBlinkFSM();
+    const eyeScaleYRef = useBlinkFSM();
     const lookAtRef = useAttentionTracking();
 
     const { eyeCloseFactor, eyeOpacity, isActive: isHideActive } = hideAnimation || { eyeCloseFactor: 1, eyeOpacity: 1, isActive: false };
@@ -40,7 +40,7 @@ export const Eyes = ({ isGlass, theme, intro, hideAnimation }) => {
     useFrame(() => {
         if (!leftEyeRef.current || !rightEyeRef.current) return;
 
-        let currentEyeScaleY = eyeScaleY;
+        let currentEyeScaleY = eyeScaleYRef.current;
         
         if (isHideActive || (hideAnimation && hideAnimation.isFullyHidden)) {
             currentEyeScaleY = eyeCloseFactor;

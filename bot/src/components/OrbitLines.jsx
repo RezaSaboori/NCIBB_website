@@ -20,12 +20,15 @@ export const OrbitLines = ({ orbits, theme, rippleOffsets, intro }) => {
         return positions;
     }), [orbits]);
 
-    const materialRef = useRef();
-    const lineGroupRef = useRef();
-
-    useLayoutEffect(() => {
-        if (!materialRef.current) return;
-        materialRef.current.onBeforeCompile = (shader) => {
+    // Create a single shared material instance and reuse it for all lines
+    const orbitMaterial = useMemo(() => {
+        const mat = new LineMaterial({
+            color: theme.currentTheme.orbitColor,
+            linewidth: CONFIG.orbitThickness,
+            transparent: false,
+            depthWrite: true,
+        });
+        mat.onBeforeCompile = (shader) => {
             shader.fragmentShader = `
                 float random(vec2 co) {
                     return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
@@ -45,9 +48,10 @@ export const OrbitLines = ({ orbits, theme, rippleOffsets, intro }) => {
                 `
             );
         };
-    }, []);
+        return mat;
+    }, [theme.currentTheme.orbitColor]);
 
-    const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+    const lineGroupRef = useRef();
 
     useFrame(() => {
         if (!lineGroupRef.current) return;
@@ -86,17 +90,11 @@ export const OrbitLines = ({ orbits, theme, rippleOffsets, intro }) => {
             {orbits.map((orbit, i) => (
                 <line2 key={i}>
                     <lineGeometry onUpdate={(self) => self.setPositions(lines[i])} />
-                    <lineMaterial 
-                        ref={materialRef}
-                        color={theme.currentTheme.orbitColor}
-                        linewidth={CONFIG.orbitThickness}
-                        resolution={[size.width, size.height]}
-                        transparent={false}
-                        depthWrite={true}
-                        depthTest={true}
-                    />
+                    <primitive object={orbitMaterial} attach="material" />
                 </line2>
             ))}
         </group>
     );
 };
+
+const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);

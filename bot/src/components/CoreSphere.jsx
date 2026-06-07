@@ -10,7 +10,8 @@ export const CoreSphere = memo(({ isGlass, theme, intro, hideAnimation }) => {
     const { camera } = useThree();
     const { active: introActive, progressRef: introProgressRef } = intro;
 
-    const { coreScale, coreOpacity, coreBlur, isActive: isHideActive } = hideAnimation || { coreScale: 1, coreOpacity: 1, coreBlur: 0, isActive: false };
+    const { valuesRef: hideValues, isFullyHidden, isActive: isHideActive } = hideAnimation || { valuesRef: { coreScale: 1, coreOpacity: 1, coreBlur: 0, isActive: false }, isFullyHidden: false, isActive: false };
+    const { coreScale, coreOpacity, coreBlur } = hideValues;
 
     const sunMaterial = useMemo(() => new THREE.MeshStandardMaterial({
         color: 0x000000,
@@ -78,7 +79,7 @@ gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * (1.0 + uGlassBrightn
         meshRef.current.rotation.y = angleToCamera;
 
         // --- Hide Animation Logic (Overrides everything else) ---
-        if (isHideActive || (hideAnimation && hideAnimation.isFullyHidden)) {
+        if (isHideActive || isFullyHidden) {
             meshRef.current.scale.setScalar(coreScale);
             
             if (isGlass) {
