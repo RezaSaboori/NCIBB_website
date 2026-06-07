@@ -8,8 +8,7 @@ export const PostProcessing = memo(({ theme, introActive }) => {
             disableNormalPass 
             multisampling={0}
             stencilBuffer={false}
-            // CRITICAL: Disable depth buffer to prevent conflict with SMAA
-            depthBuffer={false}
+            depthBuffer={true}
         >
             <Bloom 
                 intensity={theme.currentTheme.bloomStrength}

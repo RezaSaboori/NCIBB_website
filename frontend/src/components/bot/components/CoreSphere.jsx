@@ -53,39 +53,43 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
     }, [mode, transitionState]);
 
     useFrame((state) => {
-        if (!coreRef.current || !materials || !hideAnimation) return;
-
+        if (!materials || !hideAnimation) return;
+    
         const time = state.clock.elapsedTime;
         const hideState = hideAnimation;
-
+    
+        // Target the correct mesh based on transition state
+        const activeMeshRef = transitionState === 'glass' ? glassRef : sunRef;
+        if (!activeMeshRef.current) return;
+    
         // Hide animation
-        coreRef.current.scale.setScalar(hideState.coreScale);
-        coreRef.current.material.opacity = hideState.coreOpacity;
-        coreRef.current.material.emissiveIntensity = hideState.coreOpacity * (transitionState === 'sun' ? CONFIG.sunEmissiveTarget : CONFIG.coreLightGlass);
+        activeMeshRef.current.scale.setScalar(hideState.coreScale);
+        activeMeshRef.current.material.opacity = hideState.coreOpacity;
+        activeMeshRef.current.material.emissiveIntensity = hideState.coreOpacity * (transitionState === 'sun' ? CONFIG.sunEmissiveTarget : CONFIG.coreLightGlass);
         
-        if (coreRef.current.material.blur !== undefined) {
-            coreRef.current.material.blur = hideState.coreBlur;
+        if (activeMeshRef.current.material.blur !== undefined) {
+            activeMeshRef.current.material.blur = hideState.coreBlur;
         }
-
+    
         // Intro animation
         if (intro.active) {
             const progress = intro.progressRef.current;
             const scale = progress < 0.2 ? 0 : Math.min(Math.pow(progress / 0.2, 2), 1);
-            coreRef.current.scale.setScalar(hideState.coreScale * scale);
+            activeMeshRef.current.scale.setScalar(hideState.coreScale * scale);
             
             // Pulsing effect during intro
             const pulse = 1 + 0.1 * Math.sin(time * 2);
-            coreRef.current.scale.multiplyScalar(pulse);
-            coreRef.current.scale.divideScalar(pulse); // Reset after pulsing
+            activeMeshRef.current.scale.multiplyScalar(pulse);
+            activeMeshRef.current.scale.divideScalar(pulse); // Reset after pulsing
         }
-
+    
         // Point light intensity
         if (pointLightRef.current) {
             pointLightRef.current.intensity = transitionState === 'sun'
                 ? CONFIG.coreLightSun * hideState.coreOpacity
                 : CONFIG.coreLightGlass * hideState.coreOpacity;
         }
-
+    
         // Glass brightness boost
         if (glassRef.current && transitionState === 'glass') {
             glassRef.current.emissiveIntensity = hideState.coreOpacity * CONFIG.glassBrightnessBoost;

@@ -1,92 +1,59 @@
+// frontend/src/components/bot/components/Eyes.jsx
 import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Shape, Text } from '@react-three/drei';
 import * as THREE from 'three';
+import { CONFIG } from '../config/sceneConfig';
 
 export const Eyes = ({ hideAnimation, intro, theme }) => {
-    const { eyeCloseFactor, eyeOpacity } = hideAnimation;
-    
-    // Get blink and attention tracking from hooks
-    const eyeScaleY = 1; // Placeholder - blinkFSM would be integrated here
-    const lookAtRef = useRef(new THREE.Vector3(0, 0, 0));
-
-    const eyeColor = theme.isDarkMode ? '#ffffff' : '#000000';
-    const eyeWhiteMaterial = useMemo(() => {
-        return new THREE.MeshStandardMaterial({
-            color: eyeColor,
-            roughness: 0.3,
-            metalness: 0.1,
-            transparent: true,
-            opacity: eyeOpacity,
-        });
-    }, [eyeColor, eyeOpacity]);
-
-    const pupilMaterial = useMemo(() => {
-        return new THREE.MeshStandardMaterial({
-            color: theme.isDarkMode ? '#000000' : '#ffffff',
-            roughness: 0.1,
-            metalness: 0.5,
-        });
-    }, [theme.isDarkMode]);
-
-    const leftEyeRef = useRef();
+    const leftEyeRef  = useRef();
     const rightEyeRef = useRef();
+    const { eyeCloseFactor, eyeOpacity, isActive: isHideActive } = hideAnimation;
+    const { active: introActive, progressRef: introProgressRef } = intro;
 
-    useFrame((state) => {
-        if (leftEyeRef.current && rightEyeRef.current) {
-            // Apply eye closing scale
-            leftEyeRef.current.scale.y = eyeCloseFactor;
-            rightEyeRef.current.scale.y = eyeCloseFactor;
+    // ✅ Build geometry with THREE.Shape API
+    const eyeGeometry = useMemo(() => {
+        const shape = new THREE.Shape();
+        const r = CONFIG.eyeWidth;
+        const l = CONFIG.eyeHeight;
+        shape.absarc(0,  l / 2, r, Math.PI, 0,       true);
+        shape.absarc(0, -l / 2, r, 0,       Math.PI, true);
+        return new THREE.ShapeGeometry(shape, 32);
+    }, []);
 
-            // Update opacity
-            if (leftEyeRef.current.material) {
-                leftEyeRef.current.material.opacity = eyeOpacity;
-            }
-            if (rightEyeRef.current.material) {
-                rightEyeRef.current.material.opacity = eyeOpacity;
-            }
+    const isDark = theme.isDarkMode;
+    const material = useMemo(() => new THREE.MeshStandardMaterial({
+        color:             isDark ? 0xffffff : 0x000000,
+        emissive:          isDark ? 0xffffff : 0x000000,
+        emissiveIntensity: isDark ? 1.2 : 0,
+        side: THREE.DoubleSide,
+        transparent: true,
+        depthWrite: true,
+    }), [isDark]);
 
-            // Pupil scaling
-            const basePupilScale = 0.3 + 0.2 * Math.sin(state.clock.elapsedTime * 2);
-            leftEyeRef.current.children?.[1]?.scale.setScalar(basePupilScale);
-            rightEyeRef.current.children?.[1]?.scale.setScalar(basePupilScale);
+    const eyeZ   = CONFIG.coreRadius + 0.05;    // ✅ sits just in front of sphere surface
+    const eyeSep = CONFIG.eyeSeparation / 2;
+
+    useFrame(() => {
+        if (!leftEyeRef.current || !rightEyeRef.current) return;
+        let scaleY = 1;
+        if (isHideActive || hideAnimation.isFullyHidden) {
+            scaleY = eyeCloseFactor;
+        } else if (introActive) {
+            const p = introProgressRef.current;
+            const start = 0.65, end = 0.85;
+            scaleY = p >= start ? Math.min((p - start) / (end - start), 1) : 0;
         }
+        material.opacity = eyeOpacity;
+        leftEyeRef.current.scale.y  = scaleY;
+        rightEyeRef.current.scale.y = scaleY;
     });
-
-    const eyeShape = `
-        M 0,-10
-        C 10,-10 10,-5 10,0
-        C 10,5 10,10 0,10
-        C -10,10 -10,5 -10,0
-        C -10,-5 -10,-10 0,-10
-        Z
-    `;
 
     return (
         <group>
-            {/* Left Eye */}
-            <mesh ref={leftEyeRef} position={[-1.2, 0.8, 0.9]}>
-                <shapeGeometry args={[eyeShape]} />
-                <primitive object={eyeWhiteMaterial} attach="material" />
-            </mesh>
-
-            {/* Left Pupil */}
-            <mesh position={[-1.2, 0.8, 1.05]}>
-                <circleGeometry args={[0.3, 32]} />
-                <primitive object={pupilMaterial} attach="material" />
-            </mesh>
-
-            {/* Right Eye */}
-            <mesh ref={rightEyeRef} position={[1.2, 0.8, 0.9]}>
-                <shapeGeometry args={[eyeShape]} />
-                <primitive object={eyeWhiteMaterial} attach="material" />
-            </mesh>
-
-            {/* Right Pupil */}
-            <mesh position={[1.2, 0.8, 1.05]}>
-                <circleGeometry args={[0.3, 32]} />
-                <primitive object={pupilMaterial} attach="material" />
-            </mesh>
+            <mesh ref={leftEyeRef}  geometry={eyeGeometry} material={material}
+                  position={[-eyeSep, CONFIG.eyeBaseY, eyeZ]} renderOrder={10} />
+            <mesh ref={rightEyeRef} geometry={eyeGeometry} material={material}
+                  position={[ eyeSep, CONFIG.eyeBaseY, eyeZ]} renderOrder={10} />
         </group>
     );
 };
