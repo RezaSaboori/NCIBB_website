@@ -12,6 +12,12 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
     const sunRef = useRef();
     const pointLightRef = useRef();
 
+    // ALL hooks at the top - no early returns before this block
+    const [transitionState, setTransitionState] = React.useState('glass'); // 'glass' or 'sun'
+    const [currentEmissive, setCurrentEmissive] = React.useState(0);
+    const [hovered, setHover] = React.useState(false);
+    useCursor(hovered);
+
     // Materials
     const materials = useMemo(() => {
         // Safety guard for theme
@@ -38,12 +44,6 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
         return { glassMaterial, sunMaterial };
     }, [theme?.currentTheme?.coreColor]);
 
-    if (!materials) return null;
-
-    // Transition state
-    const [transitionState, setTransitionState] = React.useState('glass'); // 'glass' or 'sun'
-    const [currentEmissive, setCurrentEmissive] = React.useState(0);
-
     React.useEffect(() => {
         if (mode === 'sun' && transitionState !== 'sun') {
             setTransitionState('sun');
@@ -53,7 +53,7 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
     }, [mode, transitionState]);
 
     useFrame((state) => {
-        if (!coreRef.current) return;
+        if (!coreRef.current || !materials || !hideAnimation) return;
 
         const time = state.clock.elapsedTime;
         const hideState = hideAnimation.getState();
@@ -81,8 +81,8 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
 
         // Point light intensity
         if (pointLightRef.current) {
-            pointLightRef.current.intensity = transitionState === 'sun' 
-                ? CONFIG.coreLightSun * hideState.coreOpacity 
+            pointLightRef.current.intensity = transitionState === 'sun'
+                ? CONFIG.coreLightSun * hideState.coreOpacity
                 : CONFIG.coreLightGlass * hideState.coreOpacity;
         }
 
@@ -92,10 +92,10 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
         }
     });
 
-    const [hovered, setHover] = React.useState(false);
-    useCursor(hovered);
     const isFullyHidden = hideAnimation.getState().isFullyHidden;
 
+    // Guard at JSX level only (after all hooks have run)
+    if (!materials || !hideAnimation) return null;
     if (isFullyHidden) return null;
 
     return (

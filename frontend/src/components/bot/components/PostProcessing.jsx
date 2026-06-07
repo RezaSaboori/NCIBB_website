@@ -8,9 +8,8 @@ export const PostProcessing = memo(({ theme, introActive }) => {
             disableNormalPass 
             multisampling={0}
             stencilBuffer={false}
-            // CRITICAL: Disable depth buffer clearing if we're in the intro 
-            // to prevent subtle single-frame gaps during camera moves
-            depthBuffer={true}
+            // CRITICAL: Disable depth buffer to prevent conflict with SMAA
+            depthBuffer={false}
         >
             <Bloom 
                 intensity={theme.currentTheme.bloomStrength}

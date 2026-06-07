@@ -19,7 +19,7 @@ import { searchInCsv } from "../../components/Search"
 import { refreshButtonVariants } from "../../components/ChatInput/animations"
 import { RefreshIcon } from "../../components/ChatInput/icons/RefreshIcon"
 import { HarmonicDensity } from "../../components/bot/components/HarmonicDensity"
-import { useTheme as useBotTheme } from "../../components/bot/hooks/useTheme"
+import { THEMES } from "../../components/bot/config/themeConfig";
 import "./styles.css"
 import generatedImage from "../../../data/Gemini_Generated_Image_sc72gssc72gssc72.png"
 
@@ -40,8 +40,14 @@ const chatInputConfig = {
 }
 
 export const PortalPage = () => {
-  const { theme } = useTheme()
-  const botTheme = useBotTheme()
+  const { theme: appTheme } = useTheme()
+  // Use app theme directly for bot instead of separate botTheme hook
+  const botTheme = {
+    themeKey: appTheme === 'dark' ? 'dark' : 'light',
+    currentTheme: appTheme === 'dark' ? THEMES.dark : THEMES.light,
+    isDarkMode: appTheme === 'dark',
+    toggleTheme: () => {}
+  }
   const [isTextVisible, setIsTextVisible] = useState(false)
   const [isDataVisible, setIsDataVisible] = useState(false)
   const [activeMode, setActiveMode] = useState("datasaz")
