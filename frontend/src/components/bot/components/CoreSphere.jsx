@@ -4,21 +4,19 @@ import { Text, Float, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import { CONFIG } from '../config/sceneConfig';
 import { Eyes } from './Eyes';
-import { useIntroAnimation } from '../hooks/useIntroAnimation';
-import { useCoreHideAnimation } from '../hooks/useCoreHideAnimation';
 
-export const CoreSphere = ({ theme, visible, onIgnitionChange, ignition, mode, setMode }) => {
+export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionChange, ignition, mode, setMode }) => {
     const { camera, scene } = useThree();
     const coreRef = useRef();
     const glassRef = useRef();
     const sunRef = useRef();
     const pointLightRef = useRef();
 
-    const intro = useIntroAnimation();
-    const hideAnim = useCoreHideAnimation(visible);
-
     // Materials
     const materials = useMemo(() => {
+        // Safety guard for theme
+        if (!theme?.currentTheme?.coreColor) return null;
+
         const glassMaterial = new THREE.MeshPhysicalMaterial({
             color: theme.currentTheme.coreColor,
             metalness: 0.1,
@@ -38,7 +36,9 @@ export const CoreSphere = ({ theme, visible, onIgnitionChange, ignition, mode, s
         });
 
         return { glassMaterial, sunMaterial };
-    }, [theme.currentTheme.coreColor]);
+    }, [theme?.currentTheme?.coreColor]);
+
+    if (!materials) return null;
 
     // Transition state
     const [transitionState, setTransitionState] = React.useState('glass'); // 'glass' or 'sun'
@@ -56,7 +56,7 @@ export const CoreSphere = ({ theme, visible, onIgnitionChange, ignition, mode, s
         if (!coreRef.current) return;
 
         const time = state.clock.elapsedTime;
-        const hideState = hideAnim.getState();
+        const hideState = hideAnimation.getState();
 
         // Hide animation
         coreRef.current.scale.setScalar(hideState.coreScale);
@@ -92,8 +92,9 @@ export const CoreSphere = ({ theme, visible, onIgnitionChange, ignition, mode, s
         }
     });
 
-    const [hovered, setHover] = useCursor();
-    const isFullyHidden = hideAnim.getState().isFullyHidden;
+    const [hovered, setHover] = React.useState(false);
+    useCursor(hovered);
+    const isFullyHidden = hideAnimation.getState().isFullyHidden;
 
     if (isFullyHidden) return null;
 
@@ -120,8 +121,8 @@ export const CoreSphere = ({ theme, visible, onIgnitionChange, ignition, mode, s
             </mesh>
 
             {/* Core Eyes */}
-            <Eyes 
-                hideAnimation={hideAnim} 
+            <Eyes
+                hideAnimation={hideAnimation}
                 intro={intro}
                 theme={theme}
             />
