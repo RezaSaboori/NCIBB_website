@@ -7,7 +7,7 @@ import {
   Chip,
   Button,
   Tooltip,
-} from "@nextui-org/react"
+} from "@heroui/react"
 import { Icon } from "@iconify/react"
 import { DatabaseInfo, DataType } from "../../types/database"
 import { InfoModal } from "../InfoModal"
@@ -348,7 +348,7 @@ export const DataCard: React.FC<DataCardProps> = ({
             variant="solid"
             className="w-fit px-8 py-4 rounded-full cursor-pointer"
             style={{ fontSize: "var(--font-size-sm)" }}
-            onClick={() => setIsModalOpen(true)}
+            onPress={() => setIsModalOpen(true)}
           >
             اطلاعات بیشتر
           </Button>

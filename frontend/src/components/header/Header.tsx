@@ -1,9 +1,5 @@
-import { Around } from "@theme-toggles/react"
-import "@theme-toggles/react/css/Around.css"
-
 import { HeaderProps, NavigationItem } from "./types"
 import { useActiveIndicator } from "./hooks/useActiveIndicator"
-import { useTheme } from "../theme"
 import { HomeButton } from "./components/HomeButton"
 import { ProfileButton } from "./components/ProfileButton"
 import { ThemeToggle } from "./components/ThemeToggle"
@@ -20,8 +16,6 @@ const navigationItems: NavigationItem[] = [
 ]
 
 export const Header = ({ className }: HeaderProps) => {
-  const { theme, toggleTheme } = useTheme()
-
   useActiveIndicator()
 
   return (
@@ -32,10 +26,7 @@ export const Header = ({ className }: HeaderProps) => {
 
       <ProfileButton ariaLabel="پروفایل" title="پروفایل کاربر" />
 
-      <ThemeToggle
-        isToggled={theme === "dark"}
-        onToggle={() => toggleTheme()}
-      />
+      <ThemeToggle />
     </div>
   )
 }
