@@ -4,6 +4,7 @@ import { HomeButton } from "./components/HomeButton"
 import { ProfileButton } from "./components/ProfileButton"
 import { ThemeToggle } from "./components/ThemeToggle"
 import { Navigation } from "./components/Navigation"
+import { useTheme } from "../theme"
 import "./styles/header.css"
 
 const navigationItems: NavigationItem[] = [
@@ -16,10 +17,11 @@ const navigationItems: NavigationItem[] = [
 ]
 
 export const Header = ({ className }: HeaderProps) => {
+  const { theme } = useTheme()
   useActiveIndicator()
 
   return (
-    <div className={`header-container ${className || ""}`}>
+    <div className={`header-container ${className || ""} ${theme === "dark" ? "theme-dark" : "theme-light"}`}>
       <HomeButton ariaLabel="خانه" title="خانه" />
 
       <Navigation items={navigationItems} />

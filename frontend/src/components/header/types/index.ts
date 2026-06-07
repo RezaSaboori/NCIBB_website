@@ -16,8 +16,6 @@ export interface IconButtonProps {
 }
 
 export interface ThemeToggleProps {
-  isToggled?: boolean
-  onToggle?: (toggled: boolean) => void
   className?: string
 }
 

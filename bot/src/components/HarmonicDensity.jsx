@@ -1,4 +1,4 @@
-import React, { Suspense, useMemo, memo } from 'react';
+import React, { Suspense, useMemo, memo, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -8,8 +8,11 @@ import { PostProcessing } from './PostProcessing';
 import { useIntroAnimation } from '../hooks/useIntroAnimation';
 import { useCoreHideAnimation } from '../hooks/useCoreHideAnimation';
 
-const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive }) => {
-    const intro = useIntroAnimation(() => setIntroActive(false));
+const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive, onIntroFinished }) => {
+    const intro = useIntroAnimation(() => {
+        setIntroActive(false);
+        if (onIntroFinished) onIntroFinished();
+    });
     const hideAnimation = useCoreHideAnimation(isCoreVisible);
     const { currentTheme } = theme;
 
@@ -79,12 +82,18 @@ export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, 
         alpha: false,
     }), []);
 
+    const [introFinished, setIntroFinished] = useState(false);
+
     return (
-        <div style={{ 
-            width: '100vw', 
-            height: '100vh', 
-            // Update wrapper background to match theme for seamless edges
-            background: theme.isDarkMode || setIntroActive ? '#000' : `#${theme.currentTheme.background.toString(16).padStart(6, '0')}` 
+        <div style={{
+            width: '100vw',
+            height: '100vh',
+            // Black while intro runs (canvas is also black at exposure=0)
+            // Fades to real background after intro — smooth, no flash
+            background: introFinished
+                ? (theme.isDarkMode ? '#000' : `#${theme.currentTheme.background.toString(16).padStart(6, '0')}`)
+                : '#000000',
+            transition: 'background-color 0.6s ease'
         }}>
             <Canvas
                 shadows
@@ -96,19 +105,20 @@ export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, 
                     gl.autoClear = true;
                 }}
             >
-                <PerspectiveCamera 
-                    makeDefault 
-                    fov={45} 
-                    near={0.1} 
-                    far={1000} 
+                <PerspectiveCamera
+                    makeDefault
+                    fov={45}
+                    near={0.1}
+                    far={1000}
                 />
 
-                <SceneContent 
-                    theme={theme} 
-                    isGlass={isGlass} 
+                <SceneContent
+                    theme={theme}
+                    isGlass={isGlass}
                     isCoreVisible={isCoreVisible}
-                    ignition={ignition} 
-                    setIntroActive={setIntroActive} 
+                    ignition={ignition}
+                    setIntroActive={setIntroActive}
+                    onIntroFinished={() => setIntroFinished(true)}
                 />
             </Canvas>
         </div>
