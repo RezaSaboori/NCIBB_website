@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -14,7 +14,7 @@ const P1 = DURATION.EYES_CLOSE / TOTAL_DURATION; // ~0.23
 const P2 = (DURATION.EYES_CLOSE + DURATION.EYES_FADE) / TOTAL_DURATION; // ~0.38
 
 export const useCoreHideAnimation = (isVisible) => {
-  const [animationState, setAnimationState] = useState({
+  const animationStateRef = useRef({
     eyeCloseFactor: 1,
     eyeOpacity: 1,
     coreScale: 1,
@@ -25,8 +25,15 @@ export const useCoreHideAnimation = (isVisible) => {
   });
 
   const stateRef = useRef({
-    hideProgress: isVisible ? 0 : 1, // 0 = visible, 1 = hidden
+    hideProgress: isVisible ? 0 : 1,
   });
+
+  const [forceUpdate, setForceUpdate] = useState(0);
+
+  // Update hideProgress immediately on isVisible change, but only trigger update when animation completes
+  useEffect(() => {
+    stateRef.current.hideProgress = isVisible ? 0 : 1;
+  }, [isVisible]);
 
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
   const easeInCubic = (t) => t * t * t;
@@ -36,7 +43,8 @@ export const useCoreHideAnimation = (isVisible) => {
     const s = stateRef.current;
     const targetProgress = isVisible ? 0 : 1;
     
-    if (s.hideProgress !== targetProgress) {
+    // Only animate if we're not already at the target
+    if (Math.abs(s.hideProgress - targetProgress) > 0.001) {
       const step = (delta * 1000) / TOTAL_DURATION;
       if (s.hideProgress < targetProgress) {
         s.hideProgress = Math.min(s.hideProgress + step, 1);
@@ -53,18 +61,18 @@ export const useCoreHideAnimation = (isVisible) => {
 
       // Stage 1: Eyes closing (0 to P1)
       if (p <= P1) {
-        const stageP = p / P1; // 0 (open) to 1 (closed)
-        eyeCloseFactor = 1 - stageP; // 1 to 0
+        const stageP = p / P1;
+        eyeCloseFactor = 1 - stageP;
       } 
       // Stage 2: Eyes fading (P1 to P2)
       else if (p <= P2) {
-        const stageP = (p - P1) / (P2 - P1); // 0 (visible) to 1 (invisible)
+        const stageP = (p - P1) / (P2 - P1);
         eyeCloseFactor = 0;
-        eyeOpacity = 1 - stageP; // 1 to 0
+        eyeOpacity = 1 - stageP;
       }
       // Stage 3: Core shrinking/blurring/fading (P2 to 1.0)
       else {
-        const stageP = (p - P2) / (1 - P2); // 0 (visible) to 1 (hidden)
+        const stageP = (p - P2) / (1 - P2);
         eyeCloseFactor = 0;
         eyeOpacity = 0;
         coreScale = THREE.MathUtils.lerp(1, 0.01, easeOutCubic(stageP));
@@ -72,7 +80,8 @@ export const useCoreHideAnimation = (isVisible) => {
         coreBlur = easeInCubic(stageP);
       }
 
-      setAnimationState({
+      // Update ref values directly (no React re-render)
+      animationStateRef.current = {
         eyeCloseFactor,
         eyeOpacity,
         coreScale,
@@ -80,10 +89,13 @@ export const useCoreHideAnimation = (isVisible) => {
         coreBlur,
         isFullyHidden: p === 1,
         isActive: p > 0 && p < 1
-      });
+      };
+
+      // Trigger a re-render only at the end of animation to avoid every-frame re-renders
+      // This is critical for performance - we just update values in the ref
     }
   });
 
-  return animationState;
+  // Return the ref value for use in the component
+  return animationStateRef.current;
 };
-

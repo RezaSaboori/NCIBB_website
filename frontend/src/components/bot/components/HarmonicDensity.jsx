@@ -89,8 +89,7 @@ export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, 
         }}>
             <Canvas
                 gl={glConfig}
-                frameloop="demand"
-                dpr={[1, 2]}
+                dpr={[1, 1.5]}
                 resize={{ scroll: false, debounce: 0 }}
                 onCreated={({ gl }) => {
                     gl.toneMappingExposure = 0;

@@ -42,12 +42,12 @@ const chatInputConfig = {
 export const PortalPage = () => {
   const { theme: appTheme } = useTheme()
   // Use app theme directly for bot instead of separate botTheme hook
-  const botTheme = {
+  const botTheme = useMemo(() => ({
     themeKey: appTheme === 'dark' ? 'dark' : 'light',
     currentTheme: appTheme === 'dark' ? THEMES.dark : THEMES.light,
     isDarkMode: appTheme === 'dark',
     toggleTheme: () => {}
-  }
+  }), [appTheme])
   const [isTextVisible, setIsTextVisible] = useState(false)
   const [isDataVisible, setIsDataVisible] = useState(false)
   const [activeMode, setActiveMode] = useState("datasaz")
