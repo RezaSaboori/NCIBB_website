@@ -50,7 +50,7 @@ export const PortalPage = () => {
   }), [appTheme])
   const [isTextVisible, setIsTextVisible] = useState(false)
   const [isDataVisible, setIsDataVisible] = useState(false)
-  const [activeMode, setActiveMode] = useState("datasaz")
+  const [activeMode, setActiveMode] = useState("datayab")
   const [chatInputStep, setChatInputStep] = useState(1)
   const [databases, setDatabases] = useState<DatabaseInfo[]>([])
   const [chatInputAnimationClass, setChatInputAnimationClass] = useState("")
@@ -72,7 +72,7 @@ export const PortalPage = () => {
   )
   const [filterSearch, setFilterSearch] = useState("")
   const [isCoreVisible, setIsCoreVisible] = useState(true)
-  const [isGlass, setIsGlass] = useState(false)
+  const [isGlass, setIsGlass] = useState(true)
   const [ignition, setIgnition] = useState(0)
   const [isIntroActive, setIsIntroActive] = useState(true)
   const modesContainerRef = useRef(null)
@@ -255,20 +255,20 @@ export const PortalPage = () => {
               دستی
             </button>
             <button
-              id="datasaz"
-              onClick={() => handleModeChange("datasaz")}
+              id="datayab"
+              onClick={() => handleModeChange("datayab")}
               className={`data-finder-mode ${
-                activeMode === "datasaz" ? "active" : ""
+                activeMode === "datayab" ? "active" : ""
               }`}
             >
               داده‌یاب
             </button>
 
             <button
-              id="datayab"
-              onClick={() => handleModeChange("datayab")}
+              id="datasaz"
+              onClick={() => handleModeChange("datasaz")}
               className={`data-finder-mode ${
-                activeMode === "datayab" ? "active" : ""
+                activeMode === "datasaz" ? "active" : ""
               }`}
             >
               داده‌ساز
