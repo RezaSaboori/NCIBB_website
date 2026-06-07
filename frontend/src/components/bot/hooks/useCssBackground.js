@@ -23,6 +23,17 @@ export const useCssBackground = () => {
         return { css, hex: cssToHex(css) };
     });
 
+    // ── RE-READ AFTER FIRST PAINT TO CATCH THEME CLASS APPLIED LATE ──
+    useEffect(() => {
+        requestAnimationFrame(() => {
+            const css = read();
+            setBg(prev => {
+                if (prev.css === css) return prev; // no change, no re-render
+                return { css, hex: cssToHex(css) };
+            });
+        });
+    }, []); // ← runs once after mount
+
     useEffect(() => {
         // MutationObserver watches for .dark class being added/removed on <html>
         const observer = new MutationObserver(() => {

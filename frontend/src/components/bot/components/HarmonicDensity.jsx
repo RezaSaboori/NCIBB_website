@@ -19,8 +19,8 @@ const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroAc
     const intro = useIntroAnimation(3800, () => setIntroActive(false));
     const hideAnimation = useCoreHideAnimation(isCoreVisible);
 
-    // Simple: black during intro, then follow the live CSS background
-    const bgColor = intro.active ? '#000000' : cssBackground.css;
+    // Always use the real CSS background; intro darkness is handled by toneMappingExposure=0
+    const bgColor = cssBackground.css;
 
     return (
         <>
