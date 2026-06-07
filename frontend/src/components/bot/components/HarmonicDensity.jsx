@@ -71,7 +71,7 @@ const EnvironmentMap = memo(({ color }) => (
 
 export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive }) => {
     const glConfig = useMemo(() => ({
-        antialias: false,
+        antialias: true,
         powerPreference: "high-performance",
         toneMapping: THREE.ACESFilmicToneMapping,
         stencil: false,
@@ -88,7 +88,6 @@ export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, 
             background: theme.isDarkMode ? '#000' : `#${theme.currentTheme.background.toString(16).padStart(6, '0')}`
         }}>
             <Canvas
-                shadows
                 gl={glConfig}
                 dpr={[1, 2]}
                 resize={{ scroll: false, debounce: 0 }}
@@ -101,7 +100,8 @@ export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, 
                     makeDefault 
                     fov={45} 
                     near={0.1} 
-                    far={1000} 
+                    far={1000}
+                    position={[35, 15, 35]}
                 />
 
                 <SceneContent 

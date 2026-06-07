@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { EffectComposer, Bloom, SMAA } from '@react-three/postprocessing';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { CONFIG } from '../config/sceneConfig.js';
 
 export const PostProcessing = memo(({ theme, introActive }) => {
@@ -8,7 +8,7 @@ export const PostProcessing = memo(({ theme, introActive }) => {
             disableNormalPass
             multisampling={0}
             stencilBuffer={false}
-            depthBuffer={false}
+            depthBuffer={true}
         >
             <Bloom 
                 intensity={theme.currentTheme.bloomStrength}
@@ -17,9 +17,6 @@ export const PostProcessing = memo(({ theme, introActive }) => {
                 mipmapBlur
                 radius={CONFIG.bloomRadius}
             />
-            {/* Only run SMAA if we have enough light to see it, 
-                preventing artifacts in the dark beginning */}
-            {!introActive && <SMAA />}
         </EffectComposer>
     );
 });
