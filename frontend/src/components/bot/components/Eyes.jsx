@@ -3,6 +3,7 @@ import React, { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CONFIG } from '../config/sceneConfig';
+import { useAttentionTracking } from '../hooks/useAttentionTracking';
 
 export const Eyes = ({ hideAnimation, intro, theme }) => {
     const leftEyeRef  = useRef();
@@ -32,6 +33,7 @@ export const Eyes = ({ hideAnimation, intro, theme }) => {
 
     const eyeZ   = CONFIG.coreRadius + 0.05;    // ✅ sits just in front of sphere surface
     const eyeSep = CONFIG.eyeSeparation / 2;
+    const lookAtRef = useAttentionTracking();
 
     useFrame(() => {
         if (!leftEyeRef.current || !rightEyeRef.current) return;
@@ -44,6 +46,14 @@ export const Eyes = ({ hideAnimation, intro, theme }) => {
             scaleY = p >= start ? Math.min((p - start) / (end - start), 1) : 0;
         }
         material.opacity = eyeOpacity;
+        
+        // Cursor tracking
+        const { x, y } = lookAtRef.current;
+        leftEyeRef.current.position.x  = -eyeSep + (introActive ? 0 : x);
+        leftEyeRef.current.position.y  = CONFIG.eyeBaseY + (introActive ? 0 : y);
+        rightEyeRef.current.position.x =  eyeSep + (introActive ? 0 : x);
+        rightEyeRef.current.position.y = CONFIG.eyeBaseY + (introActive ? 0 : y);
+        
         leftEyeRef.current.scale.y  = scaleY;
         rightEyeRef.current.scale.y = scaleY;
     });

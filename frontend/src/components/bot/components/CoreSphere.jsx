@@ -24,16 +24,28 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
         if (!theme?.currentTheme?.coreColor) return null;
 
         const glassMaterial = new THREE.MeshPhysicalMaterial({
-            color:             theme.currentTheme.coreColor,
-            emissive:          new THREE.Color(theme.currentTheme.coreColor),
-            emissiveIntensity: 0.3,
-            metalness: 0.1,
-            roughness: 0.1,
-            transmission: 0.9,
-            thickness: 0.5,
-            transparent: true,
-            opacity: 0.95,
+            color:             0xffffff,
+            metalness:         0.0,
+            roughness:         0.0,
+            transmission:      0.99,
+            thickness:         3.5,
+            ior:               1.5,
+            envMapIntensity:   0.05,
+            specularIntensity: 0.0,
+            clearcoat:         0.0,
+            side:              THREE.FrontSide,
+            transparent:       true,
         });
+        glassMaterial.onBeforeCompile = (shader) => {
+            shader.uniforms.uGlassBrightnessBoost = { value: CONFIG.glassBrightnessBoost };
+            shader.fragmentShader = shader.fragmentShader.replace(
+                '#include <output_fragment>',
+                `#ifdef USE_TRANSMISSION
+gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * (1.0 + uGlassBrightnessBoost), transmission);
+#endif
+#include <output_fragment>`
+            );
+        };
 
         const sunMaterial = new THREE.MeshStandardMaterial({
             color: theme.currentTheme.coreColor,
@@ -96,12 +108,18 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
         if (glassRef.current && transitionState === 'glass') {
             glassRef.current.material.emissiveIntensity = hideState.coreOpacity * CONFIG.glassBrightnessBoost;
         }
+    
+        // Camera-facing rotation for the core group
+        if (coreRef.current && camera) {
+            const angle = Math.atan2(
+                camera.position.x - coreRef.current.position.x,
+                camera.position.z - coreRef.current.position.z
+            );
+            coreRef.current.rotation.y = angle;
+        }
     });
 
-    // Guard at JSX level only (after all hooks have run)
-    if (!materials || !hideAnimation) return null;
-    const isFullyHidden = hideAnimation.isFullyHidden;
-    if (isFullyHidden) return null;
+    const sphereGeo = useMemo(() => new THREE.SphereGeometry(CONFIG.coreRadius, 64, 64), []);
 
     return (
         <group ref={coreRef} position={[0, 0, 0]} onPointerOver={() => setHover(true)} onPointerOut={() => setHover(false)}>
@@ -109,20 +127,18 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
             <mesh
                 ref={sunRef}
                 visible={transitionState === 'sun'}
-                scale={[CONFIG.coreRadius, CONFIG.coreRadius, CONFIG.coreRadius]}
             >
-                <sphereGeometry args={[1, 64, 64]} />
-                <meshStandardMaterial attach="material" {...materials.sunMaterial} />
+                <primitive object={sphereGeo} attach="geometry" />
+                <primitive object={materials.sunMaterial} attach="material" />
             </mesh>
 
             {/* Glass Material Sphere */}
             <mesh
                 ref={glassRef}
                 visible={transitionState === 'glass'}
-                scale={[CONFIG.coreRadius, CONFIG.coreRadius, CONFIG.coreRadius]}
             >
-                <sphereGeometry args={[1, 64, 64]} />
-                <meshPhysicalMaterial attach="material" {...materials.glassMaterial} />
+                <primitive object={sphereGeo} attach="geometry" />
+                <primitive object={materials.glassMaterial} attach="material" />
             </mesh>
 
             {/* Core Eyes */}

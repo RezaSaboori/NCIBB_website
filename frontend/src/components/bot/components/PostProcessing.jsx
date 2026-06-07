@@ -4,11 +4,11 @@ import { CONFIG } from '../config/sceneConfig.js';
 
 export const PostProcessing = memo(({ theme, introActive }) => {
     return (
-        <EffectComposer 
-            disableNormalPass 
+        <EffectComposer
+            disableNormalPass
             multisampling={0}
             stencilBuffer={false}
-            depthBuffer={true}
+            depthBuffer={false}
         >
             <Bloom 
                 intensity={theme.currentTheme.bloomStrength}

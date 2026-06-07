@@ -77,6 +77,7 @@ export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, 
         stencil: false,
         depth: true,
         alpha: false,
+        preserveDrawingBuffer: false,
     }), []);
 
     return (
