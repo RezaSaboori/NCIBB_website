@@ -30,10 +30,7 @@ export const useCoreHideAnimation = (isVisible) => {
 
   const [forceUpdate, setForceUpdate] = useState(0);
 
-  // Update hideProgress immediately on isVisible change, but only trigger update when animation completes
-  useEffect(() => {
-    stateRef.current.hideProgress = isVisible ? 0 : 1;
-  }, [isVisible]);
+  // Remove the useEffect that teleports hideProgress - animation handles this live
 
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
   const easeInCubic = (t) => t * t * t;
@@ -96,6 +93,6 @@ export const useCoreHideAnimation = (isVisible) => {
     }
   });
 
-  // Return the ref value for use in the component
-  return animationStateRef.current;
+  // Return the ref itself, not .current - consumers must read .current inside useFrame
+  return animationStateRef;
 };
