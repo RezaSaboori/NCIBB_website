@@ -9,6 +9,12 @@ import { useIntroAnimation } from '../hooks/useIntroAnimation';
 import { useCoreHideAnimation } from '../hooks/useCoreHideAnimation';
 import { useCssBackground } from '../hooks/useCssBackground';
 
+const ORBIT_CONFIG = {
+    enableZoom:   false,   // set true/false to toggle scroll-wheel zoom
+    enablePan:    false,   // set true/false to toggle pan (right-click drag)
+    enableRotate: true,    // set true/false to toggle mouse drag rotation
+};
+
 const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive, cssBackground }) => {
     const intro = useIntroAnimation(3800, () => setIntroActive(false));
     const hideAnimation = useCoreHideAnimation(isCoreVisible);
@@ -29,7 +35,15 @@ const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroAc
                 layers={[0, 1]}
             />
 
-            {intro.isFinished && <OrbitControls enableDamping target={[0, 0, 0]} />}
+            {intro.isFinished && (
+                <OrbitControls
+                    enableDamping
+                    target={[0, 0, 0]}
+                    enableZoom={ORBIT_CONFIG.enableZoom}
+                    enablePan={ORBIT_CONFIG.enablePan}
+                    enableRotate={ORBIT_CONFIG.enableRotate}
+                />
+            )}
 
             {/* Set background color directly in the scene */}
             <color attach="background" args={[bgColor]} />
