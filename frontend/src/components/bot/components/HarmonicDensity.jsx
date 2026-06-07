@@ -89,11 +89,16 @@ export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, 
         }}>
             <Canvas
                 gl={glConfig}
+                frameloop="demand"
                 dpr={[1, 2]}
                 resize={{ scroll: false, debounce: 0 }}
                 onCreated={({ gl }) => {
                     gl.toneMappingExposure = 0;
                     gl.autoClear = true;
+                    // WebGL context loss recovery
+                    gl.domElement.addEventListener('webglcontextlost', (e) => {
+                        e.preventDefault();
+                    }, false);
                 }}
             >
                 <PerspectiveCamera 

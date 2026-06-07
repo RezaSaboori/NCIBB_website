@@ -72,6 +72,7 @@ export const PortalPage = () => {
   )
   const [filterSearch, setFilterSearch] = useState("")
   const [isCoreVisible, setIsCoreVisible] = useState(true)
+  const [isGlass, setIsGlass] = useState(false)
   const [ignition, setIgnition] = useState(0)
   const [isIntroActive, setIsIntroActive] = useState(true)
   const modesContainerRef = useRef(null)
@@ -104,10 +105,15 @@ export const PortalPage = () => {
       setTimeout(() => {
         switch (mode) {
           case "manual":
+            setIsCoreVisible(false)
             break
           case "datasaz":
+            setIsCoreVisible(true)
+            setIsGlass(false)
             break
           case "datayab":
+            setIsCoreVisible(true)
+            setIsGlass(true)
             break
           default:
             break
@@ -225,7 +231,7 @@ export const PortalPage = () => {
       <div className="spline-container">
         <HarmonicDensity
           theme={botTheme}
-          isGlass={true}
+          isGlass={isGlass}
           isCoreVisible={isCoreVisible}
           ignition={ignition}
           setIntroActive={setIsIntroActive}
@@ -341,7 +347,9 @@ export const PortalPage = () => {
                         cursor: "pointer",
                       }}
                     >
-                      {selectedFilterValue || "فیلتر"}
+                      {selectedFilters instanceof Set && selectedFilters.size > 0
+                        ? Array.from(selectedFilters).join(", ")
+                        : "فیلتر"}
                     </Button>
                   </DropdownTrigger>
                   <DropdownMenu
