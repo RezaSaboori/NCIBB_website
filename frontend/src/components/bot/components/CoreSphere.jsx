@@ -24,7 +24,9 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
         if (!theme?.currentTheme?.coreColor) return null;
 
         const glassMaterial = new THREE.MeshPhysicalMaterial({
-            color: theme.currentTheme.coreColor,
+            color:             theme.currentTheme.coreColor,
+            emissive:          new THREE.Color(theme.currentTheme.coreColor),
+            emissiveIntensity: 0.3,
             metalness: 0.1,
             roughness: 0.1,
             transmission: 0.9,
@@ -92,7 +94,7 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
     
         // Glass brightness boost
         if (glassRef.current && transitionState === 'glass') {
-            glassRef.current.emissiveIntensity = hideState.coreOpacity * CONFIG.glassBrightnessBoost;
+            glassRef.current.material.emissiveIntensity = hideState.coreOpacity * CONFIG.glassBrightnessBoost;
         }
     });
 

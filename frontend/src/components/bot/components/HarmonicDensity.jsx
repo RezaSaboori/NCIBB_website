@@ -9,7 +9,7 @@ import { useIntroAnimation } from '../hooks/useIntroAnimation';
 import { useCoreHideAnimation } from '../hooks/useCoreHideAnimation';
 
 const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive }) => {
-    const intro = useIntroAnimation(() => setIntroActive(false));
+    const intro = useIntroAnimation(3800, () => setIntroActive(false));
     const hideAnimation = useCoreHideAnimation(isCoreVisible);
     const { currentTheme } = theme;
 
@@ -42,9 +42,9 @@ const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroAc
                 <EnvironmentMap color={currentTheme.envBackground} />
             </Suspense>
 
-            <CoreSphere 
-                isGlass={isGlass} 
-                theme={theme} 
+            <CoreSphere
+                mode={isGlass ? 'glass' : 'sun'}
+                theme={theme}
                 intro={intro}
                 hideAnimation={hideAnimation}
             />

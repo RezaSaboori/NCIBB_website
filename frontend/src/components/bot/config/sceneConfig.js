@@ -40,3 +40,16 @@ export const CONFIG = {
     bloomRadius: 0.8,
     bloomThreshold: 0.85,
 };
+
+export const ANIMATION_STATES = {
+    IDLE:      'idle',
+    TALKING:   'talking',
+    THINKING:  'thinking',
+    LISTENING: 'listening',
+};
+
+export const ANIMATION_SPEEDS = {
+    SLOW:   0.5,
+    NORMAL: 1.0,
+    FAST:   2.0,
+};
