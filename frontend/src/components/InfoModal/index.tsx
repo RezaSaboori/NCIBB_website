@@ -6,7 +6,7 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-} from "@nextui-org/react"
+} from "@heroui/react"
 import { DatabaseInfo, DataType } from "../../types/database"
 import { Icon } from "@iconify/react"
 import "./InfoModal.css"

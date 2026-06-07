@@ -7,7 +7,7 @@ import {
   Chip,
   Button,
   Tooltip,
-} from "@nextui-org/react"
+} from "@heroui/react"
 import { Icon } from "@iconify/react"
 import { DatabaseInfo, DataType } from "../../types/database"
 import { InfoModal } from "../InfoModal"

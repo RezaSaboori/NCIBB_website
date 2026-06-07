@@ -9,7 +9,7 @@ import {
   DropdownItem,
   Button,
   Input,
-} from "@nextui-org/react"
+} from "@heroui/react"
 import { AnimatePresence, motion } from "framer-motion"
 import { useTheme } from "../../components/theme/ThemeContext"
 import { ChatInput } from "../../components/ChatInput"
