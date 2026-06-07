@@ -1,5 +1,5 @@
-import React, { memo, useEffect } from 'react';
-import { EffectComposer, Bloom, SMAA } from '@react-three/postprocessing';
+import React, { memo } from 'react';
+import { EffectComposer, Bloom, SMAA, useFrame } from '@react-three/postprocessing';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CONFIG } from '../config/sceneConfig';
@@ -7,12 +7,11 @@ import { CONFIG } from '../config/sceneConfig';
 export const PostProcessing = memo(({ theme, introActive, cssBackground }) => {
     const { gl } = useThree();
 
-    // Sync WebGL clear color with scene background so EffectComposer
-    // never reveals a black buffer underneath during transitions
-    useEffect(() => {
-        const color = new THREE.Color(introActive ? '#000000' : (cssBackground || '#000000'));
+    // useFrame runs BEFORE the frame is rendered — no flash frame
+    useFrame(() => {
+        const color = new THREE.Color(cssBackground || '#000000');
         gl.setClearColor(color, 1);
-    }, [introActive, cssBackground, gl]);
+    }, -100); // low priority number = runs first
 
     return (
         <EffectComposer
@@ -28,9 +27,8 @@ export const PostProcessing = memo(({ theme, introActive, cssBackground }) => {
                 mipmapBlur
                 radius={CONFIG.bloomRadius}
             />
-            {/* Use enabled prop — never conditionally mount/unmount effects
-                Mounting/unmounting forces EffectComposer to rebuild its pipeline → black flash */}
-            <SMAA enabled={!introActive} />
+            {/* Always mounted - SMAA enabled state handled internally */}
+            <SMAA />
         </EffectComposer>
     );
 });

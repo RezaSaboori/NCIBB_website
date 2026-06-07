@@ -178,6 +178,8 @@ gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * (1.0 + uGlassBrightn
     return (
         <group>
             <mesh ref={meshRef} geometry={useMemo(() => new THREE.SphereGeometry(CONFIG.coreRadius, 64, 64), [])}>
+                {/* Provide glass material as default — useFrame will override as needed */}
+                <primitive object={glassMaterial} attach="material" />
                 <Eyes isGlass={isGlass} theme={theme} intro={intro} hideAnimation={hideAnimation} />
             </mesh>
             <pointLight ref={lightRef} position={[0, 0, 0]} layers={[1]} />

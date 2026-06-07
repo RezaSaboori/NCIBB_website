@@ -100,7 +100,7 @@ export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, 
                 dpr={[1, 1.5]}
                 resize={{ scroll: false, debounce: 0 }}
                 onCreated={({ gl }) => {
-                    gl.toneMappingExposure = 0;
+                    gl.toneMappingExposure = 0.0001;
                     gl.autoClear = true;
                     gl.domElement.addEventListener('webglcontextlost', (e) => {
                         e.preventDefault();

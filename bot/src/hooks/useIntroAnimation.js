@@ -60,10 +60,10 @@ export const useIntroAnimation = (onComplete) => {
         }
     });
 
-    return { 
-        active: activeRef.current, 
-        isFinished, 
-        progressRef, 
-        getPhaseProgress 
+    return {
+        active: !isFinished,
+        isFinished,
+        progressRef,
+        getPhaseProgress
     };
 };
