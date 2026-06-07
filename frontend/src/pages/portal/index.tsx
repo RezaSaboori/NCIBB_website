@@ -1,7 +1,5 @@
 // @ts-nocheck
 import { useState, useRef, useEffect, useMemo, useCallback } from "react"
-import { Canvas } from "@react-three/fiber"
-import { OrbitControls } from "@react-three/drei"
 import {
   Dropdown,
   DropdownTrigger,
@@ -20,7 +18,7 @@ import { DatabaseInfo } from "../../types/database"
 import { searchInCsv } from "../../components/Search"
 import { refreshButtonVariants } from "../../components/ChatInput/animations"
 import { RefreshIcon } from "../../components/ChatInput/icons/RefreshIcon"
-import { BotScene } from "../../components/bot/components/BotScene"
+import { HarmonicDensity } from "../../components/bot/components/HarmonicDensity"
 import { useTheme as useBotTheme } from "../../components/bot/hooks/useTheme"
 import "./styles.css"
 import generatedImage from "../../../data/Gemini_Generated_Image_sc72gssc72gssc72.png"
@@ -67,6 +65,9 @@ export const PortalPage = () => {
     new Set(["سال"])
   )
   const [filterSearch, setFilterSearch] = useState("")
+  const [isCoreVisible, setIsCoreVisible] = useState(true)
+  const [ignition, setIgnition] = useState(0)
+  const [isIntroActive, setIsIntroActive] = useState(true)
   const modesContainerRef = useRef(null)
 
   useDataFinderModeIndicator(modesContainerRef, activeMode)
@@ -216,20 +217,13 @@ export const PortalPage = () => {
   return (
     <div className="holistic-page-wrapper">
       <div className="spline-container">
-        <Canvas
-          dpr={[1, 2]}
-          gl={{ antialias: false, alpha: false }}
-          shadowMap
-          toneMappingExposure={1}
-        >
-          <OrbitControls
-            enablePan={false}
-            enableZoom={false}
-            minDistance={10}
-            maxDistance={50}
-          />
-          <BotScene theme={botTheme} isHidden={false} />
-        </Canvas>
+        <HarmonicDensity
+          theme={botTheme}
+          isGlass={true}
+          isCoreVisible={isCoreVisible}
+          ignition={ignition}
+          setIntroActive={setIsIntroActive}
+        />
       </div>
 
       <div className="robot-container">
