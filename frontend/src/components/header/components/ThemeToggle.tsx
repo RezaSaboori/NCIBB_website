@@ -1,18 +1,11 @@
 import { Around } from "@theme-toggles/react"
 import { ThemeToggleProps } from "../types"
+import { useTheme } from "../../theme"
 
 export const ThemeToggle = ({
   className,
 }: ThemeToggleProps) => {
-  const handleToggle = () => {
-    const html = document.documentElement
-    const isDark = html.classList.contains("dark")
-    if (isDark) {
-      html.classList.remove("dark")
-    } else {
-      html.classList.add("dark")
-    }
-  }
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <fieldset
@@ -25,7 +18,8 @@ export const ThemeToggle = ({
         id="dark-mode-toggle"
         aria-label="Toggle Dark Mode"
         title="Toggle Dark Mode"
-        onClick={handleToggle}
+        toggled={theme === "dark"}
+        toggle={toggleTheme}
       />
     </fieldset>
   )
