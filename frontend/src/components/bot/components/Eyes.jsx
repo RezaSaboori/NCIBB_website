@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { CONFIG } from '../config/sceneConfig';
 import { useAttentionTracking } from '../hooks/useAttentionTracking';
 
-export const Eyes = ({ hideAnimation, intro, theme }) => {
+export const Eyes = ({ isGlass, hideAnimation, intro, theme }) => {
     const leftEyeRef  = useRef();
     const rightEyeRef = useRef();
     const { eyeCloseFactor, eyeOpacity, isActive: isHideActive } = hideAnimation;
@@ -21,7 +21,7 @@ export const Eyes = ({ hideAnimation, intro, theme }) => {
         return new THREE.ShapeGeometry(shape, 32);
     }, []);
 
-    const isDark = theme.isDarkMode;
+    const isDark = isGlass ? false : theme.isDarkMode;
     const material = useMemo(() => new THREE.MeshStandardMaterial({
         color:             isDark ? 0xffffff : 0x000000,
         emissive:          isDark ? 0xffffff : 0x000000,

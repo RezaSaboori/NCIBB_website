@@ -491,7 +491,7 @@ export const PortalPage = () => {
           activeMode === "manual" ? "manual-mode" : ""
         }`}
       >
-        {activeMode === "datayab" ? (
+        {activeMode === "datasaz" ? (
           <div className="generated-image-container">
             <img
               src={generatedImage}

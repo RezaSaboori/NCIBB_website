@@ -43,7 +43,7 @@ const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroAc
             </Suspense>
 
             <CoreSphere
-                mode={isGlass ? 'glass' : 'sun'}
+                isGlass={isGlass}
                 theme={theme}
                 intro={intro}
                 hideAnimation={hideAnimation}

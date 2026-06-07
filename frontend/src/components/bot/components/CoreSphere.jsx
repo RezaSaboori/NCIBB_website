@@ -1,42 +1,43 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useEffect, memo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Text, Float, useCursor } from '@react-three/drei';
 import * as THREE from 'three';
 import { CONFIG } from '../config/sceneConfig';
 import { Eyes } from './Eyes';
 
-export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionChange, ignition, mode, setMode }) => {
-    const { camera, scene } = useThree();
-    const coreRef = useRef();
-    const glassRef = useRef();
-    const sunRef = useRef();
-    const pointLightRef = useRef();
+export const CoreSphere = memo(({ isGlass, theme, intro, hideAnimation }) => {
+    const meshRef = useRef();
+    const lightRef = useRef();
+    const { camera } = useThree();
+    const { active: introActive, progressRef: introProgressRef } = intro;
 
-    // ALL hooks at the top - no early returns before this block
-    const [transitionState, setTransitionState] = React.useState('glass'); // 'glass' or 'sun'
-    const [currentEmissive, setCurrentEmissive] = React.useState(0);
-    const [hovered, setHover] = React.useState(false);
-    useCursor(hovered);
+    const { coreScale, coreOpacity, coreBlur, isActive: isHideActive } =
+        hideAnimation || { coreScale: 1, coreOpacity: 1, coreBlur: 0, isActive: false };
 
-    // Materials
-    const materials = useMemo(() => {
-        // Safety guard for theme
-        if (!theme?.currentTheme?.coreColor) return null;
+    // ── Materials (identical to demo) ──────────────────────────────────
+    const sunMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+        color: 0x000000,
+        emissive: CONFIG.coreColor,
+        emissiveIntensity: CONFIG.sunEmissiveTarget,
+        roughness: 0.4,
+        metalness: 0.8,
+        transparent: true,
+    }), []);
 
-        const glassMaterial = new THREE.MeshPhysicalMaterial({
-            color:             0xffffff,
-            metalness:         0.0,
-            roughness:         0.0,
-            transmission:      0.99,
-            thickness:         3.5,
-            ior:               1.5,
-            envMapIntensity:   0.05,
+    const glassMaterial = useMemo(() => {
+        const mat = new THREE.MeshPhysicalMaterial({
+            color: 0xffffff,
+            metalness: 0.0,
+            roughness: 0.0,
+            transmission: 0.99,
+            thickness: 3.5,
+            ior: 1.5,
+            envMapIntensity: 0.05,
             specularIntensity: 0.0,
-            clearcoat:         0.0,
-            side:              THREE.FrontSide,
-            transparent:       true,
+            clearcoat: 0.0,
+            side: THREE.FrontSide,
+            transparent: true,
         });
-        glassMaterial.onBeforeCompile = (shader) => {
+        mat.onBeforeCompile = (shader) => {
             shader.uniforms.uGlassBrightnessBoost = { value: CONFIG.glassBrightnessBoost };
             shader.fragmentShader = shader.fragmentShader.replace(
                 '#include <output_fragment>',
@@ -46,116 +47,151 @@ gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * (1.0 + uGlassBrightn
 #include <output_fragment>`
             );
         };
+        return mat;
+    }, []);
 
-        const sunMaterial = new THREE.MeshStandardMaterial({
-            color: theme.currentTheme.coreColor,
-            emissive: theme.currentTheme.coreColor,
-            emissiveIntensity: CONFIG.sunEmissiveTarget,
-            roughness: 0.2,
-            metalness: 0.5,
-        });
+    // ── Transition state — must be a REF, not useState ─────────────────
+    const transitionState = useRef({
+        active: false,
+        from: isGlass ? 'glass' : 'sun',
+        to:   isGlass ? 'glass' : 'sun',
+        start: 0,
+    });
 
-        return { glassMaterial, sunMaterial };
-    }, [theme?.currentTheme?.coreColor]);
-
-    React.useEffect(() => {
-        if (mode === 'sun' && transitionState !== 'sun') {
-            setTransitionState('sun');
-        } else if (mode === 'glass' && transitionState !== 'glass') {
-            setTransitionState('glass');
+    useEffect(() => {
+        if (introActive) return;
+        const nextMode = isGlass ? 'glass' : 'sun';
+        const currentMode = transitionState.current.to;
+        if (nextMode !== currentMode) {
+            transitionState.current = {
+                active: true,
+                from: currentMode,
+                to: nextMode,
+                start: performance.now(),
+            };
         }
-    }, [mode, transitionState]);
+    }, [isGlass, introActive]);
+
+    const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4);
 
     useFrame((state) => {
-        if (!materials || !hideAnimation) return;
-    
-        const time = state.clock.elapsedTime;
-        const hideState = hideAnimation;
-    
-        // Target the correct mesh based on transition state
-        const activeMeshRef = transitionState === 'glass' ? glassRef : sunRef;
-        if (!activeMeshRef.current) return;
-    
-        // Hide animation
-        activeMeshRef.current.scale.setScalar(hideState.coreScale);
-        activeMeshRef.current.material.opacity = hideState.coreOpacity;
-        activeMeshRef.current.material.emissiveIntensity = hideState.coreOpacity * (transitionState === 'sun' ? CONFIG.sunEmissiveTarget : CONFIG.coreLightGlass);
-        
-        if (activeMeshRef.current.material.blur !== undefined) {
-            activeMeshRef.current.material.blur = hideState.coreBlur;
+        if (!meshRef.current) return;
+
+        // Camera-facing rotation
+        const angle = Math.atan2(
+            camera.position.x - meshRef.current.position.x,
+            camera.position.z - meshRef.current.position.z
+        );
+        meshRef.current.rotation.y = angle;
+
+        // ── 1. HIDE ANIMATION (manual mode) — overrides everything ─────
+        if (isHideActive || (hideAnimation && hideAnimation.isFullyHidden)) {
+            meshRef.current.scale.setScalar(coreScale);
+            if (isGlass) {
+                meshRef.current.material = glassMaterial;
+                glassMaterial.roughness   = THREE.MathUtils.lerp(0.0, 0.8, coreBlur);
+                glassMaterial.transmission = THREE.MathUtils.lerp(0.99, 0.5, coreBlur);
+                glassMaterial.opacity     = coreOpacity;
+                if (lightRef.current) {
+                    lightRef.current.intensity = CONFIG.coreLightGlass * coreOpacity;
+                    lightRef.current.color.setHex(0xffffff);
+                }
+            } else {
+                meshRef.current.material = sunMaterial;
+                sunMaterial.emissiveIntensity = CONFIG.sunEmissiveTarget * coreOpacity;
+                sunMaterial.opacity           = coreOpacity;
+                if (lightRef.current) {
+                    lightRef.current.intensity = CONFIG.coreLightSun * coreOpacity;
+                    lightRef.current.color.setHex(CONFIG.coreColor);
+                }
+            }
+            return; // ← critical: skip all other logic
         }
-    
-        // Intro animation
-        if (intro.active) {
-            const progress = intro.progressRef.current;
-            const scale = progress < 0.2 ? 0 : Math.min(Math.pow(progress / 0.2, 2), 1);
-            activeMeshRef.current.scale.setScalar(hideState.coreScale * scale);
-            
-            // Pulsing effect during intro
-            const pulse = 1 + 0.1 * Math.sin(time * 2);
-            activeMeshRef.current.scale.multiplyScalar(pulse);
-            activeMeshRef.current.scale.divideScalar(pulse); // Reset after pulsing
+
+        // ── 2. NORMAL — reset any hide-altered props ───────────────────
+        if (isGlass) {
+            glassMaterial.roughness    = 0;
+            glassMaterial.transmission = 0.99;
+            glassMaterial.opacity      = 1;
+        } else {
+            sunMaterial.opacity = 1;
         }
-    
-        // Point light intensity
-        if (pointLightRef.current) {
-            pointLightRef.current.intensity = transitionState === 'sun'
-                ? CONFIG.coreLightSun * hideState.coreOpacity
-                : CONFIG.coreLightGlass * hideState.coreOpacity;
+
+        // ── 3. INTRO ANIMATION ─────────────────────────────────────────
+        if (introActive) {
+            const coreStart = 0.3, coreEnd = 0.6;
+            const progress = introProgressRef.current;
+            let coreP = 0;
+            if (progress >= coreStart)
+                coreP = Math.min((progress - coreStart) / (coreEnd - coreStart), 1.0);
+            const coreEased = easeOutQuart(coreP);
+            const pulse = Math.sin(coreP * Math.PI * 2.0) * (1 - coreP) * 0.05;
+            meshRef.current.scale.setScalar(0.8 + coreEased * 0.2 + pulse);
+            if (lightRef.current) {
+                lightRef.current.intensity = coreEased * 10;
+                lightRef.current.color.setHex(0xffffff);
+            }
+            meshRef.current.material = glassMaterial;
+            return;
         }
-    
-        // Glass brightness boost
-        if (glassRef.current && transitionState === 'glass') {
-            glassRef.current.material.emissiveIntensity = hideState.coreOpacity * CONFIG.glassBrightnessBoost;
-        }
-    
-        // Camera-facing rotation for the core group
-        if (coreRef.current && camera) {
-            const angle = Math.atan2(
-                camera.position.x - coreRef.current.position.x,
-                camera.position.z - coreRef.current.position.z
-            );
-            coreRef.current.rotation.y = angle;
+
+        // ── 4. SUN ↔ GLASS TRANSITION (lerped) ────────────────────────
+        if (transitionState.current.active) {
+            const elapsed = performance.now() - transitionState.current.start;
+            const t = Math.min(elapsed / CONFIG.coreTransitionDuration, 1.0);
+            const easedT = 1 - Math.pow(1 - t, 3);
+
+            if (transitionState.current.to === 'sun') {
+                meshRef.current.material = sunMaterial;
+                sunMaterial.emissiveIntensity = THREE.MathUtils.lerp(0.15, CONFIG.sunEmissiveTarget, easedT);
+                if (lightRef.current) {
+                    lightRef.current.intensity = THREE.MathUtils.lerp(CONFIG.coreLightGlass, CONFIG.coreLightSun, easedT);
+                    lightRef.current.color.setHex(0xffffff);
+                    lightRef.current.color.lerp(new THREE.Color(CONFIG.coreColor), easedT);
+                }
+                meshRef.current.scale.setScalar(1.0 + 0.05 * Math.sin(easedT * Math.PI));
+            } else {
+                // transitioning to glass: fade sun out first, then swap
+                meshRef.current.material = sunMaterial;
+                sunMaterial.emissiveIntensity = THREE.MathUtils.lerp(CONFIG.sunEmissiveTarget, 0.1, easedT);
+                if (lightRef.current) {
+                    lightRef.current.intensity = THREE.MathUtils.lerp(CONFIG.coreLightSun, CONFIG.coreLightGlass, easedT);
+                    lightRef.current.color.setHex(CONFIG.coreColor);
+                    lightRef.current.color.lerp(new THREE.Color(0xffffff), easedT);
+                }
+                meshRef.current.scale.setScalar(1.02 - 0.02 * easedT);
+                if (t >= 1.0) meshRef.current.material = glassMaterial;
+            }
+            if (t >= 1.0) transitionState.current.active = false;
+
+        } else {
+            // ── 5. IDLE STATE ──────────────────────────────────────────
+            meshRef.current.scale.setScalar(1.0);
+            if (isGlass) {
+                meshRef.current.material = glassMaterial;
+                if (lightRef.current) {
+                    lightRef.current.intensity = CONFIG.coreLightGlass;
+                    lightRef.current.color.setHex(0xffffff);
+                }
+            } else {
+                meshRef.current.material = sunMaterial;
+                sunMaterial.emissiveIntensity = CONFIG.sunEmissiveTarget;
+                if (lightRef.current) {
+                    lightRef.current.intensity = CONFIG.coreLightSun;
+                    lightRef.current.color.setHex(CONFIG.coreColor);
+                }
+            }
         }
     });
 
     const sphereGeo = useMemo(() => new THREE.SphereGeometry(CONFIG.coreRadius, 64, 64), []);
 
     return (
-        <group ref={coreRef} position={[0, 0, 0]} onPointerOver={() => setHover(true)} onPointerOut={() => setHover(false)}>
-            {/* Sun Material Sphere */}
-            <mesh
-                ref={sunRef}
-                visible={transitionState === 'sun'}
-            >
-                <primitive object={sphereGeo} attach="geometry" />
-                <primitive object={materials.sunMaterial} attach="material" />
+        <group>
+            <mesh ref={meshRef} geometry={sphereGeo}>
+                <Eyes isGlass={isGlass} theme={theme} intro={intro} hideAnimation={hideAnimation} />
             </mesh>
-
-            {/* Glass Material Sphere */}
-            <mesh
-                ref={glassRef}
-                visible={transitionState === 'glass'}
-            >
-                <primitive object={sphereGeo} attach="geometry" />
-                <primitive object={materials.glassMaterial} attach="material" />
-            </mesh>
-
-            {/* Core Eyes */}
-            <Eyes
-                hideAnimation={hideAnimation}
-                intro={intro}
-                theme={theme}
-            />
-
-            {/* Point Light */}
-            <pointLight
-                ref={pointLightRef}
-                position={[0, 0, 0]}
-                intensity={CONFIG.coreLightGlass}
-                color={theme.currentTheme.coreColor}
-                distance={20}
-            />
+            <pointLight ref={lightRef} position={[0, 0, 0]} layers={[1]} />
         </group>
     );
-};
+});
