@@ -1,4 +1,4 @@
-import React, { Suspense, useMemo, memo, useState } from 'react';
+import React, { Suspense, useMemo, memo, useState } from 'react'; // ADD useState
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,57 +7,46 @@ import { OrbitSystem } from './OrbitSystem';
 import { PostProcessing } from './PostProcessing';
 import { useIntroAnimation } from '../hooks/useIntroAnimation';
 import { useCoreHideAnimation } from '../hooks/useCoreHideAnimation';
+import { useCssBackground } from '../hooks/useCssBackground';
 
-const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive, onIntroFinished }) => {
-    const intro = useIntroAnimation(() => {
+const ORBIT_CONFIG = {
+    enableZoom:   false,
+    enablePan:    false,
+    enableRotate: true,
+};
+
+const SceneContent = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive, cssBackground, onIntroFinished }) => {  // ADD onIntroFinished
+    const intro = useIntroAnimation(3800, () => {
         setIntroActive(false);
-        if (onIntroFinished) onIntroFinished();
+        onIntroFinished();   // ← notify parent when intro is done
     });
     const hideAnimation = useCoreHideAnimation(isCoreVisible);
-    const { currentTheme } = theme;
 
-    // Convert hex background to CSS/Three string for the background color
-    const bgColor = useMemo(() => {
-        // During intro, stay black. After intro, follow theme.
-        if (intro.active) return '#000000';
-        return `#${currentTheme.background.toString(16).padStart(6, '0')}`;
-    }, [intro.active, currentTheme.background]);
+    const bgColor = cssBackground.css;
 
     return (
         <>
-            <hemisphereLight 
-                args={[0xffffff, 0x444444, 0.5]} 
-                position={[0, 20, 0]} 
-                layers={[0, 1]}
-            />
-            <directionalLight 
-                args={[0xffffff, 1.0]} 
-                position={[10, 50, 20]} 
-                layers={[0, 1]}
-            />
+            <hemisphereLight args={[0xffffff, 0x444444, 0.5]} position={[0, 20, 0]} layers={[0, 1]} />
+            <directionalLight args={[0xffffff, 1.0]} position={[10, 50, 20]} layers={[0, 1]} />
 
-            {intro.isFinished && <OrbitControls enableDamping target={[0, 0, 0]} />}
+            {intro.isFinished && (
+                <OrbitControls
+                    enableDamping
+                    target={[0, 0, 0]}
+                    enableZoom={ORBIT_CONFIG.enableZoom}
+                    enablePan={ORBIT_CONFIG.enablePan}
+                    enableRotate={ORBIT_CONFIG.enableRotate}
+                />
+            )}
 
-            {/* Set background color directly in the scene */}
             <color attach="background" args={[bgColor]} />
-            
+
             <Suspense fallback={null}>
-                <EnvironmentMap color={currentTheme.envBackground} />
+                <EnvironmentMap color={theme.currentTheme.envBackground} />
             </Suspense>
 
-            <CoreSphere 
-                isGlass={isGlass} 
-                theme={theme} 
-                intro={intro}
-                hideAnimation={hideAnimation}
-            />
-            
-            <OrbitSystem 
-                theme={theme} 
-                ignition={ignition} 
-                intro={intro}
-            />
-
+            <CoreSphere isGlass={isGlass} theme={theme} intro={intro} hideAnimation={hideAnimation} />
+            <OrbitSystem theme={theme} ignition={ignition} intro={intro} />
             <PostProcessing theme={theme} introActive={intro.active} />
         </>
     );
@@ -73,44 +62,41 @@ const EnvironmentMap = memo(({ color }) => (
 ));
 
 export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive }) => {
+    const cssBackground = useCssBackground();
+    const [introFinished, setIntroFinished] = useState(false);  // ADD
+
     const glConfig = useMemo(() => ({
-        antialias: false,
+        antialias: true,
         powerPreference: "high-performance",
         toneMapping: THREE.ACESFilmicToneMapping,
         stencil: false,
         depth: true,
         alpha: false,
+        preserveDrawingBuffer: false,
     }), []);
 
-    const [introFinished, setIntroFinished] = useState(false);
-
     return (
+        // CHANGE: wrapper stays black during intro (matches canvas at exposure=0)
+        // After intro ends, smoothly transitions to the real body background
         <div style={{
             width: '100vw',
             height: '100vh',
-            // Black while intro runs (canvas is also black at exposure=0)
-            // Fades to real background after intro — smooth, no flash
-            background: introFinished
-                ? (theme.isDarkMode ? '#000' : `#${theme.currentTheme.background.toString(16).padStart(6, '0')}`)
-                : '#000000',
-            transition: 'background-color 0.6s ease'
+            background: introFinished ? cssBackground.css : '#000000',
+            transition: introFinished ? 'background-color 0.6s ease' : 'none',
         }}>
             <Canvas
-                shadows
                 gl={glConfig}
-                dpr={[1, 2]}
+                dpr={[1, 1.5]}
                 resize={{ scroll: false, debounce: 0 }}
                 onCreated={({ gl }) => {
                     gl.toneMappingExposure = 0;
                     gl.autoClear = true;
+                    gl.domElement.addEventListener('webglcontextlost', (e) => {
+                        e.preventDefault();
+                    }, false);
                 }}
             >
-                <PerspectiveCamera
-                    makeDefault
-                    fov={45}
-                    near={0.1}
-                    far={1000}
-                />
+                <PerspectiveCamera makeDefault fov={45} near={0.1} far={1000} position={[35, 15, 35]} />
 
                 <SceneContent
                     theme={theme}
@@ -118,7 +104,8 @@ export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, 
                     isCoreVisible={isCoreVisible}
                     ignition={ignition}
                     setIntroActive={setIntroActive}
-                    onIntroFinished={() => setIntroFinished(true)}
+                    cssBackground={cssBackground}
+                    onIntroFinished={() => setIntroFinished(true)}  // ADD
                 />
             </Canvas>
         </div>
