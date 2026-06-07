@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
-import { EffectComposer, Bloom, SMAA, useFrame } from '@react-three/postprocessing';
+import { EffectComposer, Bloom, SMAA } from '@react-three/postprocessing';
+import { useFrame } from '@react-three/fiber';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CONFIG } from '../config/sceneConfig';
