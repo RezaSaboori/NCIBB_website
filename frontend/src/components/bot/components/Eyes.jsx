@@ -4,7 +4,7 @@ import { Shape, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 export const Eyes = ({ hideAnimation, intro, theme }) => {
-    const { eyeCloseFactor, eyeOpacity } = hideAnimation.getState();
+    const { eyeCloseFactor, eyeOpacity } = hideAnimation;
     
     // Get blink and attention tracking from hooks
     const eyeScaleY = 1; // Placeholder - blinkFSM would be integrated here

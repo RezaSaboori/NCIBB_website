@@ -56,7 +56,7 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
         if (!coreRef.current || !materials || !hideAnimation) return;
 
         const time = state.clock.elapsedTime;
-        const hideState = hideAnimation.getState();
+        const hideState = hideAnimation;
 
         // Hide animation
         coreRef.current.scale.setScalar(hideState.coreScale);
@@ -92,10 +92,9 @@ export const CoreSphere = ({ theme, visible, intro, hideAnimation, onIgnitionCha
         }
     });
 
-    const isFullyHidden = hideAnimation.getState().isFullyHidden;
-
     // Guard at JSX level only (after all hooks have run)
     if (!materials || !hideAnimation) return null;
+    const isFullyHidden = hideAnimation.isFullyHidden;
     if (isFullyHidden) return null;
 
     return (
