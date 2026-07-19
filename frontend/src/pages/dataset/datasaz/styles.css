@@ -153,4 +153,5 @@
   flex-direction: column;
   align-items: center;
   gap: var(--spacing-md);
+  margin-bottom: var(--spacing-5xl);
 }
