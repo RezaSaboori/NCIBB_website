@@ -1,7 +1,5 @@
-/* Adapted from .sidebar-nav to create the footer container */
+/* Glass styles are provided by the .glass utility class in glass.css */
 .footer-nav {
-  position: relative;
-  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -9,59 +7,6 @@
   margin-top: 3rem;
   padding: 2rem 0.5rem 2rem 0.5rem;
   border: none;
-  border-radius: var(
-    --border-radius-container-xl
-  ); /* Changed from pill shape to rounded rectangle */
+  border-radius: var(--border-radius-container-xl);
   font-size: 15px;
-  background-image: linear-gradient(
-    135deg,
-    var(--color-gray1),
-    var(--color-gray2) 40%
-  );
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--color-gray1) 10%, transparent),
-    inset 1.8px 3px 0px -2px
-      color-mix(in srgb, var(--color-gray1) 90%, transparent),
-    inset -2px -2px 0px -2px
-      color-mix(in srgb, var(--color-gray1) 30%, transparent),
-    inset -3px -12px 1px -8px
-      color-mix(in srgb, var(--color-gray1) 10%, transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, #000 calc(1 * 12%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 8%), transparent);
-  transition:
-    background-color 400ms cubic-bezier(1, 0, 0.4, 1),
-    box-shadow 400ms cubic-bezier(1, 0, 0.4, 1);
-}
-
-/* Dark mode styles */
-.dark .footer-nav {
-  background-image: linear-gradient(
-    135deg,
-    var(--color-gray3),
-    var(--color-gray2) 30%
-  );
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--color-gray8) 4%, transparent),
-    inset 1.8px 3px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 12%, transparent),
-    inset -2px -2px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 10%, transparent),
-    inset -3px -8px 1px -6px
-      color-mix(in srgb, var(--color-gray8) 8%, transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, var(--color-gray7) calc(1 * 25%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000000 calc(1 * 30%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 30%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000000 calc(1 * 25%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000000 calc(1 * 15%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000000 calc(1 * 12%), transparent);
 }

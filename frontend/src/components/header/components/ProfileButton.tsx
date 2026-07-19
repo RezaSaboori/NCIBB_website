@@ -18,7 +18,7 @@ export const ProfileButton = ({
   return (
     <>
       <fieldset
-        className={`header-nav header-nav--icon ${
+        className={`header-nav header-nav--icon glass-transparent ${
           isAuthenticated ? "is-authenticated" : ""
         }`}
       >

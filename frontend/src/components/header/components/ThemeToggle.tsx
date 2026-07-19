@@ -9,7 +9,7 @@ export const ThemeToggle = ({
 
   return (
     <fieldset
-      className="header-nav header-nav--icon"
+      className="header-nav header-nav--icon glass-transparent"
       style={{ paddingBottom: "0.4rem", paddingRight: "0.4rem" }}
     >
       <legend className="header-nav__legend">Toggle Dark Mode</legend>
