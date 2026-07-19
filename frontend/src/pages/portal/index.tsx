@@ -242,7 +242,7 @@ export const PortalPage = () => {
         <div
           className={`holistic-input-container ${
             isTextVisible ? "fade-in-up" : ""
-          }`}
+          } ${activeMode === "datasaz" ? "datasaz-expanded" : ""}`}
         >
           <div ref={modesContainerRef} className="data-finder-modes-container">
             <button
@@ -274,6 +274,11 @@ export const PortalPage = () => {
               داده‌ساز
             </button>
           </div>
+          {activeMode === "datasaz" && (
+            <div className={`datasaz-inline-container ${chatInputAnimationClass}`}>
+              <DatasazMode />
+            </div>
+          )}
           {activeMode !== "datasaz" && (
           <div className={`search-controls ${chatInputAnimationClass}`}>
             {activeMode === "manual" && (
@@ -493,9 +498,7 @@ export const PortalPage = () => {
           activeMode === "manual" ? "manual-mode" : ""
         }`}
       >
-        {activeMode === "datasaz" ? (
-          <DatasazMode />
-        ) : (
+        {activeMode !== "datasaz" && (
           <>
             {processedDatabases.length === 0 &&
             (searchAttempted ||

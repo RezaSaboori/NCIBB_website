@@ -195,9 +195,9 @@
 }
 
 .holistic-input-container {
-  position: absolute; /* Let flexbox handle positioning */
+  position: absolute;
   top: 45vh;
-  z-index: 1; /* Place it on top of the spline container */
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: top;
@@ -207,7 +207,19 @@
   height: fit-content;
   opacity: 0;
   padding-bottom: 2rem;
-  pointer-events: auto; /* Make this container and its children interactive */
+  pointer-events: auto;
+}
+
+.holistic-input-container.datasaz-expanded {
+  width: clamp(320px, 72vw, 1200px);
+  top: 42vh;
+}
+
+.datasaz-inline-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .holistic-input-container.fade-in-up {
