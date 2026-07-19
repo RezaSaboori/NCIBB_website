@@ -1,5 +1,5 @@
 @import "../../../styles/theme.css";
-
+@import "./components/step1/step1.css";
 /* ── Step Tab Bar ──────────────────────────────────────────────── */
 
 .datasaz-step-tabs {
