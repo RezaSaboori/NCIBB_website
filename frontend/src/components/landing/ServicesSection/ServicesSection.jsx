@@ -103,12 +103,12 @@ const ServicesSection = ({ isVisible }) => {
     <div
       className={`services-section-wrapper ${isVisible ? "is-visible" : ""}`}
     >
-      <div className="services-container">
+      <div className="services-container glass">
         <div className="services-header">
           <h2 className="services-title">خدمات</h2>
 
           <div className="services-tabs-container">
-            <div className="services-nav">
+            <div className="services-nav glass-transparent">
               <div className="services-nav__menu">
                 {tabs.map((tab) => (
                   <div
@@ -133,7 +133,7 @@ const ServicesSection = ({ isVisible }) => {
           {servicesData[activeTab].map((card, index) => (
             <div
               key={card.id}
-              className={`service-card ${isVisible ? "reveal" : ""}`}
+              className={`service-card glass ${isVisible ? "reveal" : ""}`}
               style={{
                 animationDelay: `${index * 150}ms`,
                 gridColumn: `span ${card.span || 1}`,

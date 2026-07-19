@@ -5,7 +5,7 @@ export const Navigation = ({ items, className }: NavigationProps) => {
   const location = useLocation()
 
   return (
-    <fieldset className="header-nav header-nav--main">
+    <fieldset className="header-nav header-nav--main glass-transparent">
       <legend className="header-nav__legend">Main navigation</legend>
       <div className={`header-nav__menu ${className || ""}`}>
         {items.map((item) => (

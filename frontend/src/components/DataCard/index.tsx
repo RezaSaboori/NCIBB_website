@@ -197,7 +197,7 @@ export const DataCard: React.FC<DataCardProps> = ({
     ? { animationDelay: `${animationDelay}ms` }
     : { opacity: 0 }
 
-  const cardClassName = `data-card w-full rounded-[var(--border-radius-container-lg)] p-6 ${
+  const cardClassName = `data-card glass w-full rounded-[var(--border-radius-container-lg)] p-6 ${
     isVisible ? "reveal" : ""
   }`
 
