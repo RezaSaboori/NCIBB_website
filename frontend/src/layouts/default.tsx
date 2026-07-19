@@ -29,7 +29,7 @@ export default function DefaultLayout() {
           <Outlet context={{ setSidebar }} />
         </main>
       )}
-      <div className="pb-4">
+      <div className="mt-12 pb-4">
         <Footer />
       </div>
     </div>
