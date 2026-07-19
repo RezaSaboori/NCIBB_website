@@ -10,7 +10,7 @@ export default function DefaultLayout() {
 
   return (
     <div
-      className={`relative flex flex-col ${isHomePage ? "min-h-screen bg-[var(--color-gray1)]" : "h-screen"}`}
+      className={`relative flex flex-col ${isHomePage ? "min-h-screen bg-[var(--color-gray1)]" : "min-h-screen"}`}
     >
       <Header className={isHomePage ? "bg-transparent" : ""} />
       {sidebar ? (
