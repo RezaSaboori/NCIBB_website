@@ -6,5 +6,5 @@ interface StepPanelProps {
 }
 
 export const StepPanel: React.FC<StepPanelProps> = ({ children }) => {
-  return <div className="glass datasaz-step-panel">{children}</div>;
+  return <div className="datasaz-step-panel">{children}</div>;
 };
