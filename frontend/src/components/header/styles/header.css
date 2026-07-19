@@ -53,40 +53,7 @@
   /* Background styles are now moved to the ::before pseudo-element */
 }
 
-.header-nav::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1; /* Place behind the content */
-  border-radius: inherit;
-  background-image: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.5),
-    rgba(0, 0, 0, 0.05) 60%
-  );
-  backdrop-filter: blur(4px) saturate(1.8) brightness(1.2);
-  -webkit-backdrop-filter: blur(4px) saturate(1.8) brightness(1.2);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, #fff calc(1 * 10%), transparent),
-    inset 1.8px 3px 0px -2px color-mix(in srgb, #fff calc(1 * 90%), transparent),
-    inset -2px -2px 0px -2px color-mix(in srgb, #fff calc(1 * 80%), transparent),
-    inset -3px -8px 1px -6px color-mix(in srgb, #fff calc(1 * 60%), transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, #000 calc(1 * 12%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 8%), transparent);
-  transition:
-    background-color var(--motion-duration-slow) var(--motion-easing-easeInOut),
-    box-shadow var(--motion-duration-slow) var(--motion-easing-easeInOut);
-}
+/* .header-nav transparent glass is handled by .glass-transparent in glass.css */
 
 .header-nav--main {
   direction: rtl;
@@ -276,35 +243,9 @@
   opacity: 0;
 }
 
-/* Dark mode styles using theme variables */
-[data-theme="dark"] .header-nav::before {
-  background-image: linear-gradient(
-    135deg,
-    rgba(104, 104, 104, 0.3),
-    rgba(0, 0, 0, 0.3) 30%
-  );
-  backdrop-filter: blur(4px) saturate(1.8) brightness(1.2);
-  -webkit-backdrop-filter: blur(4px) saturate(1.8) brightness(1.2);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--color-gray8) 4%, transparent),
-    inset 1.8px 3px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 12%, transparent),
-    inset -2px -2px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 10%, transparent),
-    inset -3px -8px 1px -6px
-      color-mix(in srgb, var(--color-gray8) 8%, transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, #000 calc(1 * 25%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000 calc(1 * 30%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 30%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000 calc(1 * 25%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 15%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 12%), transparent);
-}
+/* Dark mode ::before for header-nav is handled by .dark .glass-transparent::before in glass.css */
 
-[data-theme="dark"] .header-nav__menu::after {
+.dark .header-nav__menu::after {
   background-color: color-mix(in srgb, var(--color-blue) 90%, transparent);
   box-shadow:
     inset 0 0 0 1px color-mix(in srgb, #01eeff 20%, transparent),
@@ -316,35 +257,35 @@
     inset 0px 3px 6px 0px color-mix(in srgb, #000820 10%, transparent);
 }
 
-[data-theme="dark"] .header-nav__item {
+.dark .header-nav__item {
   color: var(--color-gray12);
 }
 
-[data-theme="dark"] .header-nav__item:has(input:checked) {
+.dark .header-nav__item:has(input:checked) {
   color: var(--color-gray1);
 }
 
-[data-theme="dark"] .header-nav__control {
+.dark .header-nav__control {
   color: var(--color-gray12);
 }
 
-[data-theme="dark"] .header-nav__control:hover {
+.dark .header-nav__control:hover {
   color: var(--color-blue);
 }
 
-[data-theme="dark"] .header-nav__item:hover {
+.dark .header-nav__item:hover {
   color: var(--color-blue);
 }
 
 /* Ensure authenticated state overrides dark mode */
-[data-theme="dark"] .header-nav--icon.is-authenticated::before {
+.dark .header-nav--icon.is-authenticated::before {
   background: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow: none;
 }
 
-[data-theme="dark"] .header-nav--icon #home-icon-nav {
+.dark .header-nav--icon #home-icon-nav {
   background-image: linear-gradient(135deg, #f8a4c76c, #faa6de5b);
   box-shadow:
     inset 0 0 0 1px color-mix(in srgb, #ff80aab6 20%, transparent),

@@ -19,56 +19,6 @@
   gap: 4rem;
   padding: 2.5rem;
   border-radius: var(--border-radius-container-xl);
-  background-image: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-gray1) 30%, transparent),
-    color-mix(in srgb, var(--color-gray5) 30%, transparent) 40%
-  );
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--color-gray1) 10%, transparent),
-    inset 1.8px 3px 0px -2px
-      color-mix(in srgb, var(--color-gray1) 90%, transparent),
-    inset -2px -2px 0px -2px
-      color-mix(in srgb, var(--color-gray1) 30%, transparent),
-    inset -3px -12px 1px -8px
-      color-mix(in srgb, var(--color-gray1) 10%, transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, #000 calc(1 * 12%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 8%), transparent);
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.dark .services-container {
-  background-image: linear-gradient(
-    135deg,
-    color-mix(in srgb, rgba(255, 255, 255, 0.8) 20%, transparent),
-    color-mix(in srgb, rgba(255, 255, 255, 0.4) 20%, transparent) 30%
-  );
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--color-gray8) 4%, transparent),
-    inset 1.8px 3px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 12%, transparent),
-    inset -2px -2px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 10%, transparent),
-    inset -3px -8px 1px -6px
-      color-mix(in srgb, var(--color-gray8) 8%, transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, var(--color-gray7) calc(1 * 25%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000000 calc(1 * 30%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 30%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000000 calc(1 * 25%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000000 calc(1 * 15%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000000 calc(1 * 12%), transparent);
 }
 
 .services-header {
@@ -113,62 +63,7 @@
   direction: ltr;
 }
 
-.services-nav::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background-image: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.5),
-    rgba(0, 0, 0, 0.05) 60%
-  );
-  backdrop-filter: blur(8px) saturate(1.8) brightness(1.2);
-  -webkit-backdrop-filter: blur(8px) saturate(1.8) brightness(1.2);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, #fff calc(1 * 10%), transparent),
-    inset 1.8px 3px 0px -2px color-mix(in srgb, #fff calc(1 * 90%), transparent),
-    inset -2px -2px 0px -2px color-mix(in srgb, #fff calc(1 * 80%), transparent),
-    inset -3px -8px 1px -6px color-mix(in srgb, #fff calc(1 * 60%), transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, #000 calc(1 * 12%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 8%), transparent);
-}
-
-.dark .services-nav::before {
-  background-image: linear-gradient(
-    135deg,
-    rgba(104, 104, 104, 0.3),
-    rgba(0, 0, 0, 0.3) 30%
-  );
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--color-gray8) 4%, transparent),
-    inset 1.8px 3px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 12%, transparent),
-    inset -2px -2px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 10%, transparent),
-    inset -3px -8px 1px -6px
-      color-mix(in srgb, var(--color-gray8) 8%, transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, #000 calc(1 * 25%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000 calc(1 * 30%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 30%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000 calc(1 * 25%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 15%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 12%), transparent);
-}
+/* .services-nav transparent glass is handled by .glass-transparent in glass.css */
 
 .services-nav__menu {
   display: flex;
@@ -240,63 +135,11 @@
 .service-card {
   padding: 2.5rem;
   border-radius: var(--border-radius-container-lg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  background-image: linear-gradient(
-    135deg,
-    var(--color-gray1),
-    var(--color-gray2) 40%
-  );
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--color-gray1) 10%, transparent),
-    inset 1.8px 3px 0px -2px
-      color-mix(in srgb, var(--color-gray1) 90%, transparent),
-    inset -2px -2px 0px -2px
-      color-mix(in srgb, var(--color-gray1) 30%, transparent),
-    inset -3px -12px 1px -8px
-      color-mix(in srgb, var(--color-gray1) 10%, transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, #000 calc(1 * 12%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 8%), transparent);
-  transition:
-    transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 0.4s ease;
   text-align: right;
   opacity: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-}
-
-.dark .service-card {
-  background-image: linear-gradient(
-    135deg,
-    var(--color-gray3),
-    var(--color-gray2) 30%
-  );
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--color-gray8) 4%, transparent),
-    inset 1.8px 3px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 12%, transparent),
-    inset -2px -2px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 10%, transparent),
-    inset -3px -8px 1px -6px
-      color-mix(in srgb, var(--color-gray8) 8%, transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, var(--color-gray7) calc(1 * 25%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000000 calc(1 * 30%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 30%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000000 calc(1 * 25%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000000 calc(1 * 15%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000000 calc(1 * 12%), transparent);
 }
 
 .service-card-title {
