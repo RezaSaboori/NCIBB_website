@@ -238,7 +238,7 @@ export const PortalPage = () => {
         />
       </div>
 
-      <div className="robot-container">
+      <div className={`robot-container ${activeMode === "datasaz" ? "datasaz-mode" : ""}`}>
         <div
           className={`holistic-input-container ${
             isTextVisible ? "fade-in-up" : ""

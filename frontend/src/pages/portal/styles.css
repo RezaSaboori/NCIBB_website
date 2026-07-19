@@ -211,8 +211,10 @@
 }
 
 .holistic-input-container.datasaz-expanded {
+  position: relative;
+  top: unset;
   width: clamp(320px, 72vw, 1200px);
-  top: 42vh;
+  opacity: 1;
 }
 
 .datasaz-inline-container {
@@ -396,4 +398,11 @@
   outline: none !important;
   border: none !important;
   box-shadow: none !important;
+}
+
+.robot-container.datasaz-mode {
+  height: auto;
+  min-height: 65vh;
+  align-items: flex-start;
+  padding-top: 42vh;
 }
