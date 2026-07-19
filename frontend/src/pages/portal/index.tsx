@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useRef, useEffect, useMemo, useCallback } from "react"
+import { DatasazMode } from "../dataset/datasaz"
 import {
   Dropdown,
   DropdownTrigger,
@@ -21,7 +22,6 @@ import { RefreshIcon } from "../../components/ChatInput/icons/RefreshIcon"
 import { HarmonicDensity } from "../../components/bot/components/HarmonicDensity"
 import { THEMES } from "../../components/bot/config/themeConfig";
 import "./styles.css"
-import generatedImage from "../../../data/Gemini_Generated_Image_sc72gssc72gssc72.png"
 
 const chatInputConfig = {
   datasaz: {
@@ -274,6 +274,7 @@ export const PortalPage = () => {
               داده‌ساز
             </button>
           </div>
+          {activeMode !== "datasaz" && (
           <div className={`search-controls ${chatInputAnimationClass}`}>
             {activeMode === "manual" && (
               <div className="controls-container">
@@ -484,6 +485,7 @@ export const PortalPage = () => {
               />
             </div>
           </div>
+          )}
         </div>
       </div>
       <div
@@ -492,13 +494,7 @@ export const PortalPage = () => {
         }`}
       >
         {activeMode === "datasaz" ? (
-          <div className="generated-image-container">
-            <img
-              src={generatedImage}
-              alt="Generated Data Visualization"
-              className="generated-image"
-            />
-          </div>
+          <DatasazMode />
         ) : (
           <>
             {processedDatabases.length === 0 &&
