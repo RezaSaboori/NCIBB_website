@@ -1,3 +1,4 @@
+/*StepPanel.tsx*/
 import React from "react";
 
 interface StepPanelProps {
