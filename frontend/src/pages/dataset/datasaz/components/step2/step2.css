@@ -1,5 +1,12 @@
 /* step2.css — Step 2: Definition layout styles */
 
+/* ── LTR override for the entire step 2 panel ──────────────────── */
+
+.s2-criteria-panel {
+  direction: ltr;
+  text-align: left;
+}
+
 /* ── Two-panel row layout ───────────────────────────────────────── */
 
 .s2-criteria-row {
@@ -33,6 +40,23 @@
   gap: var(--spacing-xs);
 }
 
+/* ── Search box wrapper (glass pill) ───────────────────────────── */
+
+.s2-panel-header__search-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  border: var(--border-width-thin) solid var(--color-gray2);
+  border-radius: var(--border-radius-pill);
+  padding: var(--spacing-xs) var(--spacing-xs);
+  background-color: var(--color-gray1);
+}
+
+.s2-panel-header__search-box .s2-icon-btn {
+    background-color: var(--color-gray2);
+} 
+
 .s2-search-input {
   flex: 1;
   background: transparent;
@@ -42,11 +66,31 @@
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
   padding: var(--spacing-xs);
-  justify-content: space-between;
+  direction: ltr;
 }
 
 .s2-search-input::placeholder {
-  color: var(--color-gray9);
+  color: var(--color-gray4);
+}
+
+/* ── Icon buttons (search & help) ──────────────────────────────── */
+
+.s2-icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  color: var(--color-gray10);
+}
+
+.s2-icon-btn:hover {
+  color: var(--color-gray12);
 }
 
 /* ── Add criteria button ────────────────────────────────────────── */
@@ -60,13 +104,12 @@
   border: none;
   cursor: pointer;
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-medium);
   font-family: var(--font-family-base);
   color: var(--color-gray1);
-  background-color: var(--color-blue);
   width: fit-content;
-  justify-content: space-between;
 }
+
 
 .s2-add-btn__icon {
   display: flex;
@@ -78,4 +121,6 @@
   font-size: var(--font-size-md);
   line-height: 1;
   color: var(--color-gray1);
+  padding-top: 2px;
 }
+
