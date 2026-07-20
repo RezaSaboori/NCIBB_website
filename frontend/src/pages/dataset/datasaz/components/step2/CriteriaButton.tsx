@@ -24,7 +24,7 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
         <button className="blue-glass dz-icon-btn s2-icon-btn s2-criteria-btn__action" aria-label="Help" onClick={onHelp} type="button">
           <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
         </button>
-        <button className="orange-glass dz-icon-btn s2-icon-btn s2-criteria-btn__action" aria-label="Expand" onClick={onExpand} type="button">
+        <button className="green-glass dz-icon-btn s2-icon-btn s2-criteria-btn__action" aria-label="Expand" onClick={onExpand} type="button">
           <ExpandIcon className="dz-icon-btn__icon dz-icon-btn__icon--expand" />
         </button>
         <button className="red-glass dz-icon-btn s2-icon-btn s2-criteria-btn__action" aria-label="Delete" onClick={onDelete} type="button">

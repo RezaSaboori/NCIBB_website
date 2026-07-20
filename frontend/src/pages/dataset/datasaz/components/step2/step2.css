@@ -93,6 +93,11 @@
   color: var(--color-gray12);
 }
 
+.s2-icon-btn--help{
+    width:2.5rem;
+    height:2.5rem
+}
+
 /* Only the search button inside the pill gets auto-pushed right */
 .s2-panel-header__search-box .dz-icon-btn {
   margin-inline-start: auto;
@@ -118,6 +123,7 @@
 
 .s2-add-btn__icon {
   color: var(--color-gray1);
+  --dz-icon-btn-size: 1.25rem;
 }
 
 /* ── Criteria tabs row ──────────────────────────────────────────── */
@@ -137,7 +143,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-sm);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: var(--spacing-sm);
   border-radius: var(--border-radius-pill);
   width: fit-content;
   box-sizing: border-box;
@@ -156,6 +162,7 @@
   align-items: center;
   gap: var(--spacing-xs);
   flex-shrink: 0;
+  --dz-icon-btn-size: 1.5rem;
 }
 
 .s2-criteria-btn__action {

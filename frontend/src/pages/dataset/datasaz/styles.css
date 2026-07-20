@@ -173,8 +173,8 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  height: 100%;
-  aspect-ratio: 1 / 1;
+  width: var(--dz-icon-btn-size, 1.75rem);
+  height: var(--dz-icon-btn-size, 1.75rem);
   border: none;
   border-radius: 50%;
   background: transparent;
@@ -193,23 +193,25 @@
 /* ── Per-icon optical adjustments ──────────────────────────────── */
 
 .dz-icon-btn__icon--trash {
-  padding-bottom: 1px;
+  margin-bottom: 1.5px;
+  margin-right:0.5px;
 }
 
 .dz-icon-btn__icon--expand {
-  /* no offset needed by default */
+  margin-bottom: 1.5px;
+  margin-right:1px;
 }
 
 .dz-icon-btn__icon--question {
-  /* no offset needed by default */
+  margin-bottom: 1.5px;
 }
 
 .dz-icon-btn__icon--search {
-  /* no offset needed by default */
+  margin-left:1.5px; 
 }
 
 .dz-icon-btn__icon--add {
-  /* no offset needed by default */
+  margin-bottom: 1.5px;
 }
 
 
@@ -271,7 +273,7 @@
   align-items: center;
   gap: var(--spacing-md);
   flex-shrink: 0;
-  height: 2rem;
+  --dz-icon-btn-size: 2rem;
 }
 
 .dz-glass-container--lg .dz-glass-container__header {
