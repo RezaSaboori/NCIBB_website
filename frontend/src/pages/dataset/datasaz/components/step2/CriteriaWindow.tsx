@@ -34,7 +34,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
             <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
           </button>
           <button
-            className="green-glass dz-icon-btn s2-icon-btn"
+            className="orange-glass dz-icon-btn s2-icon-btn"
             aria-label="Minimize"
             onClick={onMinimize}
             type="button"
@@ -68,7 +68,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
 
       {/* Footer */}
       <div className="s2-criteria-window__footer">
-        <button className="blue-glass s2-criteria-window__btn" type="button">
+        <button className="blue-glass s2-criteria-window__btn" type="button" onClick={onMinimize}>
           Submit
         </button>
         <button className="red-glass s2-criteria-window__btn" type="button" onClick={onDelete}>

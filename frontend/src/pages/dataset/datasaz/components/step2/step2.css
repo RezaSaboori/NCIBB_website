@@ -156,6 +156,8 @@
 
 .s2-criteria-window {
   width: 100%;
+  direction: ltr;
+  text-align: left;
 }
 
 .s2-criteria-window__header {
@@ -189,6 +191,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   width: 100%;
+  direction: ltr;
 }
 
 .s2-criteria-window__input {
@@ -221,6 +224,7 @@
   gap: var(--spacing-sm);
   flex-shrink: 0;
   margin-top: var(--spacing-md);
+  direction: ltr;
 }
 
 .s2-criteria-window__btn {
