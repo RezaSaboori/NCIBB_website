@@ -58,9 +58,9 @@
   direction: ltr;
 }
 
-.s2-panel-header__search-box .s2-icon-btn {
-    background-color: var(--color-gray2);
-} 
+.s2-panel-header__search-box .dz-icon-btn {
+  background-color: var(--color-gray2);
+}
 
 .s2-search-input {
   flex: 1 1 auto;
@@ -86,13 +86,19 @@
 /* ── Icon buttons (search & help) ──────────────────────────────── */
 
 .s2-icon-btn {
-  margin-inline-start: auto;
   color: var(--color-gray10);
 }
 
 .s2-icon-btn:hover {
   color: var(--color-gray12);
 }
+
+/* Only the search button inside the pill gets auto-pushed right */
+.s2-panel-header__search-box .dz-icon-btn {
+  margin-inline-start: auto;
+}
+
+
 /* ── Add criteria button ────────────────────────────────────────── */
 
 .s2-add-btn {
@@ -110,18 +116,8 @@
   width: fit-content;
 }
 
-
 .s2-add-btn__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.25rem;
-  height: 1.25rem;
-  border-radius: 50%;
-  font-size: var(--font-size-md);
-  line-height: 1;
   color: var(--color-gray1);
-  padding-top: 2px;
 }
 
 /* ── Criteria tabs row ──────────────────────────────────────────── */
@@ -164,8 +160,6 @@
 
 .s2-criteria-btn__action {
   color: var(--color-gray2);
-  padding-bottom: 1px;
-  padding-right: 1px;
 }
 
 .s2-criteria-btn__action:hover {

@@ -173,8 +173,8 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  width: 1.75rem;
-  height: 1.75rem;
+  height: 100%;
+  aspect-ratio: 1 / 1;
   border: none;
   border-radius: 50%;
   background: transparent;
@@ -271,6 +271,7 @@
   align-items: center;
   gap: var(--spacing-md);
   flex-shrink: 0;
+  height: 2rem;
 }
 
 .dz-glass-container--lg .dz-glass-container__header {
