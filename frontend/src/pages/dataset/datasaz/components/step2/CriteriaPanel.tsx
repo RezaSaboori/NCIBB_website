@@ -48,7 +48,9 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
         <CriteriaButton label="Criteria 1" />
         <button className="blue-glass s2-add-btn">
           {btnLabel}
-          <span className="glass-transparent s2-add-btn__icon"><AddIcon width={10} height={10} /></span>
+          <span className="glass-transparent dz-icon-btn s2-add-btn__icon">
+            <AddIcon className="dz-icon-btn__icon dz-icon-btn__icon--add" />
+          </span>
         </button>
       </div>
 
