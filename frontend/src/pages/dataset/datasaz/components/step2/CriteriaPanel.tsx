@@ -3,6 +3,7 @@ import React, { useState, useCallback } from "react";
 import "./step2.css";
 import { CriteriaButton } from "./CriteriaButton";
 import { AddCriteriaTab } from "./AddCriteriaTab";
+import { CriteriaWindow } from "./CriteriaWindow";
 import { SearchIcon, QuestionIcon } from "./icons/Step2Icons";
 
 interface CriteriaItem {
@@ -54,6 +55,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
     isInclusion ? SAMPLE_INCLUSION : SAMPLE_EXCLUSION
   );
   const [nextId, setNextId] = useState(11);
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
 
   const handleAdd = useCallback(() => {
     setCriteria((prev) => [...prev, { id: nextId, label: `Criteria ${nextId}` }]);
@@ -62,6 +64,15 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
 
   const handleDelete = useCallback((id: number) => {
     setCriteria((prev) => prev.filter((c) => c.id !== id));
+    setExpandedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
+  }, []);
+
+  const handleToggleExpand = useCallback((id: number) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
   }, []);
 
   return (
@@ -95,15 +106,29 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
           <CriteriaButton
             key={c.id}
             label={c.label}
+            isExpanded={expandedIds.has(c.id)}
+            onExpand={() => handleToggleExpand(c.id)}
             onDelete={() => handleDelete(c.id)}
           />
         ))}
         <AddCriteriaTab label={btnLabel} onClick={handleAdd} />
       </div>
 
-      {/* Body */}
-      <div className="dz-glass-container__body">
-      </div>
+      {/* Body — expanded criteria windows */}
+      {expandedIds.size > 0 && (
+        <div className="dz-glass-container__body s2-criteria-windows">
+          {criteria
+            .filter((c) => expandedIds.has(c.id))
+            .map((c) => (
+              <CriteriaWindow
+                key={c.id}
+                label={c.label}
+                onMinimize={() => handleToggleExpand(c.id)}
+                onDelete={() => handleDelete(c.id)}
+              />
+            ))}
+        </div>
+      )}
     </div>
   );
 };
