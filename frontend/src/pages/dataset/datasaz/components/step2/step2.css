@@ -86,16 +86,6 @@
 /* ── Icon buttons (search & help) ──────────────────────────────── */
 
 .s2-icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  width: 1.75rem;
-  height: 1.75rem;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
   margin-inline-start: auto;
   color: var(--color-gray10);
 }
@@ -103,7 +93,6 @@
 .s2-icon-btn:hover {
   color: var(--color-gray12);
 }
-
 /* ── Add criteria button ────────────────────────────────────────── */
 
 .s2-add-btn {

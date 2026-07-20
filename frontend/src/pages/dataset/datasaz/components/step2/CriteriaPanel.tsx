@@ -32,14 +32,14 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
               placeholder="Search Imported Criteria"
               disabled
             />
-            <button className="glass s2-icon-btn s2-icon-btn--search" aria-label="Search">
-              <SearchIcon />
+            <button className="glass dz-icon-btn s2-icon-btn s2-icon-btn--search" aria-label="Search">
+              <SearchIcon className="dz-icon-btn__icon dz-icon-btn__icon--search" />
             </button>
           </div>
         </div>
 
-        <button className="glass s2-icon-btn s2-icon-btn--help" aria-label="Help">
-          <QuestionIcon />
+        <button className="glass dz-icon-btn s2-icon-btn s2-icon-btn--help" aria-label="Help">
+          <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
         </button>
       </div>
 

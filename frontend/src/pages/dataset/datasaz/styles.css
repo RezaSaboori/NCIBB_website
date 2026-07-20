@@ -156,6 +156,62 @@
   gap: var(--spacing-md);
 }
 
+/* ── Datasaz Unified Icon Button ───────────────────────────────── */
+/*
+ * Usage:
+ *   <button className="dz-icon-btn [variant]" aria-label="...">
+ *     <SomeIcon className="dz-icon-btn__icon [dz-icon-btn__icon--trash|--question|...]" />
+ *   </button>
+ *
+ * The button height is driven by the parent container (height: 100%).
+ * Width is kept square via aspect-ratio: 1 / 1.
+ * The SVG icon fills the button fully; per-icon offsets use modifier classes.
+ */
+
+.dz-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.dz-icon-btn__icon {
+  display: block;
+  width: 55%;
+  height: 55%;
+  flex-shrink: 0;
+}
+
+/* ── Per-icon optical adjustments ──────────────────────────────── */
+
+.dz-icon-btn__icon--trash {
+  padding-bottom: 1px;
+}
+
+.dz-icon-btn__icon--expand {
+  /* no offset needed by default */
+}
+
+.dz-icon-btn__icon--question {
+  /* no offset needed by default */
+}
+
+.dz-icon-btn__icon--search {
+  /* no offset needed by default */
+}
+
+.dz-icon-btn__icon--add {
+  /* no offset needed by default */
+}
+
 
 /* ── Datasaz Glass Container — Parent Styles ──────────────────── */
 /*
