@@ -89,7 +89,7 @@ export const Footer: FC = () => {
                 <iframe
                   src="https://balad.ir/embed?p=3A1CXreyL2L1RV"
                   title="مشاهده «بیمارستان تخصصی قلب رجایی» روی نقشه بلد"
-                  className="absolute bottom-0 left-0 w-full h-[256px] border-none"
+                  className="absolute bottom-[-15px] left-0 w-full h-[256px] border-none"
                   allowFullScreen
                   loading="lazy"
                 ></iframe>
