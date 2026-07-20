@@ -24,8 +24,36 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
   const title = isInclusion ? "Inclusion Criteria" : "Exclusion Criteria";
   const btnLabel = isInclusion ? "Add inclusion" : "Add exclusion";
 
-  const [criteria, setCriteria] = useState<CriteriaItem[]>([]);
-  const [nextId, setNextId] = useState(1);
+  const SAMPLE_INCLUSION: CriteriaItem[] = [
+    { id: 1,  label: "WBC Count" },
+    { id: 2,  label: "Hemoglobin" },
+    { id: 3,  label: "Platelet Count" },
+    { id: 4,  label: "Fasting Glucose" },
+    { id: 5,  label: "HbA1c" },
+    { id: 6,  label: "Serum Creatinine" },
+    { id: 7,  label: "eGFR" },
+    { id: 8,  label: "TSH" },
+    { id: 9,  label: "LDL Cholesterol" },
+    { id: 10, label: "CRP" },
+  ];
+
+  const SAMPLE_EXCLUSION: CriteriaItem[] = [
+    { id: 1,  label: "HIV Antibody" },
+    { id: 2,  label: "HBsAg" },
+    { id: 3,  label: "Anti-HCV" },
+    { id: 4,  label: "Serum Bilirubin" },
+    { id: 5,  label: "ALT" },
+    { id: 6,  label: "AST" },
+    { id: 7,  label: "Urine Protein" },
+    { id: 8,  label: "PT / INR" },
+    { id: 9,  label: "D-Dimer" },
+    { id: 10, label: "Beta-hCG" },
+  ];
+
+  const [criteria, setCriteria] = useState<CriteriaItem[]>(
+    isInclusion ? SAMPLE_INCLUSION : SAMPLE_EXCLUSION
+  );
+  const [nextId, setNextId] = useState(11);
 
   const handleAdd = useCallback(() => {
     setCriteria((prev) => [...prev, { id: nextId, label: `Criteria ${nextId}` }]);
