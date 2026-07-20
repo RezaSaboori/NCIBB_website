@@ -1,9 +1,14 @@
 /*CriteriaPanel.tsx*/
-import React from "react";
+import React, { useState, useCallback } from "react";
 import "./step2.css";
 import { CriteriaButton } from "./CriteriaButton";
 import { AddCriteriaTab } from "./AddCriteriaTab";
 import { SearchIcon, QuestionIcon } from "./icons/Step2Icons";
+
+interface CriteriaItem {
+  id: number;
+  label: string;
+}
 
 interface CriteriaPanelProps {
   type: "inclusion" | "exclusion";
@@ -18,6 +23,18 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
 
   const title = isInclusion ? "Inclusion Criteria" : "Exclusion Criteria";
   const btnLabel = isInclusion ? "Add inclusion" : "Add exclusion";
+
+  const [criteria, setCriteria] = useState<CriteriaItem[]>([]);
+  const [nextId, setNextId] = useState(1);
+
+  const handleAdd = useCallback(() => {
+    setCriteria((prev) => [...prev, { id: nextId, label: `Criteria ${nextId}` }]);
+    setNextId((n) => n + 1);
+  }, [nextId]);
+
+  const handleDelete = useCallback((id: number) => {
+    setCriteria((prev) => prev.filter((c) => c.id !== id));
+  }, []);
 
   return (
     <div className="glass dz-glass-container dz-glass-container--md s2-criteria-panel">
@@ -46,17 +63,14 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
 
       {/* Tabs */}
       <div className="dz-criteria-tabs">
-        <CriteriaButton label="Criteria 1" />
-        <CriteriaButton label="Criteria 2" />
-        <CriteriaButton label="Criteria 3" />
-        <CriteriaButton label="Criteria 4" />
-        <CriteriaButton label="Criteria 5" />
-        <CriteriaButton label="Criteria 6" />
-        <CriteriaButton label="Criteria 7" />
-        <CriteriaButton label="Criteria 8" />
-        <CriteriaButton label="Criteria 9" />
-        <CriteriaButton label="Criteria 10" />
-        <AddCriteriaTab label={btnLabel} />
+        {criteria.map((c) => (
+          <CriteriaButton
+            key={c.id}
+            label={c.label}
+            onDelete={() => handleDelete(c.id)}
+          />
+        ))}
+        <AddCriteriaTab label={btnLabel} onClick={handleAdd} />
       </div>
 
       {/* Body */}
