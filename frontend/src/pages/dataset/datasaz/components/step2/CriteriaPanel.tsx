@@ -2,6 +2,7 @@
 import React from "react";
 import "./step2.css";
 import { CriteriaButton } from "./CriteriaButton";
+import { SearchIcon, AddIcon, QuestionIcon } from "./icons/Step2Icons";
 
 interface CriteriaPanelProps {
   type: "inclusion" | "exclusion";
@@ -32,19 +33,13 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
               disabled
             />
             <button className="glass s2-icon-btn s2-icon-btn--search" aria-label="Search">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+              <SearchIcon />
             </button>
           </div>
         </div>
 
         <button className="glass s2-icon-btn s2-icon-btn--help" aria-label="Help">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M8.3 8.8a3.8 3.8 0 1 1 7.4 1.2c0 2.2-3.7 3.1-3.7 5.4" />
-            <line x1="12" y1="19" x2="12.01" y2="19" />
-          </svg>
+          <QuestionIcon />
         </button>
       </div>
 
@@ -53,7 +48,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
         <CriteriaButton label="Criteria 1" />
         <button className="blue-glass s2-add-btn">
           {btnLabel}
-          <span className="glass-transparent s2-add-btn__icon">+</span>
+          <span className="glass-transparent s2-add-btn__icon"><AddIcon width={10} height={10} /></span>
         </button>
       </div>
 

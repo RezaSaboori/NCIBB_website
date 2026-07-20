@@ -174,10 +174,12 @@
 }
 
 .s2-criteria-btn__action {
-  color: var(--color-gray8);
+  color: var(--color-gray2);
+  padding-bottom: 1px;
+  padding-right: 1px;
 }
 
 .s2-criteria-btn__action:hover {
-  color: var(--color-gray12);
+  color: var(--color-gray1);
 }
 
