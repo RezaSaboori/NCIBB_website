@@ -135,6 +135,16 @@
   padding-top: 2px;
 }
 
+/* ── Criteria tabs row ──────────────────────────────────────────── */
+
+.s2-criteria-tabs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
 /* ── Criteria item button ───────────────────────────────────────── */
 
 .s2-criteria-btn {

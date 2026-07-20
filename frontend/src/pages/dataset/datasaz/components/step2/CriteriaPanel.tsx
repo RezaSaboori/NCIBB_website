@@ -48,13 +48,17 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
         </button>
       </div>
 
-      {/* Body */}
-      <div className="dz-glass-container__body">
+      {/* Tabs */}
+      <div className="s2-criteria-tabs">
         <CriteriaButton label="Criteria 1" />
         <button className="blue-glass s2-add-btn">
           {btnLabel}
           <span className="glass-transparent s2-add-btn__icon">+</span>
         </button>
+      </div>
+
+      {/* Body */}
+      <div className="dz-glass-container__body">
       </div>
     </div>
   );
