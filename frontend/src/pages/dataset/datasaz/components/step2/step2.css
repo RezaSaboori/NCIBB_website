@@ -66,7 +66,6 @@
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
   padding: var(--spacing-xs);
-  direction: ltr;
 }
 
 .s2-search-input::placeholder {
