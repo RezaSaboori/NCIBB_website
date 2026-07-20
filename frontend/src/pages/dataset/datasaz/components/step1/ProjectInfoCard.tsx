@@ -15,12 +15,11 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
   onEstimatedCountChange,
 }) => {
   return (
-    <div className="glass s1-glass-card">
-      <div className="s1-card-header">
-        <span className="s1-card-header__icon">🗂️</span>
+    <div className="glass dz-glass-container dz-glass-container--lg">
+      <div className="dz-glass-container__header">
         <h2 className="s1-card-header__title">اطلاعات پروژه</h2>
       </div>
-      <div className="s1-card-body">
+      <div className="dz-glass-container__body">
         <div className="s1-field">
           <label className="s1-label" htmlFor="project-name">
             نام پروژه

@@ -85,14 +85,13 @@ export const Footer: FC = () => {
                 تهران، ولیعصر، جنب پارک ملت، نبش نیایش، انستیتو ملی قلب و عروق
                 شهید رجایی
               </p>
-              <div className="h-64 rounded-3xl overflow-hidden shadow-lg w-full min-h-[256px]">
+              <div className="relative h-[180px] rounded-3xl overflow-hidden w-full">
                 <iframe
                   src="https://balad.ir/embed?p=3A1CXreyL2L1RV"
                   title="مشاهده «بیمارستان تخصصی قلب رجایی» روی نقشه بلد"
-                  className="w-full h-full min-h-[256px] border-none"
+                  className="absolute bottom-0 left-0 w-full h-[256px] border-none"
                   allowFullScreen
                   loading="lazy"
-                  style={{ minHeight: '256px' }}
                 ></iframe>
               </div>
             </div>

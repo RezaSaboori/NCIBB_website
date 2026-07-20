@@ -154,3 +154,94 @@
   align-items: center;
   gap: var(--spacing-md);
 }
+
+
+/* ── Datasaz Glass Container — Parent Styles ──────────────────── */
+/*
+ * Usage:
+ *   <div className="glass dz-glass-container dz-glass-container--lg">
+ *     <div className="dz-glass-container__header"> ... </div>
+ *     <div className="dz-glass-container__body"> ... </div>
+ *   </div>
+ *
+ * The `glass` class (from glass.css) provides the visual frosted effect.
+ * These classes provide only structure: display, radius, padding, gap.
+ *
+ * Sizes:
+ *   --lg  → border-radius-container-lg  | padding-xl  | header mb-md
+ *   --md  → border-radius-container-md  | padding-lg  | header mb-sm  (mirrors s1-glass-card)
+ *   --sm  → border-radius-container-sm  | padding-md  | header mb-sm
+ */
+
+.dz-glass-container {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Size variants ─────────────────────────────────────────────── */
+
+.dz-glass-container--lg {
+  border-radius: var(--border-radius-container-lg);
+  padding: var(--spacing-xl);
+  gap: var(--spacing-lg);
+}
+
+.dz-glass-container--md {
+  border-radius: var(--border-radius-container-md);
+  padding: var(--spacing-lg);
+  gap: var(--spacing-lg);
+}
+
+.dz-glass-container--sm {
+  border-radius: var(--border-radius-container-sm);
+  padding: var(--spacing-md);
+  gap: var(--spacing-sm);
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+
+.dz-glass-container__header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.dz-glass-container--lg .dz-glass-container__header {
+  padding-bottom: var(--spacing-md);
+}
+
+.dz-glass-container--md .dz-glass-container__header {
+  padding-bottom: var(--spacing-sm);
+  border-bottom: var(--border-width-hairline) solid
+    color-mix(in srgb, var(--color-gray5) 20%, transparent);
+}
+
+.dz-glass-container--sm .dz-glass-container__header {
+  padding-bottom: var(--spacing-xs);
+  border-bottom: var(--border-width-hairline) solid
+    color-mix(in srgb, var(--color-gray5) 15%, transparent);
+}
+
+/* ── Body ──────────────────────────────────────────────────────── */
+
+.dz-glass-container__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dz-glass-container--lg .dz-glass-container__body {
+  gap: var(--spacing-lg);
+}
+
+.dz-glass-container--md .dz-glass-container__body {
+  gap: var(--spacing-md);
+}
+
+.dz-glass-container--sm .dz-glass-container__body {
+  gap: var(--spacing-sm);
+}

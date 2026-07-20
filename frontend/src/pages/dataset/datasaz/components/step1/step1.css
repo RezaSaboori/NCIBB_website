@@ -17,32 +17,7 @@
   }
 }
 
-/* ── Glass card shell ───────────────────────────────────────────── */
 
-.s1-glass-card {
-  /* Reuses .glass from glass.css — applied via className in JSX */
-  display: flex;
-  flex-direction: column;
-  border-radius: var(--border-radius-container-md);
-  overflow: hidden;
-  min-height: 380px;
-  padding: var(--spacing-lg);
-  gap: var(--spacing-lg);
-}
-
-/* ── Card header ────────────────────────────────────────────────── */
-
-.s1-card-header {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  direction: rtl;
-}
-
-.s1-card-header__icon {
-  font-size: var(--font-size-lg);
-  line-height: 1;
-}
 
 .s1-card-header__title {
   font-family: var(--font-family-persian);
@@ -50,16 +25,6 @@
   font-weight: var(--font-weight-semibold);
   color: var(--color-gray11);
   margin: 0;
-}
-
-/* ── Card body ──────────────────────────────────────────────────── */
-
-.s1-card-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  direction: rtl;
 }
 
 /* ── Taahod (تعهدنامه) body — scrollable ────────────────────────── */

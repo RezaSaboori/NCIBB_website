@@ -3,12 +3,11 @@ import React from "react";
 
 export const TaahodCard: React.FC = () => {
   return (
-    <div className="glass s1-glass-card">
-      <div className="s1-card-header">
-        <span className="s1-card-header__icon">📋</span>
+    <div className="glass dz-glass-container dz-glass-container--lg">
+      <div className="dz-glass-container__header">
         <h2 className="s1-card-header__title">تعهدنامه</h2>
       </div>
-      <div className="s1-card-body s1-taahod-body custom-scrollbar">
+      <div className="dz-glass-container__body s1-taahod-body custom-scrollbar">
         <p className="s1-taahod-intro">
           اینجانب با آگاهی کامل از مفاد این تعهدنامه و به‌منظور استفاده از خدمات
           سامانه داده‌ساز، موارد زیر را متعهد می‌شوم:
