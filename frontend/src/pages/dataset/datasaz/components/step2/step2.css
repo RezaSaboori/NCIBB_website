@@ -38,6 +38,8 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
+  direction: ltr;
+  min-width: 0;
 }
 
 /* ── Search box wrapper (glass pill) ───────────────────────────── */
@@ -45,12 +47,15 @@
 .s2-panel-header__search-box {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   flex: 1;
+  width: 100%;
+  min-width: 0;
+  gap: var(--spacing-xs);
   border: var(--border-width-thin) solid var(--color-gray2);
   border-radius: var(--border-radius-pill);
   padding: var(--spacing-xs) var(--spacing-xs);
   background-color: var(--color-gray1);
+  direction: ltr;
 }
 
 .s2-panel-header__search-box .s2-icon-btn {
@@ -58,33 +63,40 @@
 } 
 
 .s2-search-input {
-  flex: 1;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
   background: transparent;
   border: none;
   outline: none;
   color: var(--color-gray11);
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
-  padding: var(--spacing-xs);
+  padding: 1px var(--spacing-sm) 0px var(--spacing-sm);
+  direction: ltr;
+  text-align: left;
 }
 
 .s2-search-input::placeholder {
   color: var(--color-gray4);
+  text-align: left;
 }
+
 
 /* ── Icon buttons (search & help) ──────────────────────────────── */
 
 .s2-icon-btn {
-  border: none;
-  background: transparent;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
   width: 1.75rem;
   height: 1.75rem;
+  border: none;
   border-radius: 50%;
-  flex-shrink: 0;
+  background: transparent;
+  cursor: pointer;
+  margin-inline-start: auto;
   color: var(--color-gray10);
 }
 
@@ -121,5 +133,41 @@
   line-height: 1;
   color: var(--color-gray1);
   padding-top: 2px;
+}
+
+/* ── Criteria item button ───────────────────────────────────────── */
+
+.s2-criteria-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-pill);
+  width: fit-content;
+  box-sizing: border-box;
+}
+
+.s2-criteria-btn__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray11);
+  font-family: var(--font-family-base);
+  flex: 1;
+}
+
+.s2-criteria-btn__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+.s2-criteria-btn__action {
+  color: var(--color-gray8);
+}
+
+.s2-criteria-btn__action:hover {
+  color: var(--color-gray12);
 }
 

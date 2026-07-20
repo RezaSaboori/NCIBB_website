@@ -202,6 +202,12 @@
   gap: var(--spacing-sm);
 }
 
+.dz-glass-container--xs {
+  border-radius: var(--border-radius-container-xs);
+  padding: var(--spacing-sm,);
+  gap: var(--spacing-sm);
+}
+
 /* ── Header ────────────────────────────────────────────────────── */
 
 .dz-glass-container__header {
@@ -217,14 +223,14 @@
 
 .dz-glass-container--md .dz-glass-container__header {
   padding-bottom: var(--spacing-sm);
-  border-bottom: var(--border-width-hairline) solid
-    color-mix(in srgb, var(--color-gray5) 20%, transparent);
 }
 
 .dz-glass-container--sm .dz-glass-container__header {
   padding-bottom: var(--spacing-xs);
-  border-bottom: var(--border-width-hairline) solid
-    color-mix(in srgb, var(--color-gray5) 15%, transparent);
+}
+
+.dz-glass-container--xs .dz-glass-container__header {
+  padding-bottom: var(--spacing-xs);
 }
 
 /* ── Body ──────────────────────────────────────────────────────── */
