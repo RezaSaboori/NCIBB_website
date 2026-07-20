@@ -17,20 +17,18 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
   onExpand,
 }) => {
   return (
-    <div className="glass s2-criteria-btn">
-      <span className="s2-criteria-btn__label">{label}</span>
-      <div className="s2-criteria-btn__actions">
-
-        <button className="blue-glass dz-icon-btn s2-icon-btn s2-criteria-btn__action" aria-label="Help" onClick={onHelp} type="button">
+    <div className="glass dz-criteria-tab">
+      <span className="dz-criteria-tab__title">{label}</span>
+      <div className="dz-criteria-tab__actions">
+        <button className="blue-glass dz-icon-btn s2-icon-btn" aria-label="Help" onClick={onHelp} type="button">
           <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
         </button>
-        <button className="green-glass dz-icon-btn s2-icon-btn s2-criteria-btn__action" aria-label="Expand" onClick={onExpand} type="button">
+        <button className="green-glass dz-icon-btn s2-icon-btn" aria-label="Expand" onClick={onExpand} type="button">
           <ExpandIcon className="dz-icon-btn__icon dz-icon-btn__icon--expand" />
         </button>
-        <button className="red-glass dz-icon-btn s2-icon-btn s2-criteria-btn__action" aria-label="Delete" onClick={onDelete} type="button">
+        <button className="red-glass dz-icon-btn s2-icon-btn" aria-label="Delete" onClick={onDelete} type="button">
           <TrashIcon className="dz-icon-btn__icon dz-icon-btn__icon--trash" />
         </button>
-
       </div>
     </div>
   );

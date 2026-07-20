@@ -2,7 +2,8 @@
 import React from "react";
 import "./step2.css";
 import { CriteriaButton } from "./CriteriaButton";
-import { SearchIcon, AddIcon, QuestionIcon } from "./icons/Step2Icons";
+import { AddCriteriaTab } from "./AddCriteriaTab";
+import { SearchIcon, QuestionIcon } from "./icons/Step2Icons";
 
 interface CriteriaPanelProps {
   type: "inclusion" | "exclusion";
@@ -16,7 +17,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
     : "s2-panel-header__title--exclusion";
 
   const title = isInclusion ? "Inclusion Criteria" : "Exclusion Criteria";
-  const btnLabel = isInclusion ? "Add inclusion criteria" : "Add exclusion criteria";
+  const btnLabel = isInclusion ? "Add inclusion" : "Add exclusion";
 
   return (
     <div className="glass dz-glass-container dz-glass-container--md s2-criteria-panel">
@@ -44,14 +45,18 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
       </div>
 
       {/* Tabs */}
-      <div className="s2-criteria-tabs">
+      <div className="dz-criteria-tabs">
         <CriteriaButton label="Criteria 1" />
-        <button className="blue-glass s2-add-btn">
-          {btnLabel}
-          <span className="glass-transparent dz-icon-btn s2-add-btn__icon">
-            <AddIcon className="dz-icon-btn__icon dz-icon-btn__icon--add" />
-          </span>
-        </button>
+        <CriteriaButton label="Criteria 2" />
+        <CriteriaButton label="Criteria 3" />
+        <CriteriaButton label="Criteria 4" />
+        <CriteriaButton label="Criteria 5" />
+        <CriteriaButton label="Criteria 6" />
+        <CriteriaButton label="Criteria 7" />
+        <CriteriaButton label="Criteria 8" />
+        <CriteriaButton label="Criteria 9" />
+        <CriteriaButton label="Criteria 10" />
+        <AddCriteriaTab label={btnLabel} />
       </div>
 
       {/* Body */}
