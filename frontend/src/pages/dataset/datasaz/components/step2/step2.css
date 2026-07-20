@@ -1,0 +1,81 @@
+/* step2.css — Step 2: Definition layout styles */
+
+/* ── Two-panel row layout ───────────────────────────────────────── */
+
+.s2-criteria-row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-lg);
+  width: 100%;
+  align-items: flex-start;
+}
+
+/* ── Panel header layout ────────────────────────────────────────── */
+
+.s2-panel-header__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  flex-shrink: 0;
+}
+
+.s2-panel-header__title--inclusion {
+  color: var(--color-green);
+}
+
+.s2-panel-header__title--exclusion {
+  color: var(--color-red);
+}
+
+.s2-panel-header__search {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.s2-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-gray11);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-base);
+  padding: var(--spacing-xs);
+  justify-content: space-between;
+}
+
+.s2-search-input::placeholder {
+  color: var(--color-gray9);
+}
+
+/* ── Add criteria button ────────────────────────────────────────── */
+
+.s2-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-sm);
+  border-radius: var(--border-radius-pill);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-family-base);
+  color: var(--color-gray1);
+  background-color: var(--color-blue);
+  width: fit-content;
+  justify-content: space-between;
+}
+
+.s2-add-btn__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  font-size: var(--font-size-md);
+  line-height: 1;
+  color: var(--color-gray1);
+}

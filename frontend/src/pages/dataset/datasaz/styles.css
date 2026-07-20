@@ -1,5 +1,6 @@
 @import "../../../styles/theme.css";
 @import "./components/step1/step1.css";
+@import "./components/step2/step2.css";
 /* ── Step Tab Bar ──────────────────────────────────────────────── */
 
 .datasaz-step-tabs {
@@ -206,7 +207,7 @@
 .dz-glass-container__header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   flex-shrink: 0;
 }
 
