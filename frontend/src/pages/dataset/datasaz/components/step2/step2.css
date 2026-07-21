@@ -278,3 +278,29 @@
 .dz-icon-btn__icon--minimize {
   margin-bottom: 1px;
 }
+
+/* ── CriteriaButton expand-on-select animation ──────────────────── */
+
+.s2-criteria-tab {
+  cursor: pointer;
+}
+
+.s2-criteria-tab__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+  overflow: hidden;
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    max-width var(--motion-duration-slow) var(--motion-easing-easeInOut),
+    opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+.s2-criteria-tab--selected .s2-criteria-tab__actions {
+  max-width: 7rem;
+  opacity: 1;
+  pointer-events: auto;
+}

@@ -1,5 +1,5 @@
 /* CriteriaButton.tsx */
-import React from "react";
+import React, { useState } from "react";
 import "./step2.css";
 import { TrashIcon, QuestionIcon, ExpandIcon, MinimizeIcon } from "./icons/Step2Icons";
 
@@ -18,25 +18,55 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
   onHelp,
   onExpand,
 }) => {
+  const [isSelected, setIsSelected] = useState(false);
+
+  const handleTabClick = () => {
+    setIsSelected((prev) => !prev);
+  };
+
+  const handleActionClick = (e: React.MouseEvent, callback?: () => void) => {
+    e.stopPropagation();
+    callback?.();
+  };
+
   return (
-    <div className="glass dz-criteria-tab">
+    <div
+      className={`glass dz-criteria-tab s2-criteria-tab ${isSelected ? "s2-criteria-tab--selected" : ""}`}
+      onClick={handleTabClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && handleTabClick()}
+    >
       <span className="dz-criteria-tab__title">{label}</span>
-      <div className="dz-criteria-tab__actions">
-        <button className="teal-glass dz-icon-btn s2-icon-btn" aria-label="Help" onClick={onHelp} type="button">
+      <div className="dz-criteria-tab__actions s2-criteria-tab__actions">
+        <button
+          className="teal-glass dz-icon-btn s2-icon-btn"
+          aria-label="Help"
+          onClick={(e) => handleActionClick(e, onHelp)}
+          type="button"
+          tabIndex={isSelected ? 0 : -1}
+        >
           <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
         </button>
         <button
           className={`${isExpanded ? "orange-glass" : "green-glass"} dz-icon-btn s2-icon-btn`}
           aria-label={isExpanded ? "Minimize" : "Expand"}
-          onClick={onExpand}
+          onClick={(e) => handleActionClick(e, onExpand)}
           type="button"
+          tabIndex={isSelected ? 0 : -1}
         >
           {isExpanded
             ? <MinimizeIcon className="dz-icon-btn__icon dz-icon-btn__icon--minimize" />
             : <ExpandIcon className="dz-icon-btn__icon dz-icon-btn__icon--expand" />
           }
         </button>
-        <button className="red-glass dz-icon-btn s2-icon-btn" aria-label="Delete" onClick={onDelete} type="button">
+        <button
+          className="red-glass dz-icon-btn s2-icon-btn"
+          aria-label="Delete"
+          onClick={(e) => handleActionClick(e, onDelete)}
+          type="button"
+          tabIndex={isSelected ? 0 : -1}
+        >
           <TrashIcon className="dz-icon-btn__icon dz-icon-btn__icon--trash" />
         </button>
       </div>
