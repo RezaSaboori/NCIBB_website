@@ -25,7 +25,12 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
         <button className="teal-glass dz-icon-btn s2-icon-btn" aria-label="Help" onClick={onHelp} type="button">
           <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
         </button>
-        <button className="green-glass dz-icon-btn s2-icon-btn" aria-label={isExpanded ? "Minimize" : "Expand"} onClick={onExpand} type="button">
+        <button
+          className={`${isExpanded ? "orange-glass" : "green-glass"} dz-icon-btn s2-icon-btn`}
+          aria-label={isExpanded ? "Minimize" : "Expand"}
+          onClick={onExpand}
+          type="button"
+        >
           {isExpanded
             ? <MinimizeIcon className="dz-icon-btn__icon dz-icon-btn__icon--minimize" />
             : <ExpandIcon className="dz-icon-btn__icon dz-icon-btn__icon--expand" />

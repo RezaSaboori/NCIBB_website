@@ -387,7 +387,7 @@
 .dz-criteria-tab__actions {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-xs) !important;
   flex-shrink: 0;
   --dz-icon-btn-size: 1.3rem;
 }

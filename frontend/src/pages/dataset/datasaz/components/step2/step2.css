@@ -2,10 +2,10 @@
 
 /* ── LTR override for the entire step 2 panel ──────────────────── */
 
-.s2-criteria-panel {
-  direction: ltr;
-  text-align: left;
-  gap:var(--spacing-sm)
+.s2-criteria-panel * {
+  direction: ltr !important;
+  text-align: left !important;
+  gap: var(--spacing-sm);
 }
 
 /* ── Two-panel row layout ───────────────────────────────────────── */
@@ -39,7 +39,6 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
-  direction: ltr;
   min-width: 0;
 }
 
@@ -56,7 +55,6 @@
   border-radius: var(--border-radius-pill);
   padding: var(--spacing-xs) var(--spacing-xs);
   background-color: var(--color-gray1);
-  direction: ltr;
 }
 
 .s2-panel-header__search-box .dz-icon-btn {
@@ -74,13 +72,10 @@
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
   padding: 1px var(--spacing-sm) 0px var(--spacing-sm);
-  direction: ltr;
-  text-align: left;
 }
 
 .s2-search-input::placeholder {
   color: var(--color-gray4);
-  text-align: left;
 }
 
 
@@ -120,7 +115,6 @@
     color: var(--color-gray2)
 }
 /* ── Criteria action button colors ──────────────────────────────── */
-
 .dz-criteria-tab__actions .s2-icon-btn,
 .s2-criteria-window__header .s2-icon-btn {
   color: var(--color-gray1);
@@ -156,8 +150,6 @@
 
 .s2-criteria-window {
   width: 100%;
-  direction: ltr;
-  text-align: left;
 }
 
 .s2-criteria-window__header {
@@ -170,6 +162,7 @@
   color: var(--color-gray11);
   font-family: var(--font-family-base);
   flex: 1;
+  padding-left: var(--spacing-xs);
 }
 
 .s2-criteria-window__header-actions {
@@ -183,15 +176,14 @@
 /* ── Window Body row (input + required toggle) ──────────────────── */
 
 .s2-criteria-window__body {
-  gap: var(--spacing-sm);
+    display: flex;
+    gap: var(--spacing-sm);
 }
 
 .s2-criteria-window__row {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  width: 100%;
-  direction: ltr;
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-md);
 }
 
 .s2-criteria-window__input {
@@ -224,7 +216,6 @@
   gap: var(--spacing-sm);
   flex-shrink: 0;
   margin-top: var(--spacing-md);
-  direction: ltr;
 }
 
 .s2-criteria-window__btn {
