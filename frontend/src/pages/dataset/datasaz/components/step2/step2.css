@@ -18,7 +18,18 @@
   align-items: flex-start;
 }
 
+/* ── Panel  layout ────────────────────────────────────────── */
+.s2-criteria-row .dz-glass-container--md {
+  padding: var(--spacing-sm);
+  gap: 0
+}
+
+
 /* ── Panel header layout ────────────────────────────────────────── */
+
+.dz-glass-container__header{
+  margin: var(--spacing-md);
+}
 
 .s2-panel-header__title {
   font-size: var(--font-size-lg);
@@ -41,6 +52,7 @@
   gap: var(--spacing-xs);
   min-width: 0;
 }
+
 
 /* ── Search box wrapper (glass pill) ───────────────────────────── */
 
@@ -78,7 +90,11 @@
   color: var(--color-gray4);
 }
 
+/* ── Panel tabs layout ────────────────────────────────────────── */
 
+.s2-criteria-row .dz-criteria-tabs {
+  margin-bottom: var(--spacing-sm);
+}
 /* ── Icon buttons (search & help) ──────────────────────────────── */
 
 .s2-icon-btn--help{
@@ -141,7 +157,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
+  margin-top: var(--spacing-lg);
 }
 
 .s2-criteria-window {
@@ -150,6 +167,7 @@
 
 .s2-criteria-window__header {
   justify-content: space-between;
+  margin: 0;
 }
 
 .s2-criteria-window__title {
@@ -239,7 +257,7 @@
 .s2-required-toggle {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   border: none;
   border-radius: var(--border-radius-pill);
   padding: var(--spacing-xs) var(--spacing-sm);
@@ -247,16 +265,16 @@
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
   color: var(--color-gray9);
+  font-weight: var(--font-weight-semibold);
   white-space: nowrap;
   flex-shrink: 0;
   transition: color var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
 .s2-required-toggle__dot {
-  width: 0.85rem;
-  height: 0.85rem;
+  width: 1rem;
+  height: 1rem;
   border-radius: 50%;
-  border: 1.5px solid var(--color-gray4);
   background: transparent;
   flex-shrink: 0;
   transition:
@@ -269,6 +287,10 @@
   background: var(--color-red);
   border-color: var(--color-red);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-red) 25%, transparent);
+}
+
+.s2-required-toggle__label {
+  padding: 2.5px 0 0 0 ;
 }
 
 .s2-required-toggle--checked .s2-required-toggle__label {

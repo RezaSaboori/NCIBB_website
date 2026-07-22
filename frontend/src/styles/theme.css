@@ -280,6 +280,11 @@
 * Base Body Styles
 * ========================================
 */
+html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+}
+
 body {
   margin: 0;
   font-family: var(--font-family-persian);
@@ -362,3 +367,46 @@ body {
     border-radius: 100px;
   }
 }
+/* ── Custom scrollbar ── */
+
+/* 1. Standard rules ONLY for Firefox */
+@supports (-moz-appearance: none) {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-gray4) transparent;
+    }
+}
+
+/* 2. WebKit rules for Chrome, Edge, Safari */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+/* Invisible track with top/bottom padding */
+::-webkit-scrollbar-track {
+    background: transparent;
+    margin-block: 9px; /* Adds padding to the top and bottom */
+    margin-inline: 9px; /* Adds padding to the left and right (for horizontal scrollbars) */
+}
+
+/* Floating pill thumb */
+::-webkit-scrollbar-thumb {
+    background-color: var(--color-gray4);
+    border-radius: var(--border-radius-pill);
+    border: 3px solid transparent; /* Invisible padding around the thumb */
+    background-clip: content-box;
+    cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-gray6);
+}
+
+/* Explicitly disable the arrows/buttons in WebKit */
+::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+

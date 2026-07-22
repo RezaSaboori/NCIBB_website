@@ -327,7 +327,7 @@
   gap: var(--spacing-sm);
   max-height: 9rem;
   overflow-y: auto;
-  padding: var(--spacing-xs) var(--spacing-xs) var(--spacing-md) var(--spacing-xs);
+  padding: var(--spacing-md);
   box-sizing: border-box;
 
   -webkit-mask-image: linear-gradient(
