@@ -10,12 +10,12 @@ export const RequiredToggle: React.FC<RequiredToggleProps> = ({ checked, onChang
   return (
     <button
       type="button"
-      className={`glass s2-required-toggle${checked ? " s2-required-toggle--checked" : ""}`}
+      className={`s2-required-toggle${checked ? " s2-required-toggle--checked" : ""}`}
       onClick={() => onChange(!checked)}
       aria-label="Required"
       aria-pressed={checked}
     >
-      <span className="s2-required-toggle__dot" />
+      <span className="glass s2-required-toggle__dot" />
       <span className="s2-required-toggle__label">Required ?</span>
     </button>
   );

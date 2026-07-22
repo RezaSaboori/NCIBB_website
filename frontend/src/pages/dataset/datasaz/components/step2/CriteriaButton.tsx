@@ -1,11 +1,13 @@
 /* CriteriaButton.tsx */
-import React, { useState } from "react";
+import React from "react";
 import "./step2.css";
 import { TrashIcon, QuestionIcon, ExpandIcon, MinimizeIcon } from "./icons/Step2Icons";
 
 interface CriteriaButtonProps {
   label?: string;
+  isSelected?: boolean;
   isExpanded?: boolean;
+  onSelect?: () => void;
   onDelete?: () => void;
   onHelp?: () => void;
   onExpand?: () => void;
@@ -13,17 +15,13 @@ interface CriteriaButtonProps {
 
 export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
   label = "Criteria 1",
+  isSelected = false,
   isExpanded = false,
+  onSelect,
   onDelete,
   onHelp,
   onExpand,
 }) => {
-  const [isSelected, setIsSelected] = useState(false);
-
-  const handleTabClick = () => {
-    setIsSelected((prev) => !prev);
-  };
-
   const handleActionClick = (e: React.MouseEvent, callback?: () => void) => {
     e.stopPropagation();
     callback?.();
@@ -32,10 +30,10 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
   return (
     <div
       className={`glass dz-criteria-tab s2-criteria-tab ${isSelected ? "s2-criteria-tab--selected" : ""}`}
-      onClick={handleTabClick}
+      onClick={onSelect}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && handleTabClick()}
+      onKeyDown={(e) => e.key === "Enter" && onSelect?.()}
     >
       <span className="dz-criteria-tab__title">{label}</span>
       <div className="dz-criteria-tab__actions s2-criteria-tab__actions">

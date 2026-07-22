@@ -185,6 +185,19 @@
   --color-pink: rgb(255, 55, 95);
   --color-brown: rgb(183, 138, 102);
 
+  --fill-color-red:    rgb(210, 54, 57);
+  --fill-color-orange: rgb(166, 95, 31);
+  --fill-color-yellow: rgb(138, 116, 0);
+  --fill-color-green:  rgb(30, 130, 55);
+  --fill-color-mint:   rgb(0, 131, 117);
+  --fill-color-teal:   rgb(0, 130, 139);
+  --fill-color-cyan:   rgb(36, 127, 152);
+  --fill-color-blue:   rgb(0, 119, 209);
+  --fill-color-indigo: rgb(100, 86, 238);
+  --fill-color-purple: rgb(190, 45, 211);
+  --fill-color-pink:   rgb(217, 47, 81);
+  --fill-color-brown:  rgb(143, 108, 80);
+
   --color-gray1: rgb(7, 7, 7);
   --color-gray2: rgb(27, 27, 27);
   --color-gray3: rgb(47, 47, 47);

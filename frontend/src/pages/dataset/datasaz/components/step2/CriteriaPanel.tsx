@@ -56,6 +56,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
   );
   const [nextId, setNextId] = useState(11);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const handleAdd = useCallback(() => {
     setCriteria((prev) => [...prev, { id: nextId, label: `Criteria ${nextId}` }]);
@@ -65,6 +66,11 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
   const handleDelete = useCallback((id: number) => {
     setCriteria((prev) => prev.filter((c) => c.id !== id));
     setExpandedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
+    setSelectedId((prev) => (prev === id ? null : prev));
+  }, []);
+
+  const handleSelect = useCallback((id: number) => {
+    setSelectedId((prev) => (prev === id ? null : id));
   }, []);
 
   const handleToggleExpand = useCallback((id: number) => {
@@ -106,7 +112,9 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
           <CriteriaButton
             key={c.id}
             label={c.label}
+            isSelected={selectedId === c.id}
             isExpanded={expandedIds.has(c.id)}
+            onSelect={() => handleSelect(c.id)}
             onExpand={() => handleToggleExpand(c.id)}
             onDelete={() => handleDelete(c.id)}
           />

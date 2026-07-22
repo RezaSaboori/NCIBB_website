@@ -107,35 +107,31 @@
 }
 
 .s2-add-criteria-tab__title {
-  color: var(--color-gray2);
   max-width: 7rem;
 }
 
-.s2-add-criteria-tab__icon {
-    color: var(--color-gray2)
-}
 /* ── Criteria action button colors ──────────────────────────────── */
 .dz-criteria-tab__actions .s2-icon-btn,
-.s2-criteria-window__header .s2-icon-btn {
-  color: var(--color-gray1);
+.s2-criteria-window__header .s2-icon-btn,
+.s2-add-criteria-tab__icon,
+.s2-add-criteria-tab__title {
+  color:var(--color-gray1);
   transition: opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
 .s2-criteria-tab .s2-icon-btn:hover,
-.s2-criteria-window__header .s2-icon-btn:hover {
+.s2-criteria-window__header .s2-icon-btn:hover,
+.s2-add-criteria-tab__icon:hover,
+.s2-add-criteria-tab__title:hover {
   opacity: 85%;
 }
 
 .dark .dz-criteria-tab__actions .s2-icon-btn,
-.dark .s2-criteria-window__header .s2-icon-btn{
-  opacity: 85%;
-  color: var(--color-gray1);
+.dark .s2-criteria-window__header .s2-icon-btn,
+.dark .s2-add-criteria-tab__icon,
+.dark .s2-add-criteria-tab__title {
+  color:var(--color-gray12);
   transition: opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
-}
-
-.dark .dz-criteria-tab__actions .s2-icon-btn:hover,
-.dark .s2-criteria-window__header .s2-icon-btn:hover{
-  opacity: 100%;
 }
 
 
@@ -226,8 +222,12 @@
   font-weight: var(--font-weight-semibold);
   font-family: var(--font-family-base);
   cursor: pointer;
-  color: var(--color-gray2);
+  color: var(--color-gray1);
   transition: opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+.dark .s2-criteria-window__btn {
+  color: var(--color-gray12);
 }
 
 .s2-criteria-window__btn:hover {
@@ -256,7 +256,7 @@
   width: 0.85rem;
   height: 0.85rem;
   border-radius: 50%;
-  border: 1.5px solid var(--color-gray5);
+  border: 1.5px solid var(--color-gray4);
   background: transparent;
   flex-shrink: 0;
   transition:
