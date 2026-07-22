@@ -144,8 +144,8 @@
         rgba(255, 255, 255, 0) 50%,
         rgba(0, 0, 0, 0.1) 100%
     );
-    backdrop-filter: blur(4px) saturate(1.8) brightness(1.2);
-    -webkit-backdrop-filter: blur(4px) saturate(1.8) brightness(1.2);
+    backdrop-filter: blur(4px) saturate(1.8) brightness(1.2) !important;
+    -webkit-backdrop-filter: blur(4px) saturate(1.8) brightness(1.2) !important;
     box-shadow:
         inset 0 0 0 1px color-mix(in srgb, #fff 10%, transparent),
         inset 1.8px 3px 0px -2px color-mix(in srgb, #fff 90%, transparent),
