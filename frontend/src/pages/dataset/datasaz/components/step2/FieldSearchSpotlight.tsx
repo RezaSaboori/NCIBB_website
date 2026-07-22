@@ -90,14 +90,11 @@ export const FieldSearchSpotlight: React.FC<FieldSearchSpotlightProps> = ({
                   type="button"
                   className="glass-transparent s2-spotlight__suggestion-tab"
                   onMouseDown={(e) => {
-                    e.preventDefault(); // prevent input blur before click fires
+                    e.preventDefault();
                     onSelect(item);
                   }}
                 >
                   <span className="s2-spotlight__suggestion-name">{item.name}</span>
-                  <span className="s2-spotlight__suggestion-path">
-                    {item.path.slice(0, -1).join(" › ")}
-                  </span>
                 </button>
               ))}
           </div>

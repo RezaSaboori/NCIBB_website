@@ -115,23 +115,25 @@
 
 .s2-spotlight__suggestions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: var(--spacing-xs);
   padding: 0 var(--spacing-sm) var(--spacing-sm) var(--spacing-sm);
-  max-height: 14rem;
+  max-height: 9rem;
   overflow-y: auto;
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    black 6px,
-    black calc(100% - 6px),
+    black 8px,
+    black calc(100% - 8px),
     transparent 100%
   );
   mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    black 6px,
-    black calc(100% - 6px),
+    black 8px,
+    black calc(100% - 8px),
     transparent 100%
   );
 }
@@ -188,14 +190,4 @@
   color: var(--color-gray12);
   font-family: var(--font-family-base);
   white-space: nowrap;
-}
-
-.s2-spotlight__suggestion-path {
-  font-size: var(--font-size-xs);
-  color: var(--color-gray7);
-  font-family: var(--font-family-base);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
 }
