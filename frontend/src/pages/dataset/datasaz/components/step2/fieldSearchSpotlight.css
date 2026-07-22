@@ -76,6 +76,10 @@
   border-radius: var(--border-radius-container-md);
   padding: var(--spacing-xs);
   margin: 0 var(--spacing-sm);
+  position: relative;
+  backdrop-filter: var(--glass-backdrop-filter);
+  -webkit-backdrop-filter: var(--glass-backdrop-filter);
+  background: color-mix(in srgb, var(--color-gray1) 40%, transparent);
 }
 
 .s2-spotlight__search-icon-wrap {
@@ -152,18 +156,24 @@
 }
 
 /* Each suggestion is a glass-transparent pill button */
+/* Each suggestion is a glass-transparent pill button */
 .s2-spotlight__suggestion-tab {
   display: flex;
   align-items: baseline;
   gap: var(--spacing-sm);
-  padding:var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--border-radius-pill);
   border: none;
   cursor: pointer;
   text-align: left;
   width: fit-content;
   box-sizing: border-box;
+  position: relative;
+  backdrop-filter: var(--glass-backdrop-filter);
+  -webkit-backdrop-filter: var(--glass-backdrop-filter);
+  background: color-mix(in srgb, var(--color-gray1) 30%, transparent);
   transition: opacity var(--motion-duration-fast) var(--motion-easing-easeInOut);
+
   animation: s2-suggestion-in var(--motion-duration-normal) var(--motion-easing-easeInOut) both;
 }
 
