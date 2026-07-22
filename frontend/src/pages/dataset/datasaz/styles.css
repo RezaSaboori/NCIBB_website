@@ -1,6 +1,7 @@
 @import "../../../styles/theme.css";
 @import "./components/step1/step1.css";
 @import "./components/step2/step2.css";
+@import "./components/step2/fieldSearchSpotlight.css";
 /* ── Step Tab Bar ──────────────────────────────────────────────── */
 
 .datasaz-step-tabs {

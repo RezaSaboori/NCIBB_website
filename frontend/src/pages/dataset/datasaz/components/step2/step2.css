@@ -304,3 +304,9 @@
   opacity: 1;
   pointer-events: auto;
 }
+
+/* ── Add criteria tab — active (spotlight open) state ──────────── */
+.s2-add-criteria-tab--active {
+  opacity: 0.7;
+  pointer-events: none;
+}

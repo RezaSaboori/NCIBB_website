@@ -4,7 +4,10 @@ import "./step2.css";
 import { CriteriaButton } from "./CriteriaButton";
 import { AddCriteriaTab } from "./AddCriteriaTab";
 import { CriteriaWindow } from "./CriteriaWindow";
+import { FieldSearchSpotlight } from "./FieldSearchSpotlight";
 import { SearchIcon, QuestionIcon } from "./icons/Step2Icons";
+import { useFieldSearch } from "../../hooks/useFieldSearch";
+import type { SuggestionItem } from "../../types";
 
 interface CriteriaItem {
   id: number;
@@ -57,11 +60,27 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
   const [nextId, setNextId] = useState(11);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [spotlightOpen, setSpotlightOpen] = useState(false);
 
-  const handleAdd = useCallback(() => {
-    setCriteria((prev) => [...prev, { id: nextId, label: `Criteria ${nextId}` }]);
-    setNextId((n) => n + 1);
-  }, [nextId]);
+  const { query, suggestions, isLoading, handleQueryChange, reset } = useFieldSearch();
+
+  const handleOpenSpotlight = useCallback(() => {
+    setSpotlightOpen(true);
+  }, []);
+
+  const handleCloseSpotlight = useCallback(() => {
+    setSpotlightOpen(false);
+    reset();
+  }, [reset]);
+
+  const handleSelectSuggestion = useCallback(
+    (item: SuggestionItem) => {
+      setCriteria((prev) => [...prev, { id: nextId, label: item.name }]);
+      setNextId((n) => n + 1);
+      handleCloseSpotlight();
+    },
+    [nextId, handleCloseSpotlight]
+  );
 
   const handleDelete = useCallback((id: number) => {
     setCriteria((prev) => prev.filter((c) => c.id !== id));
@@ -82,7 +101,17 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
   }, []);
 
   return (
-    <div className="glass dz-glass-container dz-glass-container--md s2-criteria-panel">
+    <div className="glass dz-glass-container dz-glass-container--md s2-criteria-panel" style={{ position: "relative" }}>
+      {/* Spotlight overlay */}
+      <FieldSearchSpotlight
+        isOpen={spotlightOpen}
+        query={query}
+        suggestions={suggestions}
+        isLoading={isLoading}
+        onQueryChange={handleQueryChange}
+        onSelect={handleSelectSuggestion}
+        onClose={handleCloseSpotlight}
+      />
       {/* Header */}
       <div className="dz-glass-container__header">
         <span className={`s2-panel-header__title ${titleClass}`}>{title}</span>
@@ -119,7 +148,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
             onDelete={() => handleDelete(c.id)}
           />
         ))}
-        <AddCriteriaTab label={btnLabel} onClick={handleAdd} />
+        <AddCriteriaTab label={btnLabel} isActive={spotlightOpen} onClick={handleOpenSpotlight} />
       </div>
 
       {/* Body — expanded criteria windows */}
