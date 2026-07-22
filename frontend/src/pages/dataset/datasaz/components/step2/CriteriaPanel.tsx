@@ -62,7 +62,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
 
-  const { query, suggestions, isLoading, handleQueryChange, reset } = useFieldSearch();
+  const { query, suggestions, isLoading, error, handleQueryChange, reset } = useFieldSearch();
 
   const handleOpenSpotlight = useCallback(() => {
     setSpotlightOpen(true);
@@ -100,18 +100,10 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
     });
   }, []);
 
+  const showBody = spotlightOpen || expandedIds.size > 0;
+
   return (
-    <div className="glass dz-glass-container dz-glass-container--md s2-criteria-panel" style={{ position: "relative" }}>
-      {/* Spotlight overlay */}
-      <FieldSearchSpotlight
-        isOpen={spotlightOpen}
-        query={query}
-        suggestions={suggestions}
-        isLoading={isLoading}
-        onQueryChange={handleQueryChange}
-        onSelect={handleSelectSuggestion}
-        onClose={handleCloseSpotlight}
-      />
+    <div className="glass dz-glass-container dz-glass-container--md s2-criteria-panel">
       {/* Header */}
       <div className="dz-glass-container__header">
         <span className={`s2-panel-header__title ${titleClass}`}>{title}</span>
@@ -151,9 +143,19 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
         <AddCriteriaTab label={btnLabel} isActive={spotlightOpen} onClick={handleOpenSpotlight} />
       </div>
 
-      {/* Body — expanded criteria windows */}
-      {expandedIds.size > 0 && (
-        <div className="dz-glass-container__body s2-criteria-windows">
+      {/* Body — spotlight overlay + expanded criteria windows */}
+      {showBody && (
+        <div className="dz-glass-container__body s2-criteria-windows" style={{ position: "relative" }}>
+          <FieldSearchSpotlight
+            isOpen={spotlightOpen}
+            query={query}
+            suggestions={suggestions}
+            isLoading={isLoading}
+            error={error}
+            onQueryChange={handleQueryChange}
+            onSelect={handleSelectSuggestion}
+            onClose={handleCloseSpotlight}
+          />
           {criteria
             .filter((c) => expandedIds.has(c.id))
             .map((c) => (

@@ -9,6 +9,7 @@ interface FieldSearchSpotlightProps {
   query: string;
   suggestions: SuggestionItem[];
   isLoading: boolean;
+  error: string | null;
   onQueryChange: (value: string) => void;
   onSelect: (item: SuggestionItem) => void;
   onClose: () => void;
@@ -19,6 +20,7 @@ export const FieldSearchSpotlight: React.FC<FieldSearchSpotlightProps> = ({
   query,
   suggestions,
   isLoading,
+  error,
   onQueryChange,
   onSelect,
   onClose,
@@ -54,12 +56,9 @@ export const FieldSearchSpotlight: React.FC<FieldSearchSpotlightProps> = ({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="glass-transparent s2-spotlight">
+      <div className="s2-spotlight">
         {/* Search Row */}
-        <div className="s2-spotlight__search-row">
-          <span className="glass-transparent s2-spotlight__search-icon-wrap">
-            <SearchIcon className="s2-spotlight__search-icon" />
-          </span>
+        <div className="glass-transparent s2-spotlight__search-row">
           <input
             ref={inputRef}
             className="s2-spotlight__input"
@@ -70,15 +69,21 @@ export const FieldSearchSpotlight: React.FC<FieldSearchSpotlightProps> = ({
             autoComplete="off"
             spellCheck={false}
           />
+          <span className="glass-transparent s2-spotlight__search-icon-wrap">
+            <SearchIcon className="s2-spotlight__search-icon" />
+          </span>
         </div>
 
         {/* Floating suggestion tabs */}
-        {(suggestions.length > 0 || isLoading) && (
+        {(suggestions.length > 0 || isLoading || error) && (
           <div className="s2-spotlight__suggestions">
             {isLoading && (
               <span className="s2-spotlight__loading">Searching…</span>
             )}
-            {!isLoading &&
+            {!isLoading && error && (
+              <span className="s2-spotlight__error">{error}</span>
+            )}
+            {!isLoading && !error &&
               suggestions.map((item) => (
                 <button
                   key={item.code}
