@@ -17,10 +17,11 @@
   align-items: flex-start;
   justify-content: center;
   box-sizing: border-box;
+  isolation: isolate;
 
   /* Fades out the content behind the overlay progressively */
-  backdrop-filter: var(--glass-backdrop-filter);
-  -webkit-backdrop-filter: var(--glass-backdrop-filter);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 
   animation: s2-overlay-in var(--motion-duration-slow) var(--motion-easing-easeInOut) both;
 }
