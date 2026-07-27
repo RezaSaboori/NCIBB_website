@@ -42,6 +42,7 @@ LOCAL_APPS = [
     'projects',
     'messaging',
     'core',
+    'datasaz',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -209,6 +210,9 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
+
+# Ontology Autocomplete microservice — server-internal address only
+ONTOLOGY_API_URL = os.environ.get("ONTOLOGY_API_URL", "http://127.0.0.1:5175")
 
 # Logging Configuration
 LOGGING = {

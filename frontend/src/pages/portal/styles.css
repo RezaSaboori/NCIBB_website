@@ -43,8 +43,8 @@
 
 .data-finder-modes-container {
   position: relative;
-  z-index: 1;
-  isolation: isolate; /* Force isolated stacking context for ::before */
+  z-index: 11; /* Must be higher than z-index: 10 of the spotlight overlay */
+  isolation: isolate;
   display: flex;
   align-items: center;
   width: fit-content;

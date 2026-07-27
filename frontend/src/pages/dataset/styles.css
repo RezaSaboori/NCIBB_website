@@ -42,6 +42,7 @@
 .data-finder-modes-container {
   position: relative;
   z-index: 1;
+  isolation: isolate !important; /* Force isolated stacking context for ::before */
   display: flex;
   align-items: center;
   width: fit-content;

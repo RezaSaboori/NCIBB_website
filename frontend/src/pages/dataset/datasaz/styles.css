@@ -7,7 +7,7 @@
 .datasaz-step-tabs {
   position: relative;
   z-index: 1; /* Establish stacking context so ::before z-index:-1 is trapped */
-  isolation: isolate; /* Hard isolation to prevent ancestor interference */
+  isolation: isolate !important; /* Hard isolation to prevent ancestor interference */
   display: flex;
   align-items: center;
   width: fit-content;

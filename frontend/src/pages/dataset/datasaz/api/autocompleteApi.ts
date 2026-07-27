@@ -1,7 +1,7 @@
 /* autocompleteApi.ts */
 import type { AutocompleteResponse } from "../types";
 
-const AUTOCOMPLETE_BASE = "http://localhost:5175";
+const AUTOCOMPLETE_ENDPOINT = "/api/datasaz/autocomplete/";
 
 export async function fetchSuggestions(
   query: string,
@@ -13,7 +13,7 @@ export async function fetchSuggestions(
     limit: String(limit),
     mode,
   });
-  const res = await fetch(`${AUTOCOMPLETE_BASE}/autocomplete?${params}`);
+  const res = await fetch(`${AUTOCOMPLETE_ENDPOINT}?${params}`);
   if (!res.ok) throw new Error(`Autocomplete error: ${res.status}`);
   return res.json();
 }
