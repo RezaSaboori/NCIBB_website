@@ -27,6 +27,10 @@
   margin: 0;
 }
 
+.s1-two-col-grid .dz-glass-container__header{
+  margin: 0;
+}
+
 /* ── Taahod (تعهدنامه) body — scrollable ────────────────────────── */
 
 .s1-taahod-body {

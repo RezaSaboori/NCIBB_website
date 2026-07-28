@@ -18,6 +18,7 @@ interface FieldSearchSpotlightProps {
 export const FieldSearchSpotlight = React.forwardRef<HTMLDivElement, FieldSearchSpotlightProps>(
   ({ isOpen, query, suggestions, isLoading, error, onQueryChange, onSelect, onClose }, ref) => {
     const inputRef = useRef<HTMLInputElement>(null);
+    const panelRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
       if (isOpen) {
@@ -35,17 +36,26 @@ export const FieldSearchSpotlight = React.forwardRef<HTMLDivElement, FieldSearch
       return () => document.removeEventListener("keydown", onKey);
     }, [isOpen, onClose]);
 
+    // Close when clicking outside the spotlight panel (anywhere on the page)
+    useEffect(() => {
+      if (!isOpen) return;
+      const onDocMouseDown = (e: MouseEvent) => {
+        if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+          onClose();
+        }
+      };
+      document.addEventListener("mousedown", onDocMouseDown);
+      return () => document.removeEventListener("mousedown", onDocMouseDown);
+    }, [isOpen, onClose]);
+
     if (!isOpen) return null;
 
     return (
       <div
         ref={ref}
         className="s2-spotlight-overlay"
-        onMouseDown={(e) => {
-          if (e.target === e.currentTarget) onClose();
-        }}
       >
-        <div className="s2-spotlight">
+        <div ref={panelRef} className="s2-spotlight">
           {/* Search Row */}
           <div className="glass-transparent s2-spotlight__search-row">
             <input
