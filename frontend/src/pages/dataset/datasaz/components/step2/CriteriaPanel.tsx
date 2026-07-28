@@ -200,7 +200,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
             onClose={handleCloseSpotlight}
           />
           {expandedIds.size > 0 && (
-            <div className="dz-glass-container__body s2-criteria-windows">
+            <div className="s2-criteria-windows">
               {(isFiltering ? filteredCriteria : criteria)
                 .filter((c) => expandedIds.has(c.id))
                 .slice()
