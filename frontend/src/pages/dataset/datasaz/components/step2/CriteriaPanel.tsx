@@ -1,5 +1,5 @@
 /*CriteriaPanel.tsx*/
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import "./step2.css";
 import { CriteriaButton } from "./CriteriaButton";
 import { AddCriteriaTab } from "./AddCriteriaTab";
@@ -61,8 +61,25 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
+  const [spotlightMinHeight, setSpotlightMinHeight] = useState(0);
+  const spotlightRef = useRef<HTMLDivElement>(null);
 
   const { query, suggestions, isLoading, error, handleQueryChange, reset } = useFieldSearch();
+
+  // Track spotlight height in real-time and drive body minHeight
+  useEffect(() => {
+    if (!spotlightOpen) {
+      setSpotlightMinHeight(0);
+      return;
+    }
+    const el = spotlightRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      setSpotlightMinHeight(el.offsetHeight);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [spotlightOpen, suggestions]);
 
   const handleOpenSpotlight = useCallback(() => {
     setSpotlightOpen(true);
@@ -125,7 +142,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
         </button>
       </div>
 
-      {/* Tabs + spotlight anchor wrapper */}
+      {/* Tabs row */}
       <div className="s2-criteria-tabs-anchor">
         <div className="dz-criteria-tabs">
           {criteria.map((c) => (
@@ -141,33 +158,39 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
           ))}
           <AddCriteriaTab label={btnLabel} isActive={spotlightOpen} onClick={handleOpenSpotlight} />
         </div>
-
-        {/* Spotlight — absolutely positioned below tabs, floats above windows */}
-        <FieldSearchSpotlight
-          isOpen={spotlightOpen}
-          query={query}
-          suggestions={suggestions}
-          isLoading={isLoading}
-          error={error}
-          onQueryChange={handleQueryChange}
-          onSelect={handleSelectSuggestion}
-          onClose={handleCloseSpotlight}
-        />
       </div>
 
-      {/* Expanded criteria windows — rendered below the anchor in flow */}
-      {expandedIds.size > 0 && (
-        <div className="dz-glass-container__body s2-criteria-windows">
-          {criteria
-            .filter((c) => expandedIds.has(c.id))
-            .map((c) => (
-              <CriteriaWindow
-                key={c.id}
-                label={c.label}
-                onMinimize={() => handleToggleExpand(c.id)}
-                onDelete={() => handleDelete(c.id)}
-              />
-            ))}
+      {/* Body: spotlight floats in front; windows in flow below; body grows to fit whichever is taller */}
+      {(spotlightOpen || expandedIds.size > 0) && (
+        <div
+          className="s2-criteria-body"
+          style={{ minHeight: spotlightMinHeight > 0 ? spotlightMinHeight : undefined }}
+        >
+          <FieldSearchSpotlight
+            ref={spotlightRef}
+            isOpen={spotlightOpen}
+            query={query}
+            suggestions={suggestions}
+            isLoading={isLoading}
+            error={error}
+            onQueryChange={handleQueryChange}
+            onSelect={handleSelectSuggestion}
+            onClose={handleCloseSpotlight}
+          />
+          {expandedIds.size > 0 && (
+            <div className="dz-glass-container__body s2-criteria-windows">
+              {criteria
+                .filter((c) => expandedIds.has(c.id))
+                .map((c) => (
+                  <CriteriaWindow
+                    key={c.id}
+                    label={c.label}
+                    onMinimize={() => handleToggleExpand(c.id)}
+                    onDelete={() => handleDelete(c.id)}
+                  />
+                ))}
+            </div>
+          )}
         </div>
       )}
     </div>

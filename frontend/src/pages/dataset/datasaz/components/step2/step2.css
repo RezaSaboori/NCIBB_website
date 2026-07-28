@@ -159,14 +159,16 @@
 
 /* ── Criteria Window ────────────────────────────────────────────── */
 
-/* Anchor wrapper: establishes the positioning context for the spotlight */
+/* Anchor wrapper for the tabs row — no positioning needed here anymore */
 .s2-criteria-tabs-anchor {
   position: relative;
 }
 
-/* Panel must allow spotlight to overflow visually */
-.s2-criteria-panel {
-  overflow: visible !important;
+/* Body container: positioning context for the absolute spotlight overlay */
+.s2-criteria-body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .s2-criteria-windows {

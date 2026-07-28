@@ -9,27 +9,21 @@
 
 .s2-spotlight-overlay {
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  inset: 0;
   z-index: 20;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   box-sizing: border-box;
   isolation: isolate;
-  padding-top: var(--spacing-xs);
+  border-radius: inherit;
+  /* Blur blurs whatever is painted behind this element — i.e. the windows */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   animation: s2-overlay-in var(--motion-duration-slow) var(--motion-easing-easeInOut) both;
 }
 
-/* Blur the windows below when spotlight is open — applied via parent modifier class */
-.s2-criteria-panel--spotlight-open .s2-criteria-windows {
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  transition: backdrop-filter var(--motion-duration-slow) var(--motion-easing-easeInOut);
-}
-
-.dark .s2-criteria-panel--spotlight-open .s2-criteria-windows {
+.dark .s2-spotlight-overlay {
   background: color-mix(in srgb, var(--color-gray14) 20%, transparent);
 }
 
