@@ -181,6 +181,8 @@
   padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
   position: relative;
   z-index: 1;
+  max-height: 30rem;
+  overflow-y: auto;
 }
 
 .s2-criteria-window {

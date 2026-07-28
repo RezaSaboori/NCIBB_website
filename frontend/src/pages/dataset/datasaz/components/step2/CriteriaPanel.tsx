@@ -109,7 +109,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   const handleSelectSuggestion = useCallback(
     (item: SuggestionItem) => {
       const newId = nextId;
-      setCriteria((prev) => [{ id: newId, label: item.name }, ...prev]);
+      setCriteria((prev) => [...prev, { id: newId, label: item.name }]);
       setNextId((n) => n + 1);
       setExpandedIds((prev) => { const next = new Set(prev); next.add(newId); return next; });
       setSelectedId(newId);
@@ -200,6 +200,8 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
             <div className="dz-glass-container__body s2-criteria-windows">
               {criteria
                 .filter((c) => expandedIds.has(c.id))
+                .slice()
+                .reverse()
                 .map((c) => (
                   <CriteriaWindow
                     key={c.id}
