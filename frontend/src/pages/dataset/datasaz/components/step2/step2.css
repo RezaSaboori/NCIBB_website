@@ -170,6 +170,7 @@
   flex-direction: column;
   overflow: visible;
   flex: 0 0 auto;
+  min-height: 0;
 }
 
 .s2-criteria-windows {
@@ -179,8 +180,7 @@
   padding: var(--spacing-sm) var(--spacing-md) var(--spacing-md) var(--spacing-md);
   position: relative;
   z-index: 1;
-  flex: 0 0 auto;
-  height: auto;
+  flex: 0 1 auto;
   max-height: 30rem;
   overflow-y: auto;
   box-sizing: border-box;
