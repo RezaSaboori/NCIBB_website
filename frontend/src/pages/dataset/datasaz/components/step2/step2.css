@@ -460,3 +460,42 @@
   padding: var(--spacing-xs) var(--spacing-sm);
   align-self: center;
 }
+
+/* ── CriteriaWindow: select (enum) input ────────────────────────── */
+
+.s2-criteria-window__select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: var(--spacing-xl);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-sm) center;
+}
+
+.s2-criteria-window__select option {
+  background: var(--color-gray2);
+  color: var(--color-gray11);
+}
+
+/* ── CriteriaWindow: range hint below numeric input ─────────────── */
+
+.s2-criteria-window__range-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray5);
+  font-family: var(--font-family-base);
+  padding-left: var(--spacing-sm);
+  margin-top: calc(var(--spacing-xs) * -0.5);
+}
+
+/* ── Remove number input spinner arrows ─────────────────────────── */
+
+.s2-criteria-window__input[type="number"]::-webkit-inner-spin-button,
+.s2-criteria-window__input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.s2-criteria-window__input[type="number"] {
+  -moz-appearance: textfield;
+}

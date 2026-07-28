@@ -89,7 +89,18 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
           label = `${base} (${counter})`;
           counter++;
         }
-        return [...prev, { id: newId, label, unit: item.unit }];
+        return [
+          ...prev,
+          {
+            id: newId,
+            label,
+            unit: item.unit,
+            value_type: item.value_type,
+            value_min: item.min,
+            value_max: item.max,
+            values: item.values,
+          },
+      ];
       });
       setNextId((n) => n + 1);
       setExpandedIds((prev) => { const next = new Set(prev); next.add(newId); return next; });
@@ -192,6 +203,10 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
                     key={c.id}
                     label={c.label}
                     unit={c.unit}
+                    value_type={c.value_type}
+                    value_min={c.value_min}
+                    value_max={c.value_max}
+                    values={c.values}
                     onMinimize={() => handleToggleExpand(c.id)}
                     onDelete={() => handleDelete(c.id)}
                   />

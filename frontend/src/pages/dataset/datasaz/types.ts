@@ -29,6 +29,10 @@ export interface CriteriaItem {
   id: number;
   label: string;
   unit?: string;
+  value_type?: "numeric" | "enum" | string;
+  value_min?: number;
+  value_max?: number;
+  values?: string[];
 }
 
 export interface DefinitionSummary {
