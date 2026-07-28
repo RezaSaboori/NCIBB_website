@@ -5,6 +5,7 @@ import { RequiredToggle } from "./RequiredToggle";
 
 interface CriteriaWindowProps {
   label: string;
+  unit?: string;
   onMinimize: () => void;
   onHelp?: () => void;
   onDelete: () => void;
@@ -12,6 +13,7 @@ interface CriteriaWindowProps {
 
 export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   label,
+  unit,
   onMinimize,
   onHelp,
   onDelete,
@@ -23,7 +25,10 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
     <div className="glass dz-glass-container dz-glass-container--sm s2-criteria-window">
       {/* Header */}
       <div className="dz-glass-container__header s2-criteria-window__header">
-        <span className="s2-criteria-window__title">{label}</span>
+        <span className="s2-criteria-window__title">
+          {label}
+          {unit && <span className="s2-criteria-window__unit">{unit}</span>}
+        </span>
         <div className="s2-criteria-window__header-actions">
           <button
             className="teal-glass dz-icon-btn s2-icon-btn"

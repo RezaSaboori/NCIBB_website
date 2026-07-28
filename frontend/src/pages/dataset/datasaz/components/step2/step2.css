@@ -205,6 +205,15 @@
   font-family: var(--font-family-base);
   flex: 1;
   padding-left: var(--spacing-xs);
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+}
+
+.s2-criteria-window__unit {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray6);
 }
 
 .s2-criteria-window__header-actions {

@@ -28,6 +28,7 @@ export interface AutocompleteResponse {
 export interface CriteriaItem {
   id: number;
   label: string;
+  unit?: string;
 }
 
 export interface DefinitionSummary {
