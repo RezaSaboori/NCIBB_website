@@ -63,6 +63,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
   const [spotlightOpen, setSpotlightOpen] = useState(false);
   const [spotlightMinHeight, setSpotlightMinHeight] = useState(0);
   const spotlightRef = useRef<HTMLDivElement>(null);
+  const spotlightRoRef = useRef<ResizeObserver | null>(null);
 
   const { query, suggestions, isLoading, error, handleQueryChange, reset } = useFieldSearch();
 
@@ -70,26 +71,24 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
   useEffect(() => {
     if (!spotlightOpen) {
       setSpotlightMinHeight(0);
+      spotlightRoRef.current?.disconnect();
+      spotlightRoRef.current = null;
       return;
     }
-    // Defer until after React has painted the spotlight into the DOM
     const frame = requestAnimationFrame(() => {
       const el = spotlightRef.current;
       if (!el) return;
-      // Set initial height immediately
       setSpotlightMinHeight(el.offsetHeight);
-      // Then watch for resizes (suggestions appearing/disappearing)
       const ro = new ResizeObserver(() => {
         setSpotlightMinHeight(el.offsetHeight);
       });
       ro.observe(el);
-      // Store disconnect on the ref so cleanup can reach it
-      (spotlightRef as React.MutableRefObject<any>)._ro = ro;
+      spotlightRoRef.current = ro;
     });
     return () => {
       cancelAnimationFrame(frame);
-      (spotlightRef as React.MutableRefObject<any>)._ro?.disconnect();
-      (spotlightRef as React.MutableRefObject<any>)._ro = null;
+      spotlightRoRef.current?.disconnect();
+      spotlightRoRef.current = null;
     };
   }, [spotlightOpen]);
 

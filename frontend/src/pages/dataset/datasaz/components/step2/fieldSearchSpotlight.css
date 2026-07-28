@@ -9,24 +9,23 @@
 
 .s2-spotlight-overlay {
   position: absolute;
-  top: 0;
+  top: calc(-1*(var(--spacing-md)));
   left: 0;
   right: 0;
-  /* NO bottom: 0 — height is driven by content, not stretched to parent */
   z-index: 20;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   box-sizing: border-box;
   isolation: isolate;
-  border-radius: inherit;
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
   animation: s2-overlay-in var(--motion-duration-slow) var(--motion-easing-easeInOut) both;
 }
 
-.dark .s2-spotlight-overlay {
-  background: color-mix(in srgb, var(--color-gray14) 20%, transparent);
+/* Blur the entire windows container when spotlight is open */
+.s2-criteria-panel--spotlight-open .s2-criteria-windows {
+  filter: blur(3px);
+  transition: filter var(--motion-duration-normal) var(--motion-easing-easeInOut);
+  pointer-events: none;
 }
 
 @keyframes s2-overlay-in {
