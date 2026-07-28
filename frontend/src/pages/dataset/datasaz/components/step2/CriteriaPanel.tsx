@@ -125,35 +125,37 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
         </button>
       </div>
 
-      {/* Tabs */}
-      <div className="dz-criteria-tabs">
-        {criteria.map((c) => (
-          <CriteriaButton
-            key={c.id}
-            label={c.label}
-            isSelected={selectedId === c.id}
-            isExpanded={expandedIds.has(c.id)}
-            onSelect={() => handleSelect(c.id)}
-            onExpand={() => handleToggleExpand(c.id)}
-            onDelete={() => handleDelete(c.id)}
-          />
-        ))}
-        <AddCriteriaTab label={btnLabel} isActive={spotlightOpen} onClick={handleOpenSpotlight} />
+      {/* Tabs + spotlight anchor wrapper */}
+      <div className="s2-criteria-tabs-anchor">
+        <div className="dz-criteria-tabs">
+          {criteria.map((c) => (
+            <CriteriaButton
+              key={c.id}
+              label={c.label}
+              isSelected={selectedId === c.id}
+              isExpanded={expandedIds.has(c.id)}
+              onSelect={() => handleSelect(c.id)}
+              onExpand={() => handleToggleExpand(c.id)}
+              onDelete={() => handleDelete(c.id)}
+            />
+          ))}
+          <AddCriteriaTab label={btnLabel} isActive={spotlightOpen} onClick={handleOpenSpotlight} />
+        </div>
+
+        {/* Spotlight — absolutely positioned below tabs, floats above windows */}
+        <FieldSearchSpotlight
+          isOpen={spotlightOpen}
+          query={query}
+          suggestions={suggestions}
+          isLoading={isLoading}
+          error={error}
+          onQueryChange={handleQueryChange}
+          onSelect={handleSelectSuggestion}
+          onClose={handleCloseSpotlight}
+        />
       </div>
 
-      {/* Spotlight — sits in normal flow directly after tabs, grows naturally */}
-      <FieldSearchSpotlight
-        isOpen={spotlightOpen}
-        query={query}
-        suggestions={suggestions}
-        isLoading={isLoading}
-        error={error}
-        onQueryChange={handleQueryChange}
-        onSelect={handleSelectSuggestion}
-        onClose={handleCloseSpotlight}
-      />
-
-      {/* Expanded criteria windows — independent of spotlight state */}
+      {/* Expanded criteria windows — rendered below the anchor in flow */}
       {expandedIds.size > 0 && (
         <div className="dz-glass-container__body s2-criteria-windows">
           {criteria
