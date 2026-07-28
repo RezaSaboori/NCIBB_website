@@ -362,7 +362,12 @@
   gap: var(--spacing-sm);
   width: 100%;
   margin-bottom: var(--spacing-sm);
-  direction: ltr;
+  direction: rtl;
+
+}
+
+.s2-counters-bar *{
+    font-family: var(--font-family-persian) !important;
 }
 
 .s2-counter-tab {
@@ -375,7 +380,6 @@
   height: 2.25rem;
   box-sizing: border-box;
   cursor: default;
-  font-family: var(--font-family-base);
 }
 
 .s2-counter-tab__value, .s2-counter-tab__label {
@@ -398,19 +402,22 @@
 
 .s2-counter-tab__label {
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-semibold);
 }
 
 /* ── Per-variant text colors ────────────────────────────────────── */
 
-.s2-counter-tab--inclusion .s2-counter-tab__value,
-.s2-counter-tab--inclusion .s2-counter-tab__label {
+.s2-counter-tab--inclusion .s2-counter-tab__value{
   color: var(--color-green);
 }
 
-.s2-counter-tab--exclusion .s2-counter-tab__value,
+.s2-counter-tab--exclusion .s2-counter-tab__value{
+  color: var(--color-red);
+}
+
+.s2-counter-tab--inclusion .s2-counter-tab__label,
 .s2-counter-tab--exclusion .s2-counter-tab__label {
-  color: var(--color-orange);
+  color: var(--color-gray10);
 }
 
 .s2-counter-tab--errors .s2-counter-tab__value,
@@ -420,9 +427,8 @@
 }
 
 
+.s2-counter-tab--start {
+  font-weight: var(--font-weight-bold);
+  padding: var(--spacing-md) var(--spacing-3xl);
 
-.dark .s2-counter-tab--errors .s2-counter-tab__value,
-.dark .s2-counter-tab--errors .s2-counter-tab__label,
-.dark .s2-counter-tab--start .s2-counter-tab__label {
-  color: var(--color-gray12);
 }
