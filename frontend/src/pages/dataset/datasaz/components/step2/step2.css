@@ -351,3 +351,73 @@
   opacity: 0.7;
   pointer-events: none;
 }
+
+/* ── Definition Counters Bar ────────────────────────────────────── */
+
+.s2-counters-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  margin-bottom: var(--spacing-sm);
+  direction: ltr;
+}
+
+.s2-counter-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-pill);
+  border: none;
+  height: 2.25rem;
+  box-sizing: border-box;
+  cursor: default;
+  font-family: var(--font-family-base);
+}
+
+.s2-counter-tab__value, .s2-counter-tab__label {
+  padding-top: 1px;
+}
+
+.s2-counter-tab--start {
+  cursor: pointer;
+  transition: opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+.s2-counter-tab--start:hover {
+  opacity: 0.85;
+}
+
+.s2-counter-tab__value {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+}
+
+.s2-counter-tab__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Per-variant text colors ────────────────────────────────────── */
+
+.s2-counter-tab--inclusion .s2-counter-tab__value,
+.s2-counter-tab--inclusion .s2-counter-tab__label {
+  color: var(--color-green);
+}
+
+.s2-counter-tab--exclusion .s2-counter-tab__value,
+.s2-counter-tab--exclusion .s2-counter-tab__label {
+  color: var(--color-orange);
+}
+
+.s2-counter-tab--errors .s2-counter-tab__value,
+.s2-counter-tab--errors .s2-counter-tab__label {
+  color: var(--color-gray1);
+}
+
+.s2-counter-tab--start .s2-counter-tab__label {
+  color: var(--color-gray1);
+}

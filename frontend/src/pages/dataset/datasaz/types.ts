@@ -24,3 +24,9 @@ export interface AutocompleteResponse {
   results: SuggestionItem[];
   elapsed_ms: number;
 }
+
+export interface DefinitionSummary {
+  inclusionCount: number;
+  exclusionCount: number;
+  errorCount: number;
+}

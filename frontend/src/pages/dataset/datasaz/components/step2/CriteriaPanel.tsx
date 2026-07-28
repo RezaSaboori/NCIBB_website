@@ -16,9 +16,10 @@ interface CriteriaItem {
 
 interface CriteriaPanelProps {
   type: "inclusion" | "exclusion";
+  onCountChange?: (count: number) => void;
 }
 
-export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
+export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChange }) => {
   const isInclusion = type === "inclusion";
 
   const titleClass = isInclusion
@@ -58,6 +59,10 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
     isInclusion ? SAMPLE_INCLUSION : SAMPLE_EXCLUSION
   );
   const [nextId, setNextId] = useState(11);
+
+  useEffect(() => {
+    onCountChange?.(criteria.length);
+  }, [criteria.length, onCountChange]);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
