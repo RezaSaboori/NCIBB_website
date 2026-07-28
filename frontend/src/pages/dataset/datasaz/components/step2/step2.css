@@ -320,11 +320,6 @@
     box-shadow var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
-.s2-required-toggle--checked .s2-required-toggle__dot {
-  background: var(--color-red);
-  border-color: var(--color-red);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-red) 25%, transparent);
-}
 
 .s2-required-toggle__label {
   padding: 3px 0 0 0 ;
