@@ -34,7 +34,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
 
   const buildPlaceholder = () => {
     if (isNumeric && value_min != null && value_max != null)
-      return `${value_min} – ${value_max}`;
+      return `Range: ${value_min} – ${value_max}`;
     return "Enter value...";
   };
 
@@ -125,11 +125,6 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
           )}
           <RequiredToggle checked={isRequired} onChange={setIsRequired} />
         </div>
-        {isNumeric && value_min != null && value_max != null && (
-          <span className="s2-criteria-window__range-hint">
-            Range: {value_min} – {value_max}
-          </span>
-        )}
       </div>
 
       {/* Footer */}

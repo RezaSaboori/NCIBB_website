@@ -478,15 +478,6 @@
   color: var(--color-gray11);
 }
 
-/* ── CriteriaWindow: range hint below numeric input ─────────────── */
-
-.s2-criteria-window__range-hint {
-  font-size: var(--font-size-xs);
-  color: var(--color-gray5);
-  font-family: var(--font-family-base);
-  padding-left: var(--spacing-sm);
-  margin-top: calc(var(--spacing-xs) * -0.5);
-}
 
 /* ── Remove number input spinner arrows ─────────────────────────── */
 
