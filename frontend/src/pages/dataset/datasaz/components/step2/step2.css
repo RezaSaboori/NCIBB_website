@@ -188,6 +188,9 @@
 
 .s2-criteria-window {
   width: 100%;
+  /* Pin to content height so windows never shrink inside the scrollable
+     .s2-criteria-windows list; overflow is handled by the container. */
+  flex: 0 0 auto;
 }
 
 .s2-criteria-window__header {
