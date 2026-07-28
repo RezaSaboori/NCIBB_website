@@ -80,7 +80,17 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   const handleSelectSuggestion = useCallback(
     (item: SuggestionItem) => {
       const newId = nextId;
-      setCriteria((prev) => [...prev, { id: newId, label: item.name }]);
+      setCriteria((prev) => {
+        const base = item.name;
+        const existingLabels = new Set(prev.map((c) => c.label));
+        let label = base;
+        let counter = 1;
+        while (existingLabels.has(label)) {
+          label = `${base} (${counter})`;
+          counter++;
+        }
+        return [...prev, { id: newId, label }];
+      });
       setNextId((n) => n + 1);
       setExpandedIds((prev) => { const next = new Set(prev); next.add(newId); return next; });
       setSelectedId(newId);
