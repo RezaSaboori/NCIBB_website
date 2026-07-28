@@ -1,10 +1,6 @@
 /* useCriteriaSearch.ts */
 import { useState, useCallback, useMemo } from "react";
-
-export interface CriteriaItem {
-  id: number;
-  label: string;
-}
+import type { CriteriaItem } from "../types";
 
 export function useCriteriaSearch(criteria: CriteriaItem[]) {
   const [searchQuery, setSearchQuery] = useState("");
