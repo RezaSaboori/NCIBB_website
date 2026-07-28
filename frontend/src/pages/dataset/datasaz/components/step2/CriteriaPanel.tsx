@@ -66,20 +66,32 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type }) => {
 
   const { query, suggestions, isLoading, error, handleQueryChange, reset } = useFieldSearch();
 
-  // Track spotlight height in real-time and drive body minHeight
+  // Drive s2-criteria-body minHeight from spotlight's live rendered height
   useEffect(() => {
     if (!spotlightOpen) {
       setSpotlightMinHeight(0);
       return;
     }
-    const el = spotlightRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(() => {
+    // Defer until after React has painted the spotlight into the DOM
+    const frame = requestAnimationFrame(() => {
+      const el = spotlightRef.current;
+      if (!el) return;
+      // Set initial height immediately
       setSpotlightMinHeight(el.offsetHeight);
+      // Then watch for resizes (suggestions appearing/disappearing)
+      const ro = new ResizeObserver(() => {
+        setSpotlightMinHeight(el.offsetHeight);
+      });
+      ro.observe(el);
+      // Store disconnect on the ref so cleanup can reach it
+      (spotlightRef as React.MutableRefObject<any>)._ro = ro;
     });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [spotlightOpen, suggestions]);
+    return () => {
+      cancelAnimationFrame(frame);
+      (spotlightRef as React.MutableRefObject<any>)._ro?.disconnect();
+      (spotlightRef as React.MutableRefObject<any>)._ro = null;
+    };
+  }, [spotlightOpen]);
 
   const handleOpenSpotlight = useCallback(() => {
     setSpotlightOpen(true);
