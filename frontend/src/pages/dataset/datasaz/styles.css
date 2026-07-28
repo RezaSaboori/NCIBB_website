@@ -394,3 +394,9 @@
   flex-shrink: 0;
   --dz-icon-btn-size: 1.3rem;
 }
+
+/* ── Definition Counters Bar — wrapper-level alignment ─────────── */
+
+.s2-counters-bar {
+  width: 100%;
+}

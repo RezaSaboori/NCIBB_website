@@ -414,10 +414,15 @@
 }
 
 .s2-counter-tab--errors .s2-counter-tab__value,
-.s2-counter-tab--errors .s2-counter-tab__label {
+.s2-counter-tab--errors .s2-counter-tab__label,
+.s2-counter-tab--start .s2-counter-tab__label {
   color: var(--color-gray1);
 }
 
-.s2-counter-tab--start .s2-counter-tab__label {
-  color: var(--color-gray1);
+
+
+.dark .s2-counter-tab--errors .s2-counter-tab__value,
+.dark .s2-counter-tab--errors .s2-counter-tab__label,
+.dark .s2-counter-tab--start .s2-counter-tab__label {
+  color: var(--color-gray12);
 }

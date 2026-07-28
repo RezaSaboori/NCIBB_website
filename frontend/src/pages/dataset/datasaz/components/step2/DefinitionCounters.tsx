@@ -20,12 +20,12 @@ export const DefinitionCounters: React.FC<DefinitionCountersProps> = ({
         <span className="s2-counter-tab__value">{errorCount}</span>
         <span className="s2-counter-tab__label">Errors</span>
       </div>
-      <div className="glass s2-counter-tab s2-counter-tab--inclusion">
+      <div className="glass-transparent s2-counter-tab s2-counter-tab--inclusion">
         <span className="s2-counter-tab__value">{inclusionCount}</span>
         <span className="s2-counter-tab__label">Inclusion</span>
       </div>
 
-      <div className="glass s2-counter-tab s2-counter-tab--exclusion">
+      <div className="glass-transparent s2-counter-tab s2-counter-tab--exclusion">
         <span className="s2-counter-tab__value">{exclusionCount}</span>
         <span className="s2-counter-tab__label">Exclusion</span>
       </div>
