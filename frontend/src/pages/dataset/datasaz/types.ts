@@ -25,6 +25,11 @@ export interface AutocompleteResponse {
   elapsed_ms: number;
 }
 
+export interface CriteriaItem {
+  id: number;
+  label: string;
+}
+
 export interface DefinitionSummary {
   inclusionCount: number;
   exclusionCount: number;

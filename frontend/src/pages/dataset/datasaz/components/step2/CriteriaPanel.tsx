@@ -7,12 +7,8 @@ import { CriteriaWindow } from "./CriteriaWindow";
 import { FieldSearchSpotlight } from "./FieldSearchSpotlight";
 import { SearchIcon, QuestionIcon } from "./icons/Step2Icons";
 import { useFieldSearch } from "../../hooks/useFieldSearch";
-import type { SuggestionItem } from "../../types";
-
-interface CriteriaItem {
-  id: number;
-  label: string;
-}
+import { useCriteriaSearch } from "../../hooks/useCriteriaSearch";
+import type { SuggestionItem, CriteriaItem } from "../../types";
 
 interface CriteriaPanelProps {
   type: "inclusion" | "exclusion";
@@ -63,6 +59,9 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   useEffect(() => {
     onCountChange?.(criteria.length);
   }, [criteria.length, onCountChange]);
+  const { searchQuery, handleSearchChange, filteredCriteria, isFiltering } =
+    useCriteriaSearch(criteria);
+
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
@@ -147,8 +146,9 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
             <input
               className="s2-search-input"
               type="text"
-              placeholder="Search Imported Criteria"
-              disabled
+              placeholder="Search criteria…"
+              value={searchQuery}
+              onChange={handleSearchChange}
             />
             <button className="glass dz-icon-btn s2-icon-btn s2-icon-btn--search" aria-label="Search">
               <SearchIcon className="dz-icon-btn__icon dz-icon-btn__icon--search" />
@@ -164,7 +164,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
       {/* Tabs row */}
       <div className="s2-criteria-tabs-anchor">
         <div className="dz-criteria-tabs">
-          {criteria.map((c) => (
+          {filteredCriteria.map((c) => (
             <CriteriaButton
               key={c.id}
               label={c.label}
@@ -175,6 +175,9 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
               onDelete={() => handleDelete(c.id)}
             />
           ))}
+          {isFiltering && filteredCriteria.length === 0 && (
+            <span className="s2-search-empty">No criteria match</span>
+          )}
           <AddCriteriaTab label={btnLabel} isActive={spotlightOpen} onClick={handleOpenSpotlight} />
         </div>
       </div>
@@ -198,7 +201,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
           />
           {expandedIds.size > 0 && (
             <div className="dz-glass-container__body s2-criteria-windows">
-              {criteria
+              {(isFiltering ? filteredCriteria : criteria)
                 .filter((c) => expandedIds.has(c.id))
                 .slice()
                 .reverse()

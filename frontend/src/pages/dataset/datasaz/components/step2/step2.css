@@ -1,17 +1,9 @@
-/* step2.css — Step 2: Definition layout styles */
-.dz-glass-container {
-  display: flex;
-  flex-direction: column;
-  overflow: visible;
-  width: 100%;
-  box-sizing: border-box;
-}
+
 /* ── LTR override for the entire step 2 panel ──────────────────── */
 
 .s2-criteria-panel * {
   direction: ltr !important;
   text-align: left !important;
-  gap: var(--spacing-sm);
 }
 
 
@@ -436,4 +428,14 @@
   font-weight: var(--font-weight-bold);
   padding: var(--spacing-md) var(--spacing-3xl);
 
+}
+
+/* ── Search empty state ─────────────────────────────────────────── */
+
+.s2-search-empty {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray6);
+  font-family: var(--font-family-base);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  align-self: center;
 }
