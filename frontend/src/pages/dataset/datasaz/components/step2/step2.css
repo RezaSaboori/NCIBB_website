@@ -30,9 +30,9 @@
 /* ── Panel  layout ────────────────────────────────────────── */
 .s2-criteria-row .dz-glass-container--md {
   padding: var(--spacing-sm);
-  gap: 0
+  gap: 0;
+  overflow: visible;
 }
-
 
 /* ── Panel header layout ────────────────────────────────────────── */
 

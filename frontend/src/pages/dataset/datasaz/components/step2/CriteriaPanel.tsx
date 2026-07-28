@@ -108,8 +108,11 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
 
   const handleSelectSuggestion = useCallback(
     (item: SuggestionItem) => {
-      setCriteria((prev) => [...prev, { id: nextId, label: item.name }]);
+      const newId = nextId;
+      setCriteria((prev) => [{ id: newId, label: item.name }, ...prev]);
       setNextId((n) => n + 1);
+      setExpandedIds((prev) => { const next = new Set(prev); next.add(newId); return next; });
+      setSelectedId(newId);
       handleCloseSpotlight();
     },
     [nextId, handleCloseSpotlight]
