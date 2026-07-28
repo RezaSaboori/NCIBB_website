@@ -26,6 +26,10 @@
   overflow: visible;
 }
 
+.s2-criteria-panel {
+  overflow: visible;
+}
+
 /* ── Panel header layout ────────────────────────────────────────── */
 
 .dz-glass-container__header{
@@ -164,6 +168,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  overflow: visible;
 }
 
 .s2-criteria-windows {
