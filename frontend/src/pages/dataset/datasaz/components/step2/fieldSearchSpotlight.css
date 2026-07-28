@@ -1,6 +1,6 @@
 /* fieldSearchSpotlight.css — Spotlight search overlay for Step 2 */
 
-/* ── Overlay backdrop — regressive blur fade-out ────────────────── */
+/* ── Overlay wrapper — in normal flow, blurs windows below via parent modifier ── */
 .s2-spotlight-overlay * {
   direction: ltr !important;
   text-align: left !important;
@@ -8,25 +8,26 @@
 }
 
 .s2-spotlight-overlay {
-  position: absolute;
-  inset: 0;
-  top: calc(-1*(var(--spacing-xl)));
+  position: relative;
   z-index: 10;
-  border-radius: inherit;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   box-sizing: border-box;
   isolation: isolate;
-
-  /* Fades out the content behind the overlay progressively */
-  backdrop-filter:blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-
+  width: 100%;
+  margin-bottom: var(--spacing-lg);
   animation: s2-overlay-in var(--motion-duration-slow) var(--motion-easing-easeInOut) both;
 }
 
-.dark .s2-spotlight-overlay {
+/* Blur the windows below when spotlight is open — applied via parent modifier class */
+.s2-criteria-panel--spotlight-open .s2-criteria-windows {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: backdrop-filter var(--motion-duration-slow) var(--motion-easing-easeInOut);
+}
+
+.dark .s2-criteria-panel--spotlight-open .s2-criteria-windows {
   background: color-mix(in srgb, var(--color-gray14) 20%, transparent);
 }
 
@@ -120,9 +121,6 @@
   align-items: flex-start;
   gap: var(--spacing-xs);
   padding: 0 var(--spacing-sm) var(--spacing-sm) var(--spacing-sm);
-  max-height: 9rem;
-  overflow-y: auto;
-
 }
 
 .s2-spotlight__loading {
