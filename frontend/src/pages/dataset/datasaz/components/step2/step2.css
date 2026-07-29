@@ -32,7 +32,7 @@
 
 /* ── Panel header layout ────────────────────────────────────────── */
 
-.dz-glass-container__header{
+.s2-criteria-panel .dz-glass-container__header {
   margin: var(--spacing-md);
 }
 
