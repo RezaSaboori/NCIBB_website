@@ -91,12 +91,14 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
     const el = triggerRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
+    const dir = getComputedStyle(el).direction;
     setPanelStyle({
       position: "fixed",
       top: rect.bottom + 6,
       left: rect.left,
       width: rect.width,
       zIndex: 9999,
+      direction: dir as "ltr" | "rtl",
     });
   }, []);
 
