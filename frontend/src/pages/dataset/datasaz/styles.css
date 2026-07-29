@@ -248,7 +248,7 @@
 .dz-glass-container {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   width: 100%;
   box-sizing: border-box;
 }

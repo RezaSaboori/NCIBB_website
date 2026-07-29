@@ -220,11 +220,6 @@
  * We only need to ensure the panel itself isn't constrained by
  * any inherited position/overflow from the DOM tree.
  */
-.ui-dropdown__panel--portal {
-  position: fixed; /* overridden inline by JS, but set as fallback */
-  width: max-content;
-  min-width: 8rem;
-}
 
 /* Portal root injected into <body> — must have no positioning so that
    absolute children measure from the document origin correctly. */
