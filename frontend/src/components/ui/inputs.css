@@ -13,6 +13,13 @@
  * Wrap any input variant with this to get the glass-pill look.
  */
 
+/* ── Design token: single source of truth for all input heights ── */
+:root {
+  --ui-input-height: 2.5rem;        /* 40px  — shell fixed height            */
+  --ui-input-icon-size: 1.75rem;    /* 28px  — icon btn inside shell         */
+  --ui-input-max-text-height: 6rem; /* max-height for growable TextInput     */
+}
+
 .ui-input-shell {
   display: flex;
   align-items: center;
@@ -21,7 +28,9 @@
   gap: var(--spacing-xs);
   border: var(--border-width-thin) solid var(--color-gray2);
   border-radius: var(--border-radius-container-xs);
-  padding: var(--spacing-xs);
+  padding: 0 var(--spacing-xs);
+  height: var(--ui-input-height);
+  min-height: var(--ui-input-height);
   background-color: var(--color-gray1);
   box-sizing: border-box;
   transition:
@@ -36,6 +45,26 @@
 
 .ui-input-shell--open {
   border-color: var(--color-blue);
+}
+
+/* ── Growable shell: for TextInput when long-text support is needed ── */
+/*
+ * Apply .ui-input-shell--grow on the shell when using TextInput
+ * with multiline prop. Height is freed; max-height + scroll applies.
+ * The icon (if any) stays pinned top-right via align-self: flex-start.
+ */
+.ui-input-shell--grow {
+  height: auto;
+  min-height: var(--ui-input-height);
+  max-height: var(--ui-input-max-text-height);
+  overflow-y: auto;
+  align-items: flex-start;
+  padding: var(--spacing-xs);
+}
+
+.ui-input-shell--grow .dz-icon-btn {
+  align-self: flex-start;
+  margin-top: 2px;
 }
 
 /* ── Persian locale modifier ─────────────────────────────────── */
@@ -60,7 +89,19 @@
   color: var(--color-gray11);
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
-  padding: 1px var(--spacing-sm) 0 var(--spacing-sm);
+  padding: 0 var(--spacing-sm);
+  /* Single-line inputs vertically center via the shell's align-items:center */
+  align-self: center;
+}
+
+/* Textarea variant for growable TextInput */
+.ui-input-field--textarea {
+  resize: none;
+  overflow-y: auto;
+  line-height: var(--line-height-normal);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  align-self: stretch;
+  min-height: calc(var(--ui-input-height) - 2 * var(--spacing-xs));
 }
 
 
@@ -69,6 +110,9 @@
 .ui-input-shell .dz-icon-btn {
   background-color: var(--color-gray2);
   flex-shrink: 0;
+  width: var(--ui-input-icon-size);
+  height: var(--ui-input-icon-size);
+  --dz-icon-btn-size: var(--ui-input-icon-size);
 }
 
 /* ── Dropdown pill text ──────────────────────────────────────── */

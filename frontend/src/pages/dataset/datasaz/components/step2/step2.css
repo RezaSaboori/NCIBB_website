@@ -65,13 +65,6 @@
 .s2-criteria-row .dz-criteria-tabs {
   margin-bottom: var(--spacing-sm);
 }
-/* ── Icon buttons (search & help) ──────────────────────────────── */
-
-.s2-icon-btn--help{
-    width:2.5rem;
-    height:2.5rem
-}
-
 
 
 /* ── Add criteria tab color overrides ──────────────────────────── */
@@ -182,7 +175,7 @@
   align-items: center;
   gap: var(--spacing-xs);
   flex-shrink: 0;
-  --dz-icon-btn-size: 1.5rem;
+  --dz-icon-btn-size: var(--ui-input-icon-size);
 }
 
 /* ── Window Body row (input + required toggle) ──────────────────── */
