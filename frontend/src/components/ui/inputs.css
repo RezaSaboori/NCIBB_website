@@ -1,0 +1,213 @@
+@import "../../styles/theme.css";
+
+/* ============================================================
+   UI INPUT SYSTEM — shared primitives
+   All input variants build on the pill-shell (.ui-input-shell)
+   which mirrors the established .s2-panel-header__search-box
+   visual language from datasaz.
+   ============================================================ */
+
+/* ── Shell (pill wrapper) ────────────────────────────────────── */
+/*
+ * Used by: TextInput, NumberInput, SearchInput, DropdownInput
+ * Wrap any input variant with this to get the glass-pill look.
+ */
+
+.ui-input-shell {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  gap: var(--spacing-xs);
+  border: var(--border-width-thin) solid var(--color-gray2);
+  border-radius: var(--border-radius-pill);
+  padding: var(--spacing-xs);
+  background-color: var(--color-gray1);
+  box-sizing: border-box;
+  transition:
+    border-color var(--motion-duration-normal) var(--motion-easing-easeInOut),
+    box-shadow var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+.ui-input-shell:focus-within {
+  border-color: var(--color-gray3);
+  box-shadow: var(--elevation-2);
+}
+
+.ui-input-shell--open {
+  border-color: var(--color-blue);
+}
+
+/* ── Bare text/number field (sits inside the shell) ──────────── */
+
+.ui-input-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--color-gray11);
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-base);
+  padding: 1px var(--spacing-sm) 0 var(--spacing-sm);
+}
+
+.ui-input-field::placeholder {
+  color: var(--color-gray4);
+}
+
+/* ── Icon button inside the shell ────────────────────────────── */
+
+.ui-input-shell .dz-icon-btn {
+  background-color: var(--color-gray2);
+  flex-shrink: 0;
+}
+
+/* ── Dropdown pill text ──────────────────────────────────────── */
+
+.ui-dropdown__text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-base);
+  color: var(--color-gray11);
+  padding: 1px var(--spacing-sm) 0 var(--spacing-sm);
+  cursor: default;
+}
+
+.ui-dropdown__text--placeholder {
+  color: var(--color-gray4);
+}
+
+/* ── Chevron icon rotation ───────────────────────────────────── */
+
+.ui-chevron-icon {
+  transition: transform var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+.ui-chevron-icon--open {
+  transform: rotate(180deg);
+}
+
+/* ── Dropdown panel ──────────────────────────────────────────── */
+
+.ui-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.ui-dropdown__panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--color-gray1);
+  border-radius: var(--border-radius-container-xs);
+  box-shadow: var(--elevation-4);
+  border: var(--border-width-thin) solid var(--color-gray3);
+  padding: var(--spacing-sm);
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.97);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    visibility 0.2s;
+  max-height: 220px;
+  overflow: hidden;
+}
+
+.ui-dropdown__panel.is-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.ui-dropdown__list {
+  overflow-y: auto;
+  max-height: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ui-dropdown__item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-item-md);
+  font-size: 13px;
+  font-family: var(--font-family-base);
+  color: var(--color-gray10);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ui-dropdown__item:hover {
+  background: color-mix(in srgb, var(--color-blue) 8%, transparent);
+  color: var(--color-blue);
+}
+
+.ui-dropdown__item.is-selected {
+  background: color-mix(in srgb, var(--color-blue) 12%, transparent);
+  color: var(--color-blue);
+  font-weight: 600;
+}
+
+/* ── RadioToggle (Required?) ─────────────────────────────────── */
+/*
+ * Standalone pill-button toggle. Replaces s2-required-toggle
+ * in datasaz; generic enough for any boolean toggle.
+ */
+
+.ui-radio-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  border: none;
+  border-radius: var(--border-radius-pill);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-family: var(--font-family-base);
+  color: var(--color-gray9);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: transparent;
+  transition: color var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+.ui-radio-toggle__dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition:
+    background var(--motion-duration-normal) var(--motion-easing-easeInOut),
+    box-shadow var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+.ui-radio-toggle__label {
+  padding: 3px 0 0 0;
+}
+
+.ui-radio-toggle--checked .ui-radio-toggle__label {
+  color: var(--color-red);
+}
+
+/* ── Number input — hide spinner arrows ──────────────────────── */
+
+.ui-input-field[type="number"]::-webkit-inner-spin-button,
+.ui-input-field[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ui-input-field[type="number"] {
+  -moz-appearance: textfield;
+}

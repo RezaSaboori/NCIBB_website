@@ -6,6 +6,7 @@ import { AddCriteriaTab } from "./AddCriteriaTab";
 import { CriteriaWindow } from "./CriteriaWindow";
 import { FieldSearchSpotlight } from "./FieldSearchSpotlight";
 import { SearchIcon, QuestionIcon } from "./icons/Step2Icons";
+import { SearchInput } from "../../../../../components/ui/inputs";
 import { useFieldSearch } from "../../hooks/useFieldSearch";
 import { useCriteriaSearch } from "../../hooks/useCriteriaSearch";
 import type { SuggestionItem, CriteriaItem } from "../../types";
@@ -135,18 +136,16 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
         <span className={`s2-panel-header__title ${titleClass}`}>{title}</span>
 
         <div className="s2-panel-header__search">
-          <div className="s2-panel-header__search-box">
-            <input
-              className="s2-search-input"
-              type="text"
-              placeholder="Search criteria…"
-              value={searchQuery}
-              onChange={handleSearchChange}
-            />
-            <button className="glass dz-icon-btn s2-icon-btn s2-icon-btn--search" aria-label="Search">
-              <SearchIcon className="dz-icon-btn__icon dz-icon-btn__icon--search" />
-            </button>
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={(v) => handleSearchChange({ target: { value: v } } as React.ChangeEvent<HTMLInputElement>)}
+            placeholder="Search criteria…"
+            icon={
+              <button className="glass dz-icon-btn s2-icon-btn s2-icon-btn--search" aria-label="Search">
+                <SearchIcon className="dz-icon-btn__icon dz-icon-btn__icon--search" />
+              </button>
+            }
+          />
         </div>
 
         <button className="glass dz-icon-btn s2-icon-btn s2-icon-btn--help" aria-label="Help">
