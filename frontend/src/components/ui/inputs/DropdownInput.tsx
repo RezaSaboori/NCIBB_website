@@ -87,7 +87,20 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
     : (props.value as string);
 
   const triggerRef = useRef<HTMLDivElement>(null);
-  const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({});
+  // Initial panel style MUST carry `position: fixed` so the closed panel is
+  // positioned relative to the viewport (not the document) and therefore
+  // does NOT contribute to document scroll height. Without this, a freshly
+  // mounted (never-opened) dropdown's portal panel sits at its static
+  // position at the bottom of <body> and creates dead space below the
+  // footer equal to its rendered height. `visibility: hidden` keeps it
+  // invisible; `top/left: -9999px` guarantees it never paints anywhere
+  // visible until `updatePanelPosition()` supplies real coordinates.
+  const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({
+    position: "fixed",
+    top: -9999,
+    left: -9999,
+    visibility: "hidden",
+  });
 
   const updatePanelPosition = useCallback(() => {
     const el = triggerRef.current;
@@ -102,6 +115,7 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
       zIndex: 9999,
       direction: resolvedDir,
       textAlign: "start",
+      visibility: "visible",
     });
   }, []);
 
