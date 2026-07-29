@@ -20,7 +20,7 @@
   min-width: 0;
   gap: var(--spacing-xs);
   border: var(--border-width-thin) solid var(--color-gray2);
-  border-radius: var(--border-radius-pill);
+  border-radius: var(--border-radius-container-xs);
   padding: var(--spacing-xs);
   background-color: var(--color-gray1);
   box-sizing: border-box;
@@ -46,7 +46,7 @@
 
 .ui-input-shell--persian .ui-input-field {
   font-family: var(--font-family-persian);
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
 }
 
 /* ── Bare text/number field (sits inside the shell) ──────────── */
@@ -63,10 +63,6 @@
   padding: 1px var(--spacing-sm) 0 var(--spacing-sm);
 }
 
-.ui-input-field::placeholder {
-  font-size: var(--font-size-sm);
-  color: var(--color-gray4);
-}
 
 /* ── Icon button inside the shell ────────────────────────────── */
 
