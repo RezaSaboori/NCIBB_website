@@ -1,6 +1,6 @@
 /* CriteriaWindow.tsx */
-import React, { useState } from "react";
-import { QuestionIcon, TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
+import React, { useState, useRef, useEffect } from "react";
+import { QuestionIcon, TrashIcon, MinimizeIcon, ChevronIcon } from "./icons/Step2Icons";
 import { RequiredToggle } from "./RequiredToggle";
 
 interface CriteriaWindowProps {
@@ -28,6 +28,19 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [isRequired, setIsRequired] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    const handleOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, [dropdownOpen]);
 
   const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;
   const isNumeric = value_type === "numeric";
@@ -98,18 +111,51 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
       <div className="dz-glass-container__body s2-criteria-window__body">
         <div className="s2-criteria-window__row">
           {isEnum ? (
-            <select
-              className="glass s2-criteria-window__input s2-criteria-window__select"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+            <div
+              className="s2-criteria-window__dropdown"
+              ref={dropdownRef}
             >
-              <option value="">Select value...</option>
-              {values!.map((v) => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
+              {/* Pill trigger — mirrors .s2-panel-header__search-box */}
+              <div
+                className={`s2-panel-header__search-box s2-criteria-window__input-pill${dropdownOpen ? " s2-criteria-window__input-pill--open" : ""}`}
+                onClick={() => setDropdownOpen((o) => !o)}
+                role="button"
+                aria-expanded={dropdownOpen}
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setDropdownOpen((o) => !o); }}
+              >
+                <span className={`s2-criteria-window__pill-text${!inputValue ? " s2-criteria-window__pill-text--placeholder" : ""}`}>
+                  {inputValue || "Select value..."}
+                </span>
+                <button
+                  className="glass dz-icon-btn s2-criteria-window__chevron-btn"
+                  type="button"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                >
+                  <ChevronIcon
+                    className={`dz-icon-btn__icon dz-icon-btn__icon--chevron${dropdownOpen ? " dz-icon-btn__icon--chevron-open" : ""}`}
+                  />
+                </button>
+              </div>
+
+              {/* Dropdown panel */}
+              <div className={`s2-criteria-window__dropdown-panel${dropdownOpen ? " is-open" : ""}`}>
+                <div className="s2-criteria-window__dropdown-list">
+                  {values!.map((v) => (
+                    <div
+                      key={v}
+                      className={`s2-criteria-window__dropdown-item${inputValue === v ? " is-selected" : ""}`}
+                      onClick={() => { setInputValue(v); setDropdownOpen(false); }}
+                      role="option"
+                      aria-selected={inputValue === v}
+                    >
+                      {v}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           ) : (
             <input
               className="glass s2-criteria-window__input"
