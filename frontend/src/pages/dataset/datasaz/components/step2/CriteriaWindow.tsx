@@ -85,7 +85,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
                 onChange={setInputValue}
                 placeholder="Select value..."
                 chevronIcon={<ChevronIcon />}
-                searchable={values!.length > 5}
+                searchable={values!.length > 6}
               />
           ) : isNumeric ? (
             <NumberInput

@@ -91,6 +91,7 @@
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
   padding: 0 var(--spacing-sm);
+  text-align: start;
   /* Single-line inputs vertically center via the shell's align-items:center */
   align-self: center;
 }
@@ -183,6 +184,7 @@
   margin: var(--spacing-sm);
   height: 2rem;
   min-height: 2rem;
+  width: auto;
   background: var(--color-gray2);
 }
 
