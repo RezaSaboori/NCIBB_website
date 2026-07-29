@@ -35,6 +35,7 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
 
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [hoveredOption, setHoveredOption] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -126,9 +127,17 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
           {filteredOptions.map((opt) => (
             <div
               key={opt}
-              className={`ui-dropdown__item${isSelected(opt) ? " is-selected blue-glass" : " glass"}`}
+              className={`ui-dropdown__item${
+                isSelected(opt)
+                  ? " is-selected blue-glass"
+                  : hoveredOption === opt
+                    ? " glass"
+                    : ""
+              }`}
               role="option"
               aria-selected={isSelected(opt)}
+              onMouseEnter={() => setHoveredOption(opt)}
+              onMouseLeave={() => setHoveredOption(null)}
               onClick={() => handleSelect(opt)}
             >
               {multiple && (
