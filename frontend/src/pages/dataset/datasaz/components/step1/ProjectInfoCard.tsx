@@ -32,6 +32,7 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
             placeholder="نام پروژه را وارد کنید"
             dir="rtl"
             className="ui-input-shell--persian"
+            multiline
           />
         </div>
         <div className="s1-field">

@@ -106,22 +106,6 @@
   height: auto;
   max-height: calc(var(--ui-input-max-text-height) - 2 * var(--spacing-xs));
   min-height: calc(var(--ui-input-height) - 2 * var(--spacing-xs));
-  /* Custom scrollbar matches app style */
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-gray4) transparent;
-}
-
-.ui-input-field--textarea::-webkit-scrollbar {
-  width: 4px;
-}
-
-.ui-input-field--textarea::-webkit-scrollbar-thumb {
-  background-color: var(--color-gray4);
-  border-radius: var(--border-radius-pill);
-}
-
-.ui-input-field--textarea::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-gray6);
 }
 
 

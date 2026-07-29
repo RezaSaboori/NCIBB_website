@@ -140,6 +140,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
             value={searchQuery}
             onChange={handleSearchChange}
             placeholder="Search criteria…"
+            multiline
             icon={
               <button className="glass dz-icon-btn s2-icon-btn s2-icon-btn--search" aria-label="Search">
                 <SearchIcon className="dz-icon-btn__icon dz-icon-btn__icon--search" />
