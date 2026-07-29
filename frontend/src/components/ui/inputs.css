@@ -188,6 +188,24 @@
   background: var(--color-gray2);
 }
 
+/* ── Portal panel direction isolation ───────────────────────────
+ * globals.css has [dir="rtl"] * { text-align: right } which
+ * matches all descendants of <html dir="rtl"> regardless of
+ * intermediate dir attributes. We counteract it here with higher
+ * specificity scoped to the panel's own dir attribute.
+ */
+.ui-dropdown__panel[dir="ltr"],
+.ui-dropdown__panel[dir="ltr"] * {
+  text-align: left;
+  direction: ltr;
+}
+
+.ui-dropdown__panel[dir="rtl"],
+.ui-dropdown__panel[dir="rtl"] * {
+  text-align: right;
+  direction: rtl;
+}
+
 .ui-dropdown__list {
   overflow-y: auto;
   max-height: 200px;
