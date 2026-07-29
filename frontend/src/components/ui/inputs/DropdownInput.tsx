@@ -101,6 +101,7 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
       width: rect.width,
       zIndex: 9999,
       direction: resolvedDir,
+      textAlign: "start",
     });
   }, []);
 
