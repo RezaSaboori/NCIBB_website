@@ -214,6 +214,19 @@
   font-weight: 600;
 }
 
+/* ── Portal variant: panel rendered into <body> via React Portal ── */
+/*
+ * position:fixed is set inline by JS (getBoundingClientRect).
+ * We only need to ensure the panel itself isn't constrained by
+ * any inherited position/overflow from the DOM tree.
+ */
+.ui-dropdown__panel--portal {
+  position: fixed; /* overridden inline by JS, but set as fallback */
+  width: max-content;
+  min-width: 8rem;
+}
+
+
 /* ── RadioToggle (Required?) ─────────────────────────────────── */
 /*
  * Standalone pill-button toggle. Replaces s2-required-toggle
