@@ -8,6 +8,7 @@ interface BaseDropdownProps {
   className?: string;
   chevronIcon: React.ReactNode;
   searchable?: boolean;
+  dir?: "ltr" | "rtl";
 }
 
 interface SingleDropdownProps extends BaseDropdownProps {
@@ -32,6 +33,7 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
     chevronIcon,
     searchable = false,
     multiple = false,
+    dir,
   } = props;
 
   const [open, setOpen] = useState(false);
@@ -91,14 +93,14 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
     const el = triggerRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    const dir = getComputedStyle(el).direction;
+    const resolvedDir = dir ?? (getComputedStyle(el).direction as "ltr" | "rtl");
     setPanelStyle({
       position: "fixed",
       top: rect.bottom + 6,
       left: rect.left,
       width: rect.width,
       zIndex: 9999,
-      direction: dir as "ltr" | "rtl",
+      direction: resolvedDir,
     });
   }, []);
 
@@ -130,7 +132,7 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
             ref={searchRef}
             className="ui-input-field"
             type="text"
-            placeholder="Search..."
+            placeholder={panelStyle.direction === "rtl" ? "جست و جو" : "Search..."}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onClick={(e) => e.stopPropagation()}
