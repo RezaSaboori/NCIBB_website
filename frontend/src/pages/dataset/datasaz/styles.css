@@ -148,7 +148,6 @@
 
 .datasaz-step-panel {
   width: 100%;
-  min-height: 200px;
   border-radius: var(--border-radius-lg);
   padding: var(--spacing-lg);
   margin-top: var(--spacing-md);
