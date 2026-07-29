@@ -121,9 +121,12 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
       ? document.getElementById("ui-dropdown-portals") ?? document.body
       : null;
 
+  const resolvedDir = (panelStyle.direction as "ltr" | "rtl") ?? "ltr";
+
   const panel = (
     <div
       ref={panelRef}
+      dir={resolvedDir}
       className={`ui-dropdown__panel${open ? " is-open" : ""}`}
       style={panelStyle}
     >
