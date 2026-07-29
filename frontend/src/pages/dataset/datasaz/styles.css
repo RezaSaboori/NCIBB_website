@@ -2,6 +2,16 @@
 @import "./components/step1/step1.css";
 @import "./components/step2/step2.css";
 @import "./components/step2/fieldSearchSpotlight.css";
+
+/* ── Datasaz Unified Control Height Token ──────────────────────── */
+/*
+ * All interactive shells (inputs, dropdowns) and icon buttons
+ * in datasaz must render at this height for visual consistency.
+ * Panels that host inputs must set this on their subtree.
+ */
+:root {
+  --dz-input-h: 2.25rem;
+}
 /* ── Step Tab Bar ──────────────────────────────────────────────── */
 
 .datasaz-step-tabs {
