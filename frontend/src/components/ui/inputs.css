@@ -157,7 +157,11 @@
 }
 
 .ui-dropdown__panel {
-  /* position + coordinates are set inline via portal (position: fixed + getBoundingClientRect) */
+  /* Default to absolute so the closed panel is taken out of normal flow and
+     does not contribute to body height while portal'd into document.body.
+     When opened, inline `position: fixed` (set via getBoundingClientRect)
+     overrides this and positions the panel under the trigger. */
+  position: absolute;
   background: var(--color-gray1);
   border-radius: var(--border-radius-container-xs);
   box-shadow: var(--elevation-4);
