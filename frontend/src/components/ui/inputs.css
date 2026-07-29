@@ -156,10 +156,7 @@
 }
 
 .ui-dropdown__panel {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
+  /* position + coordinates are set inline via portal (position: fixed + getBoundingClientRect) */
   background: var(--color-gray1);
   border-radius: var(--border-radius-container-xs);
   box-shadow: var(--elevation-4);
@@ -211,7 +208,7 @@
 }
 
 .ui-dropdown__item:hover:not(.is-selected) {
-  color: var(--color-gray10);
+  color: var(--color-blue);
 }
 
 .ui-dropdown__item.is-selected {

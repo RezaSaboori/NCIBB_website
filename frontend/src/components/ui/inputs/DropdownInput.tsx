@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import ReactDOM from "react-dom";
 import "../inputs.css";
 
 interface BaseDropdownProps {
@@ -37,12 +38,15 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
   const [search, setSearch] = useState("");
   const [hoveredOption, setHoveredOption] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) { setSearch(""); return; }
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      const inTrigger = ref.current?.contains(e.target as Node);
+      const inPanel = panelRef.current?.contains(e.target as Node);
+      if (!inTrigger && !inPanel) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -80,9 +84,93 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
       : ""
     : (props.value as string);
 
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({});
+
+  const updatePanelPosition = useCallback(() => {
+    const el = triggerRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    setPanelStyle({
+      position: "fixed",
+      top: rect.bottom + 6,
+      left: rect.left,
+      width: rect.width,
+      zIndex: 9999,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    updatePanelPosition();
+    window.addEventListener("scroll", updatePanelPosition, true);
+    window.addEventListener("resize", updatePanelPosition);
+    return () => {
+      window.removeEventListener("scroll", updatePanelPosition, true);
+      window.removeEventListener("resize", updatePanelPosition);
+    };
+  }, [open, updatePanelPosition]);
+
+  const portalRoot =
+    typeof document !== "undefined"
+      ? document.getElementById("ui-dropdown-portals") ?? document.body
+      : null;
+
+  const panel = (
+    <div
+      ref={panelRef}
+      className={`ui-dropdown__panel${open ? " is-open" : ""}`}
+      style={panelStyle}
+    >
+      {searchable && (
+        <div className="ui-input-shell ui-dropdown__search-shell">
+          <input
+            ref={searchRef}
+            className="ui-input-field"
+            type="text"
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+      <div className="ui-dropdown__list">
+        {filteredOptions.map((opt) => (
+          <div
+            key={opt}
+            className={`ui-dropdown__item${
+              isSelected(opt)
+                ? " is-selected blue-glass"
+                : hoveredOption === opt
+                  ? " glass"
+                  : ""
+            }`}
+            role="option"
+            aria-selected={isSelected(opt)}
+            onMouseEnter={() => setHoveredOption(opt)}
+            onMouseLeave={() => setHoveredOption(null)}
+            onClick={() => handleSelect(opt)}
+          >
+            {multiple && (
+              <span className="ui-dropdown__check">
+                {isSelected(opt) ? "✓" : ""}
+              </span>
+            )}
+            {opt}
+          </div>
+        ))}
+        {filteredOptions.length === 0 && (
+          <div className="ui-dropdown__item ui-dropdown__item--empty">No results</div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className={`ui-dropdown ${className}`} ref={ref}>
       <div
+        ref={triggerRef}
         className={`ui-input-shell${open ? " ui-input-shell--open" : ""}`}
         role="button"
         tabIndex={0}
@@ -109,50 +197,7 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
         </button>
       </div>
 
-      <div className={`ui-dropdown__panel${open ? " is-open" : ""}`}>
-        {searchable && (
-          <div className="ui-input-shell ui-dropdown__search-shell">
-            <input
-              ref={searchRef}
-              className="ui-input-field"
-              type="text"
-              placeholder="Search..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-            />
-          </div>
-        )}
-        <div className="ui-dropdown__list">
-          {filteredOptions.map((opt) => (
-            <div
-              key={opt}
-              className={`ui-dropdown__item${
-                isSelected(opt)
-                  ? " is-selected blue-glass"
-                  : hoveredOption === opt
-                    ? " glass"
-                    : ""
-              }`}
-              role="option"
-              aria-selected={isSelected(opt)}
-              onMouseEnter={() => setHoveredOption(opt)}
-              onMouseLeave={() => setHoveredOption(null)}
-              onClick={() => handleSelect(opt)}
-            >
-              {multiple && (
-                <span className="ui-dropdown__check">
-                  {isSelected(opt) ? "✓" : ""}
-                </span>
-              )}
-              {opt}
-            </div>
-          ))}
-          {filteredOptions.length === 0 && (
-            <div className="ui-dropdown__item ui-dropdown__item--empty">No results</div>
-          )}
-        </div>
-      </div>
+      {portalRoot && ReactDOM.createPortal(panel, portalRoot)}
     </div>
   );
 };
