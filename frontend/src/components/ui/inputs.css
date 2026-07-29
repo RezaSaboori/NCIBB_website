@@ -219,6 +219,11 @@
   font-weight: 600;
 }
 
+.dark .ui-dropdown__item.is-selected {
+  color: var(--color-gray12);
+}
+
+
 .ui-dropdown__item--empty {
   color: var(--color-gray5);
   cursor: default;
