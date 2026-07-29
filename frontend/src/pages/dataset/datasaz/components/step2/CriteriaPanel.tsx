@@ -52,7 +52,9 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
       spotlightRoRef.current = null;
       return;
     }
-    const frame = requestAnimationFrame(() => {
+
+    let frameId: number;
+    frameId = requestAnimationFrame(() => {
       const el = spotlightRef.current;
       if (!el) return;
       setSpotlightMinHeight(el.offsetHeight);
@@ -62,8 +64,9 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
       ro.observe(el);
       spotlightRoRef.current = ro;
     });
+
     return () => {
-      cancelAnimationFrame(frame);
+      cancelAnimationFrame(frameId);          // ← cancel the rAF
       spotlightRoRef.current?.disconnect();
       spotlightRoRef.current = null;
     };
