@@ -180,7 +180,7 @@
 }
 
 .ui-dropdown__search-shell {
-  margin-bottom: var(--spacing-xs);
+  margin: var(--spacing-sm);
   height: 2rem;
   min-height: 2rem;
   background: var(--color-gray2);

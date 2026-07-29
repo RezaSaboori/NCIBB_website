@@ -80,12 +80,13 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
         <div className="s2-criteria-window__row">
           {isEnum ? (
             <DropdownInput
-              value={inputValue}
-              options={values!}
-              onChange={setInputValue}
-              placeholder="Select value..."
-              chevronIcon={<ChevronIcon />}
-            />
+                value={inputValue}
+                options={values!}
+                onChange={setInputValue}
+                placeholder="Select value..."
+                chevronIcon={<ChevronIcon />}
+                searchable={values!.length > 5}
+              />
           ) : isNumeric ? (
             <NumberInput
               value={inputValue}
