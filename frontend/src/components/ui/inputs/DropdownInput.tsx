@@ -19,9 +19,7 @@ export const DropdownInput: React.FC<DropdownInputProps> = ({
   chevronIcon,
 }) => {
   const [open, setOpen] = useState(false);
-  const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({});
-  const shellRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
