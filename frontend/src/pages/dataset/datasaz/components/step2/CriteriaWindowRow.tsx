@@ -1,6 +1,6 @@
 import React from "react";
 import { TextInput, NumberInput, DropdownInput, RadioToggle } from "../../../../../components/ui/inputs";
-import { ChevronIcon } from "./icons/Step2Icons";
+import { ChevronIcon, TrashIcon } from "./icons/Step2Icons";
 
 const NUMERIC_OPERATORS = ["=", "<", ">", "<=", ">="];
 
@@ -19,6 +19,8 @@ interface CriteriaWindowRowProps {
   value_min?: number;
   value_max?: number;
   onChange: (id: number, patch: Partial<RowState>) => void;
+  showDelete?: boolean;
+  onDelete?: (id: number) => void;
 }
 
 export const CriteriaWindowRow: React.FC<CriteriaWindowRowProps> = ({
@@ -29,6 +31,8 @@ export const CriteriaWindowRow: React.FC<CriteriaWindowRowProps> = ({
   value_min,
   value_max,
   onChange,
+  showDelete = false,
+  onDelete,
 }) => {
   const buildPlaceholder = () => {
     if (isNumeric && value_min != null && value_max != null)
@@ -38,6 +42,16 @@ export const CriteriaWindowRow: React.FC<CriteriaWindowRowProps> = ({
 
   return (
     <div className="s2-criteria-window__row">
+      {showDelete && (
+        <button
+          className="glass dz-icon-btn s2-icon-btn"
+          aria-label="Delete"
+          type="button"
+          onClick={() => onDelete?.(row.id)}
+        >
+          <TrashIcon className="dz-icon-btn__icon dz-icon-btn__icon--trash" />
+        </button>
+      )}
       {isEnum ? (
         <DropdownInput
           value={row.inputValue}

@@ -34,6 +34,7 @@
 
 .s2-criteria-panel .dz-glass-container__header {
   margin: var(--spacing-md);
+  margin-bottom: 0;
 }
 
 .s2-panel-header__title {
@@ -151,11 +152,13 @@
   /* Pin to content height so windows never shrink inside the scrollable
      .s2-criteria-windows list; overflow is handled by the container. */
   flex: 0 0 auto;
+  padding:var(--spacing-sm);
 }
+
 
 .s2-criteria-window__header {
   justify-content: space-between;
-  margin: 0 !important;
+  margin: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm) !important;
 }
 
 .s2-criteria-window__title {
@@ -189,14 +192,22 @@
 .s2-criteria-window__body {
     display: flex;
     gap: var(--spacing-sm);
+    max-height: 15rem;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: var(--spacing-sm);
 }
 
 .s2-criteria-window__row {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: var(--spacing-sm);
 }
 
+.s2-criteria-window__row .s2-icon-btn{
+  color: var(--color-red);
+}
 
 
 /* ── Window Footer ──────────────────────────────────────────────── */
@@ -206,7 +217,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   flex-shrink: 0;
-  margin-top: var(--spacing-md);
+  margin: var(--spacing-sm);
 }
 
 .s2-criteria-window__btn {

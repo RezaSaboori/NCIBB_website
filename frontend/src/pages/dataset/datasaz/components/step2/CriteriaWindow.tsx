@@ -109,6 +109,8 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
             value_min={value_min}
             value_max={value_max}
             onChange={handleRowChange}
+            showDelete={rows.length > 1}
+            onDelete={(id) => setRows((prev) => prev.filter((r) => r.id !== id))}
           />
         ))}
 
