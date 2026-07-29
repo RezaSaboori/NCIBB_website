@@ -6,8 +6,8 @@ export function useCriteriaSearch(criteria: CriteriaItem[]) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearchChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setSearchQuery(e.target.value);
+    (value: string) => {
+      setSearchQuery(value);
     },
     []
   );

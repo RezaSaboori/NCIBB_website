@@ -138,7 +138,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
         <div className="s2-panel-header__search">
           <SearchInput
             value={searchQuery}
-            onChange={(v) => handleSearchChange({ target: { value: v } } as React.ChangeEvent<HTMLInputElement>)}
+            onChange={handleSearchChange}
             placeholder="Search criteria…"
             icon={
               <button className="glass dz-icon-btn s2-icon-btn s2-icon-btn--search" aria-label="Search">
