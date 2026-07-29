@@ -27,7 +27,7 @@
 }
 
 .s2-criteria-panel {
-  overflow: visible;
+  overflow: clip;
 }
 
 /* ── Panel header layout ────────────────────────────────────────── */
