@@ -1,5 +1,6 @@
 /*ProjectInfoCard.tsx*/
 import React from "react";
+import { TextInput, NumberInput } from "../../../../../components/ui/inputs";
 
 interface ProjectInfoCardProps {
   projectName: string;
@@ -24,13 +25,11 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
           <label className="s1-label" htmlFor="project-name">
             نام پروژه
           </label>
-          <input
+          <TextInput
             id="project-name"
-            type="text"
-            className="s1-input"
-            placeholder="نام پروژه را وارد کنید"
             value={projectName}
-            onChange={(e) => onProjectNameChange(e.target.value)}
+            onChange={onProjectNameChange}
+            placeholder="نام پروژه را وارد کنید"
             dir="rtl"
           />
         </div>
@@ -38,13 +37,11 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
           <label className="s1-label" htmlFor="estimated-count">
             تعداد داده تخمینی
           </label>
-          <input
+          <NumberInput
             id="estimated-count"
-            type="number"
-            className="s1-input"
-            placeholder="مثال: ۱۰۰۰"
             value={estimatedCount}
-            onChange={(e) => onEstimatedCountChange(e.target.value)}
+            onChange={onEstimatedCountChange}
+            placeholder="مثال: ۱۰۰۰"
             dir="rtl"
             min={1}
           />

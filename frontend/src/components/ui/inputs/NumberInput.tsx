@@ -9,6 +9,8 @@ interface NumberInputProps {
   min?: number;
   max?: number;
   className?: string;
+  dir?: "rtl" | "ltr";
+  id?: string;
 }
 
 export const NumberInput: React.FC<NumberInputProps> = ({
@@ -19,6 +21,8 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   min,
   max,
   className = "",
+  dir,
+  id,
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
@@ -39,6 +43,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   return (
     <div className={`ui-input-shell ${className}`}>
       <input
+        id={id}
         className="ui-input-field"
         type="number"
         value={value}
@@ -48,6 +53,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
         min={min}
         max={max}
         step="any"
+        dir={dir}
       />
     </div>
   );
