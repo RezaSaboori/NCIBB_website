@@ -38,6 +38,17 @@
   border-color: var(--color-blue);
 }
 
+/* ── Persian locale modifier ─────────────────────────────────── */
+/*
+ * Apply to the shell when inputs contain Persian/Arabic text.
+ * Usage: <TextInput className="ui-input-shell--persian" ... />
+ */
+
+.ui-input-shell--persian .ui-input-field {
+  font-family: var(--font-family-persian);
+  font-size: var(--font-size-base);
+}
+
 /* ── Bare text/number field (sits inside the shell) ──────────── */
 
 .ui-input-field {
@@ -53,6 +64,7 @@
 }
 
 .ui-input-field::placeholder {
+  font-size: var(--font-size-sm);
   color: var(--color-gray4);
 }
 

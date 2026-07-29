@@ -31,6 +31,7 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
             onChange={onProjectNameChange}
             placeholder="نام پروژه را وارد کنید"
             dir="rtl"
+            className="ui-input-shell--persian"
           />
         </div>
         <div className="s1-field">
@@ -44,6 +45,7 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
             placeholder="مثال: ۱۰۰۰"
             dir="rtl"
             min={1}
+            className="ui-input-shell--persian"
           />
           <span className="s1-hint">تعداد تقریبی رکوردهای داده‌ای که قرار است پردازش شوند</span>
         </div>
