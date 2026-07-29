@@ -23,7 +23,6 @@
 .s2-criteria-row .dz-glass-container--md {
   padding: var(--spacing-sm);
   gap: 0;
-  overflow: visible;
 }
 
 .s2-criteria-panel {
