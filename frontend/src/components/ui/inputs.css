@@ -170,8 +170,7 @@
     opacity 0.2s ease,
     transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
     visibility 0.2s;
-  max-height: 220px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .ui-dropdown__panel.is-open {
