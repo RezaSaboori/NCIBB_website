@@ -132,6 +132,7 @@
   overflow: visible;
   flex: 0 0 auto;
   min-height: 0;
+  height: fit-content;
 }
 
 .s2-criteria-windows {
@@ -190,6 +191,7 @@
 /* ── Window Body row (input + required toggle) ──────────────────── */
 
 .s2-criteria-window__body {
+    flex: 0 0 auto;
     display: flex;
     gap: var(--spacing-sm);
     max-height: 15rem;

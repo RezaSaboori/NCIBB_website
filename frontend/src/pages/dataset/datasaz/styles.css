@@ -307,7 +307,7 @@
 /* ── Body ──────────────────────────────────────────────────────── */
 
 .dz-glass-container__body {
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
 }
