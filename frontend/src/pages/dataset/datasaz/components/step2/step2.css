@@ -58,6 +58,10 @@
   min-width: 0;
 }
 
+.s2-icon-btn--help {
+  width:2.5rem;
+  height:2.5rem 
+}
 
 
 /* ── Panel tabs layout ────────────────────────────────────────── */
@@ -68,7 +72,9 @@
 
 
 /* ── Add criteria tab color overrides ──────────────────────────── */
-.s2-icon-btn {
+.s2-criteria-window__header-actions .s2-icon-btn {
+  width:1.5rem;
+  height: 1.5rem;
   color: var(--color-gray10);
 }
 
@@ -370,4 +376,40 @@
 
 .s2-criteria-window__numeric-row .ui-input-shell {
   flex: 1 1 auto;
+}
+
+/* ── Add More Rule Button ───────────────────────────────────────── */
+
+.s2-criteria-window__add-rule-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: none;
+  border: none;
+  margin: var(--spacing-sm) 0 0 var(--spacing-xs);
+  cursor: pointer;
+  padding: 0;
+  color: var(--color-blue);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-family-base);
+  width: fit-content;
+  transition: opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+.s2-criteria-window__add-rule-btn:hover {
+  opacity: 0.75;
+}
+
+.s2-criteria-window__add-rule-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-blue);
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  flex-shrink: 0;
 }

@@ -1,9 +1,7 @@
 /* CriteriaWindow.tsx */
 import React, { useState } from "react";
-import { QuestionIcon, TrashIcon, MinimizeIcon, ChevronIcon } from "./icons/Step2Icons";
-import { TextInput, NumberInput, DropdownInput, RadioToggle } from "../../../../../components/ui/inputs";
-
-const NUMERIC_OPERATORS = ["=", "<", ">", "<=", ">="];
+import { QuestionIcon, TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
+import { CriteriaWindowRow, RowState } from "./CriteriaWindowRow";
 
 interface CriteriaWindowProps {
   label: string;
@@ -17,6 +15,16 @@ interface CriteriaWindowProps {
   onDelete: () => void;
 }
 
+let _rowIdCounter = 0;
+const nextRowId = () => ++_rowIdCounter;
+
+const makeRow = (): RowState => ({
+  id: nextRowId(),
+  inputValue: "",
+  numericOperator: "=",
+  isRequired: false,
+});
+
 export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   label,
   unit,
@@ -28,19 +36,30 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   onHelp,
   onDelete,
 }) => {
-  const [inputValue, setInputValue] = useState("");
-  const [numericOperator, setNumericOperator] = useState("=");
-  const [isRequired, setIsRequired] = useState(false);
+  const [rows, setRows] = useState<RowState[]>([makeRow()]);
 
   const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;
   const isNumeric = value_type === "numeric";
 
-  const buildPlaceholder = () => {
-    if (isNumeric && value_min != null && value_max != null)
-      return `Range: ${value_min} – ${value_max}`;
-    return "Enter value...";
+  const handleRowChange = (id: number, patch: Partial<RowState>) => {
+    setRows((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, ...patch } : r))
+    );
   };
 
+  const handleAddRow = () => {
+    setRows((prev) => [...prev, makeRow()]);
+  };
+
+  // Hide "Add more rule" if:
+  //  - datatype is enum AND any row is marked required
+  //  - datatype is enum AND all enum values are already covered (rows.length >= values.length)
+  const showAddMoreRule = (() => {
+    if (!isEnum) return true;
+    if (rows.some((r) => r.isRequired)) return false;
+    if (values && rows.length >= values.length) return false;
+    return true;
+  })();
 
   return (
     <div className="glass dz-glass-container dz-glass-container--sm s2-criteria-window">
@@ -80,43 +99,29 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
 
       {/* Body */}
       <div className="dz-glass-container__body s2-criteria-window__body">
-        <div className="s2-criteria-window__row">
-          {isEnum ? (
-            <DropdownInput
-                value={inputValue}
-                options={values!}
-                onChange={setInputValue}
-                placeholder="Select value..."
-                chevronIcon={<ChevronIcon />}
-                searchable={values!.length > 6}
-              />
-          ) : isNumeric ? (
-            <div className="s2-criteria-window__numeric-row">
-              <DropdownInput
-                value={numericOperator}
-                options={NUMERIC_OPERATORS}
-                onChange={setNumericOperator}
-                placeholder="Operator"
-                chevronIcon={<ChevronIcon />}
-                dir="ltr"
-              />
-              <NumberInput
-                value={inputValue}
-                onChange={setInputValue}
-                placeholder={buildPlaceholder()}
-                min={value_min}
-                max={value_max}
-              />
-            </div>
-          ) : (
-            <TextInput
-              value={inputValue}
-              onChange={setInputValue}
-              placeholder={buildPlaceholder()}
-            />
-          )}
-          <RadioToggle checked={isRequired} onChange={setIsRequired} />
-        </div>
+        {rows.map((row) => (
+          <CriteriaWindowRow
+            key={row.id}
+            row={row}
+            isEnum={isEnum}
+            isNumeric={isNumeric}
+            values={values}
+            value_min={value_min}
+            value_max={value_max}
+            onChange={handleRowChange}
+          />
+        ))}
+
+        {showAddMoreRule && (
+          <button
+            className="s2-criteria-window__add-rule-btn"
+            type="button"
+            onClick={handleAddRow}
+          >
+            <span className="s2-criteria-window__add-rule-btn-icon">+</span>
+            Add more rule
+          </button>
+        )}
       </div>
 
       {/* Footer */}
