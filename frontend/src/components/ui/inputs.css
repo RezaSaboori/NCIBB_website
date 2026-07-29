@@ -183,6 +183,13 @@
   transform: translateY(0) scale(1);
 }
 
+.ui-dropdown__search-shell {
+  margin-bottom: var(--spacing-xs);
+  height: 2rem;
+  min-height: 2rem;
+  background: var(--color-gray2);
+}
+
 .ui-dropdown__list {
   overflow-y: auto;
   max-height: 200px;
@@ -204,14 +211,26 @@
 }
 
 .ui-dropdown__item:hover {
-  background: color-mix(in srgb, var(--color-blue) 8%, transparent);
   color: var(--color-blue);
 }
 
 .ui-dropdown__item.is-selected {
-  background: color-mix(in srgb, var(--color-blue) 12%, transparent);
   color: var(--color-blue);
   font-weight: 600;
+}
+
+.ui-dropdown__item--empty {
+  color: var(--color-gray5);
+  cursor: default;
+  font-style: italic;
+}
+
+.ui-dropdown__check {
+  width: 1rem;
+  display: inline-block;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--color-blue);
 }
 
 /* ── Portal variant: panel rendered into <body> via React Portal ── */
