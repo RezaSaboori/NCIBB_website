@@ -188,7 +188,7 @@
 .s2-criteria-window__row {
     display: flex;
     justify-content: space-between;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
 }
 
 
@@ -365,7 +365,7 @@
 
 .s2-criteria-window__numeric-row .ui-dropdown {
   flex: 0 0 auto;
-  width: 9.5rem;
+  width: 5rem;
 }
 
 .s2-criteria-window__numeric-row .ui-input-shell {

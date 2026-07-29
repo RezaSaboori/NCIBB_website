@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { QuestionIcon, TrashIcon, MinimizeIcon, ChevronIcon } from "./icons/Step2Icons";
 import { TextInput, NumberInput, DropdownInput, RadioToggle } from "../../../../../components/ui/inputs";
 
-const NUMERIC_OPERATORS = ["Equal", "Below and Equal", "Above and Equal", "Below", "Above"];
+const NUMERIC_OPERATORS = ["=", "<", ">", "<=", ">="];
 
 interface CriteriaWindowProps {
   label: string;
@@ -29,7 +29,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   onDelete,
 }) => {
   const [inputValue, setInputValue] = useState("");
-  const [numericOperator, setNumericOperator] = useState("Equal");
+  const [numericOperator, setNumericOperator] = useState("=");
   const [isRequired, setIsRequired] = useState(false);
 
   const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;

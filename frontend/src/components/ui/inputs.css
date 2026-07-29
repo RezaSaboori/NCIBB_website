@@ -207,11 +207,11 @@
 
 .ui-dropdown__list {
   overflow-y: auto;
-  max-height: 200px;
+  max-height: 250px;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  padding: var(--spacing-sm);
+  padding: var(--spacing-xs);
 }
 
 .ui-dropdown__item {
@@ -279,10 +279,7 @@
 .ui-radio-toggle {
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  border: none;
-  border-radius: var(--border-radius-pill);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  gap: var(--spacing-xs);
   cursor: pointer;
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
@@ -290,7 +287,6 @@
   font-weight: var(--font-weight-semibold);
   white-space: nowrap;
   flex-shrink: 0;
-  background: transparent;
   transition: color var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
@@ -305,7 +301,7 @@
 }
 
 .ui-radio-toggle__label {
-  padding: 3px 0 0 0;
+  padding: 0px 0 0 0;
 }
 
 .ui-radio-toggle--checked .ui-radio-toggle__label {
