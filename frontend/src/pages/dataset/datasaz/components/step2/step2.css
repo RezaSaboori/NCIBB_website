@@ -353,3 +353,21 @@
 }
 
 
+/* ── Numeric operator + value row ──────────────────────────────── */
+
+.s2-criteria-window__numeric-row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-sm);
+  align-items: center;
+  width: 100%;
+}
+
+.s2-criteria-window__numeric-row .ui-dropdown {
+  flex: 0 0 auto;
+  width: 9.5rem;
+}
+
+.s2-criteria-window__numeric-row .ui-input-shell {
+  flex: 1 1 auto;
+}

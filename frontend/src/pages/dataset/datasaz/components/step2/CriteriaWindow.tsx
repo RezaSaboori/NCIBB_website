@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { QuestionIcon, TrashIcon, MinimizeIcon, ChevronIcon } from "./icons/Step2Icons";
 import { TextInput, NumberInput, DropdownInput, RadioToggle } from "../../../../../components/ui/inputs";
 
+const NUMERIC_OPERATORS = ["Equal", "Below and Equal", "Above and Equal", "Below", "Above"];
+
 interface CriteriaWindowProps {
   label: string;
   unit?: string;
@@ -27,6 +29,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   onDelete,
 }) => {
   const [inputValue, setInputValue] = useState("");
+  const [numericOperator, setNumericOperator] = useState("Equal");
   const [isRequired, setIsRequired] = useState(false);
 
   const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;
@@ -88,13 +91,23 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
                 searchable={values!.length > 6}
               />
           ) : isNumeric ? (
-            <NumberInput
-              value={inputValue}
-              onChange={setInputValue}
-              placeholder={buildPlaceholder()}
-              min={value_min}
-              max={value_max}
-            />
+            <div className="s2-criteria-window__numeric-row">
+              <DropdownInput
+                value={numericOperator}
+                options={NUMERIC_OPERATORS}
+                onChange={setNumericOperator}
+                placeholder="Operator"
+                chevronIcon={<ChevronIcon />}
+                dir="ltr"
+              />
+              <NumberInput
+                value={inputValue}
+                onChange={setInputValue}
+                placeholder={buildPlaceholder()}
+                min={value_min}
+                max={value_max}
+              />
+            </div>
           ) : (
             <TextInput
               value={inputValue}
