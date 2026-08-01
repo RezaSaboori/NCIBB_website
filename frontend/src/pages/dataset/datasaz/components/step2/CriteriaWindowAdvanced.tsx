@@ -8,6 +8,7 @@ import { CriteriaWindowMini } from "./CriteriaWindowMini";
 import { FieldSearchSpotlight } from "./FieldSearchSpotlight";
 import { TextInput, RadioToggle } from "../../../../../components/ui/inputs";
 import { useFieldSearch } from "../../hooks/useFieldSearch";
+import { useTabFocusScroll } from "../../hooks/useTabFocusScroll";
 import type { CriteriaItem, AdvancedCriteriaEntry } from "../../types";
 import type { RowState } from "./CriteriaWindowRow";
 
@@ -60,6 +61,16 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   );
   // Per-entry rows snapshot so switching tabs doesn't lose state
   const entryRowsRef = useRef<Map<number, RowState[]>>(new Map());
+  const advWindowsContainerRef = useRef<HTMLDivElement | null>(null);
+  const advTabsAnchorRef = useRef<HTMLDivElement | null>(null);
+
+  const { scrollToWindow: scrollToEntry } = useTabFocusScroll({
+    selectedId: activeEntryId,
+    setSelectedId: setActiveEntryId,
+    expandedIds: expandedEntryIds,
+    windowsContainerRef: advWindowsContainerRef,
+    tabsAnchorRef: advTabsAnchorRef,
+  });
 
   useEffect(() => {
     if (!spotlightOpen) {
@@ -196,7 +207,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
       </div>
 
       {/* Tabs row */}
-      <div className="s2-criteria-tabs-anchor">
+      <div className="s2-criteria-tabs-anchor" ref={advTabsAnchorRef}>
         <div className="dz-criteria-tabs s2-adv-group__tabs">
           {entries.map((entry) => (
             <CriteriaButton
@@ -205,10 +216,14 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
               isSelected={activeEntryId === entry.entryId}
               isExpanded={expandedEntryIds.has(entry.entryId)}
               isAdvanced={false}
-              onSelect={() => setActiveEntryId(entry.entryId)}
+              onSelect={() => {
+                setActiveEntryId(entry.entryId);
+                scrollToEntry(entry.entryId);
+              }}
               onExpand={() => {
                 setActiveEntryId(entry.entryId);
                 handleToggleExpand(entry.entryId);
+                scrollToEntry(entry.entryId);
               }}
               onDelete={() => handleDeleteEntry(entry.entryId)}
             />
@@ -237,13 +252,14 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
           onSelect={handleSelectSuggestion}
           onClose={handleCloseSpotlight}
         />
+        <div ref={advWindowsContainerRef} style={{ display: "contents" }}>
         {entries
           .filter((entry) => expandedEntryIds.has(entry.entryId))
           .slice()
           .reverse()
           .map((entry) => (
+            <div key={entry.entryId} data-criteria-id={entry.entryId}>
             <CriteriaWindowMini
-              key={entry.entryId}
               label={entry.label}
               unit={entry.unit}
               value_type={entry.value_type}
@@ -259,7 +275,9 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
               onClose={() => handleToggleExpand(entry.entryId)}
               onDelete={() => handleDeleteEntry(entry.entryId)}
             />
+            </div>
           ))}
+        </div>
       </div>
 
       {/* Footer */}

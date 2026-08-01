@@ -10,6 +10,7 @@ import { SearchIcon, QuestionIcon } from "./icons/Step2Icons";
 import { SearchInput } from "../../../../../components/ui/inputs";
 import { useFieldSearch } from "../../hooks/useFieldSearch";
 import { useCriteriaSearch } from "../../hooks/useCriteriaSearch";
+import { useTabFocusScroll } from "../../hooks/useTabFocusScroll";
 import type { SuggestionItem, CriteriaItem } from "../../types";
 import type { RowState } from "./CriteriaWindowRow";
 
@@ -130,9 +131,24 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     setSelectedId((prev) => (prev === id ? null : prev));
   }, []);
 
-  const handleSelect = useCallback((id: number) => {
-    setSelectedId((prev) => (prev === id ? null : id));
-  }, []);
+  const windowsContainerRef = useRef<HTMLDivElement | null>(null);
+  const tabsAnchorRef = useRef<HTMLDivElement | null>(null);
+
+  const { scrollToWindow } = useTabFocusScroll({
+    selectedId,
+    setSelectedId,
+    expandedIds,
+    windowsContainerRef,
+    tabsAnchorRef,
+  });
+
+  const handleSelect = useCallback(
+    (id: number) => {
+      setSelectedId((prev) => (prev === id ? null : id));
+      scrollToWindow(id);
+    },
+    [scrollToWindow]
+  );
 
   const handleToggleExpand = useCallback((id: number) => {
     setExpandedIds((prev) => {
@@ -187,7 +203,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
       </div>
 
       {/* Tabs row */}
-      <div className="s2-criteria-tabs-anchor">
+      <div className="s2-criteria-tabs-anchor" ref={tabsAnchorRef}>
         <div className="dz-criteria-tabs">
           {filteredCriteria.map((c) => (
             <CriteriaButton
@@ -226,45 +242,47 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
             onClose={handleCloseSpotlight}
           />
           {expandedIds.size > 0 && (
-            <div className="s2-criteria-windows">
+            <div className="s2-criteria-windows" ref={windowsContainerRef}>
               {(isFiltering ? filteredCriteria : criteria)
                 .filter((c) => expandedIds.has(c.id))
                 .slice()
                 .reverse()
                 .map((c) =>
                   advancedIds.has(c.id) ? (
-                    <CriteriaWindowAdvanced
-                      key={c.id}
-                      origin={c}
-                      groupName={groupNames.get(c.id) ?? `Group ${c.id}`}
-                      onGroupNameChange={(name) =>
-                        setGroupNames((prev) => { const m = new Map(prev); m.set(c.id, name); return m; })
-                      }
-                      isGroupRequired={groupRequired.get(c.id) ?? false}
-                      onGroupRequiredChange={(val) =>
-                        setGroupRequired((prev) => { const m = new Map(prev); m.set(c.id, val); return m; })
-                      }
-                      initialRows={simpleRowsRef.current.get(c.id)}
-                      onExitAdvanced={() => handleToggleAdvanced(c.id)}
-                      onMinimize={() => handleToggleExpand(c.id)}
-                      onDelete={() => handleDelete(c.id)}
-                    />
+                    <div key={c.id} data-criteria-id={c.id}>
+                      <CriteriaWindowAdvanced
+                        origin={c}
+                        groupName={groupNames.get(c.id) ?? `Group ${c.id}`}
+                        onGroupNameChange={(name) =>
+                          setGroupNames((prev) => { const m = new Map(prev); m.set(c.id, name); return m; })
+                        }
+                        isGroupRequired={groupRequired.get(c.id) ?? false}
+                        onGroupRequiredChange={(val) =>
+                          setGroupRequired((prev) => { const m = new Map(prev); m.set(c.id, val); return m; })
+                        }
+                        initialRows={simpleRowsRef.current.get(c.id)}
+                        onExitAdvanced={() => handleToggleAdvanced(c.id)}
+                        onMinimize={() => handleToggleExpand(c.id)}
+                        onDelete={() => handleDelete(c.id)}
+                      />
+                    </div>
                   ) : (
-                    <CriteriaWindow
-                      key={c.id}
-                      label={c.label}
-                      unit={c.unit}
-                      value_type={c.value_type}
-                      value_min={c.value_min}
-                      value_max={c.value_max}
-                      values={c.values}
-                      isAdvanced={false}
-                      onToggleAdvanced={() => handleToggleAdvanced(c.id)}
-                      onMinimize={() => handleToggleExpand(c.id)}
-                      onDelete={() => handleDelete(c.id)}
-                      initialRows={simpleRowsRef.current.get(c.id)}
-                      onRowsChange={(rows) => { simpleRowsRef.current.set(c.id, rows); }}
-                    />
+                    <div key={c.id} data-criteria-id={c.id}>
+                      <CriteriaWindow
+                        label={c.label}
+                        unit={c.unit}
+                        value_type={c.value_type}
+                        value_min={c.value_min}
+                        value_max={c.value_max}
+                        values={c.values}
+                        isAdvanced={false}
+                        onToggleAdvanced={() => handleToggleAdvanced(c.id)}
+                        onMinimize={() => handleToggleExpand(c.id)}
+                        onDelete={() => handleDelete(c.id)}
+                        initialRows={simpleRowsRef.current.get(c.id)}
+                        onRowsChange={(rows) => { simpleRowsRef.current.set(c.id, rows); }}
+                      />
+                    </div>
                   )
                 )}
             </div>
