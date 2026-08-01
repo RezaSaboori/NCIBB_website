@@ -103,15 +103,22 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     tabsAnchorRef,
   });
 
-  // Scroll to a newly added criteria tab after the DOM has rendered the window
+  // Scroll to a newly added criteria tab after the DOM has painted the new window
   const pendingScrollIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (pendingScrollIdRef.current === null) return;
     const id = pendingScrollIdRef.current;
     pendingScrollIdRef.current = null;
-    scrollToWindow(id);
-  }, [criteria, scrollToWindow]);
+    // rAF ensures the DOM node for the new window exists before querying
+    const frame = requestAnimationFrame(() => {
+      const container = windowsContainerRef.current;
+      if (!container) return;
+      const target = container.querySelector<HTMLElement>(`[data-criteria-id="${id}"]`);
+      target?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [criteria, windowsContainerRef]);
 
   const handleSelectSuggestion = useCallback(
     (item: SuggestionItem) => {
