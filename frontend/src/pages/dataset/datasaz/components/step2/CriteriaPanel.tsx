@@ -32,6 +32,8 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   const [nextId, setNextId] = useState(1);
   // Per-criteria rows snapshot: preserved across simple↔advanced mode switches
   const simpleRowsRef = useRef<Map<number, RowState[]>>(new Map());
+  // Counter for auto-naming advanced groups: Group 1, Group 2, …
+  const advGroupCounterRef = useRef(0);
   // Per-criteria group name (controlled from panel, reflected in tab label)
   const [groupNames, setGroupNames] = useState<Map<number, string>>(new Map());
   // Per-criteria group required (controlled from panel)
@@ -147,12 +149,12 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
       if (next.has(id)) {
         next.delete(id);
       } else {
-        // Seed group name from label on first entry into advanced mode
+        // Seed group name as Group 1, Group 2, … on first entry into advanced mode
         setGroupNames((gn) => {
           if (gn.has(id)) return gn;
-          const item = criteria.find((c) => c.id === id);
+          advGroupCounterRef.current += 1;
           const m = new Map(gn);
-          m.set(id, item ? `Group: ${item.label}` : `Group ${id}`);
+          m.set(id, `Group ${advGroupCounterRef.current}`);
           return m;
         });
         next.add(id);

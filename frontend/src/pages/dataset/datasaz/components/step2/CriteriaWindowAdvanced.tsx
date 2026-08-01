@@ -218,7 +218,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
         </div>
       </div>
 
-      {/* Pane */}
+      {/* Pane — renders all expanded entries stacked, not just the active one */}
       <div
         className="s2-criteria-body s2-adv-group__pane"
         style={{ minHeight: spotlightMinHeight > 0 ? spotlightMinHeight : undefined }}
@@ -234,25 +234,27 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
           onSelect={handleSelectSuggestion}
           onClose={handleCloseSpotlight}
         />
-        {expandedEntryIds.has(activeEntryId) && (
-          <CriteriaWindowMini
-            key={activeEntryId}
-            label={activeEntry.label}
-            unit={activeEntry.unit}
-            value_type={activeEntry.value_type}
-            value_min={activeEntry.value_min}
-            value_max={activeEntry.value_max}
-            values={activeEntry.values}
-            initialRows={
-              activeEntryId === firstEntryId
-                ? (entryRowsRef.current.get(firstEntryId) ?? initialRows)
-                : entryRowsRef.current.get(activeEntryId)
-            }
-            onRowsChange={(rows) => entryRowsRef.current.set(activeEntryId, rows)}
-            onClose={() => handleToggleExpand(activeEntryId)}
-            onDelete={() => handleDeleteEntry(activeEntryId)}
-          />
-        )}
+        {entries
+          .filter((entry) => expandedEntryIds.has(entry.entryId))
+          .map((entry) => (
+            <CriteriaWindowMini
+              key={entry.entryId}
+              label={entry.label}
+              unit={entry.unit}
+              value_type={entry.value_type}
+              value_min={entry.value_min}
+              value_max={entry.value_max}
+              values={entry.values}
+              initialRows={
+                entry.entryId === firstEntryId
+                  ? (entryRowsRef.current.get(firstEntryId) ?? initialRows)
+                  : entryRowsRef.current.get(entry.entryId)
+              }
+              onRowsChange={(rows) => entryRowsRef.current.set(entry.entryId, rows)}
+              onClose={() => handleToggleExpand(entry.entryId)}
+              onDelete={() => handleDeleteEntry(entry.entryId)}
+            />
+          ))}
       </div>
 
       {/* Footer */}
