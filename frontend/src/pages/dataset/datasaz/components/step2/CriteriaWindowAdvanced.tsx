@@ -104,6 +104,15 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
     reset();
   }, [reset]);
 
+  const pendingScrollEntryIdRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (pendingScrollEntryIdRef.current === null) return;
+    const id = pendingScrollEntryIdRef.current;
+    pendingScrollEntryIdRef.current = null;
+    scrollToEntry(id);
+  }, [entries, scrollToEntry]);
+
   const handleSelectSuggestion = useCallback(
     (item: any) => {
       const newEntryId = nextEntryId();
@@ -132,6 +141,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
       });
       setActiveEntryId(newEntryId);
       setExpandedEntryIds((prev) => { const s = new Set(prev); s.add(newEntryId); return s; });
+      pendingScrollEntryIdRef.current = newEntryId;
       handleCloseSpotlight();
     },
     [handleCloseSpotlight]

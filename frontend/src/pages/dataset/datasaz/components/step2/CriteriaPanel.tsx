@@ -92,6 +92,16 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     reset();
   }, [reset]);
 
+  // Scroll to a newly added criteria tab after the DOM has rendered the window
+  const pendingScrollIdRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (pendingScrollIdRef.current === null) return;
+    const id = pendingScrollIdRef.current;
+    pendingScrollIdRef.current = null;
+    scrollToWindow(id);
+  }, [criteria, scrollToWindow]);
+
   const handleSelectSuggestion = useCallback(
     (item: SuggestionItem) => {
       const newId = nextId;
@@ -115,11 +125,12 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
             value_max: item.max,
             values: item.values,
           },
-      ];
+        ];
       });
       setNextId((n) => n + 1);
       setExpandedIds((prev) => { const next = new Set(prev); next.add(newId); return next; });
       setSelectedId(newId);
+      pendingScrollIdRef.current = newId;
       handleCloseSpotlight();
     },
     [nextId, handleCloseSpotlight]
