@@ -13,6 +13,7 @@ import { useCriteriaSearch } from "../../hooks/useCriteriaSearch";
 import { useTabFocusScroll } from "../../hooks/useTabFocusScroll";
 import type { SuggestionItem, CriteriaItem } from "../../types";
 import type { RowState } from "./CriteriaWindowRow";
+import { resolveCriteriaLabel } from "../../../utils/criteriaLabel";
 
 interface CriteriaPanelProps {
   type: "inclusion" | "exclusion";
@@ -129,12 +130,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
       setCriteria((prev) => {
         const base = item.name;
         const existingLabels = new Set(prev.map((c) => c.label));
-        let label = base;
-        let counter = 1;
-        while (existingLabels.has(label)) {
-          label = `${base} (${counter})`;
-          counter++;
-        }
+        const label = resolveCriteriaLabel(base, existingLabels);
         return [
           ...prev,
           {
@@ -184,9 +180,21 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     setAdvancedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
+        // Exiting advanced → simple: re-derive label to avoid collisions with siblings
         next.delete(id);
+        setCriteria((prevCriteria) => {
+          const target = prevCriteria.find((c) => c.id === id);
+          if (!target) return prevCriteria;
+          // Strip any existing numbering to get the true base name
+          const base = target.label.replace(/ \(\d+\)$/, "");
+          const otherLabels = new Set(
+            prevCriteria.filter((c) => c.id !== id).map((c) => c.label)
+          );
+          const label = resolveCriteriaLabel(base, otherLabels);
+          return prevCriteria.map((c) => (c.id === id ? { ...c, label } : c));
+        });
       } else {
-        // Seed group name as Group 1, Group 2, … based on current live count
+        // Entering advanced: seed group name based on current live advanced count
         next.add(id);
         setGroupNames((gn) => {
           if (gn.has(id)) return gn;
@@ -197,7 +205,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
       }
       return next;
     });
-  }, [criteria]);
+  }, []);
 
   return (
     <div className={`glass dz-glass-container dz-glass-container--md s2-criteria-panel${spotlightOpen ? " s2-criteria-panel--spotlight-open" : ""}`}>

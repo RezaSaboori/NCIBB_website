@@ -10,6 +10,7 @@ import { TextInput, RadioToggle } from "../../../../../components/ui/inputs";
 import { useFieldSearch } from "../../hooks/useFieldSearch";
 import { useTabFocusScroll } from "../../hooks/useTabFocusScroll";
 import type { CriteriaItem, AdvancedCriteriaEntry } from "../../types";
+import { resolveCriteriaLabel } from "../../../utils/criteriaLabel";
 import type { RowState } from "./CriteriaWindowRow";
 
 interface CriteriaWindowAdvancedProps {
@@ -122,12 +123,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
       setEntries((prev) => {
         const base = item.name;
         const existingLabels = new Set(prev.map((e) => e.label));
-        let label = base;
-        let counter = 1;
-        while (existingLabels.has(label)) {
-          label = `${base} (${counter})`;
-          counter++;
-        }
+        const label = resolveCriteriaLabel(base, existingLabels);
         return [
           ...prev,
           {
