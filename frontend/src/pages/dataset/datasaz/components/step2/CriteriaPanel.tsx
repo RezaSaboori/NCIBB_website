@@ -4,6 +4,7 @@ import "./step2.css";
 import { CriteriaButton } from "./CriteriaButton";
 import { AddCriteriaTab } from "./AddCriteriaTab";
 import { CriteriaWindow } from "./CriteriaWindow";
+import { CriteriaWindowAdvanced } from "./CriteriaWindowAdvanced";
 import { FieldSearchSpotlight } from "./FieldSearchSpotlight";
 import { SearchIcon, QuestionIcon } from "./icons/Step2Icons";
 import { SearchInput } from "../../../../../components/ui/inputs";
@@ -211,21 +212,32 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
                 .filter((c) => expandedIds.has(c.id))
                 .slice()
                 .reverse()
-                .map((c) => (
-                  <CriteriaWindow
-                    key={c.id}
-                    label={c.label}
-                    unit={c.unit}
-                    value_type={c.value_type}
-                    value_min={c.value_min}
-                    value_max={c.value_max}
-                    values={c.values}
-                    isAdvanced={advancedIds.has(c.id)}
-                    onToggleAdvanced={() => handleToggleAdvanced(c.id)}
-                    onMinimize={() => handleToggleExpand(c.id)}
-                    onDelete={() => handleDelete(c.id)}
-                  />
-                ))}
+                .map((c) =>
+                  advancedIds.has(c.id) ? (
+                    <CriteriaWindowAdvanced
+                      key={c.id}
+                      origin={c}
+                      defaultGroupName={`Group ${c.id}`}
+                      onExitAdvanced={() => handleToggleAdvanced(c.id)}
+                      onMinimize={() => handleToggleExpand(c.id)}
+                      onDelete={() => handleDelete(c.id)}
+                    />
+                  ) : (
+                    <CriteriaWindow
+                      key={c.id}
+                      label={c.label}
+                      unit={c.unit}
+                      value_type={c.value_type}
+                      value_min={c.value_min}
+                      value_max={c.value_max}
+                      values={c.values}
+                      isAdvanced={false}
+                      onToggleAdvanced={() => handleToggleAdvanced(c.id)}
+                      onMinimize={() => handleToggleExpand(c.id)}
+                      onDelete={() => handleDelete(c.id)}
+                    />
+                  )
+                )}
             </div>
           )}
         </div>

@@ -35,6 +35,17 @@ export interface CriteriaItem {
   values?: string[];
 }
 
+export interface AdvancedCriteriaEntry extends CriteriaItem {
+  /** unique within the group */
+  entryId: number;
+}
+
+export interface AdvancedGroup {
+  groupName: string;
+  isRequired: boolean;
+  entries: AdvancedCriteriaEntry[];
+}
+
 export interface DefinitionSummary {
   inclusionCount: number;
   exclusionCount: number;

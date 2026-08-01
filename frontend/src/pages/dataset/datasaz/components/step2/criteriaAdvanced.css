@@ -1,25 +1,93 @@
-/* criteriaAdvanced.css — Advanced mode overrides for CriteriaWindow and its tab */
+/* criteriaAdvanced.css — Advanced mode styles */
 
-/* ── Window: advanced mode switches glass → opal-glass ─────────── */
+/* ── Existing hooks (preserved) ────────────────────────────────── */
 
-.s2-criteria-window--advanced {
-  /* opal-glass replaces glass on the container itself */
+
+/* ── Advanced Group: header layout ─────────────────────────────── */
+
+.s2-adv-group__header {
+  gap: var(--spacing-sm) !important;
 }
 
-/* ── Footer advanced btn: flips to glass, label changes via React ── */
-
-.s2-criteria-window__btn--advanced-active {
-  /* Inherits .glass from className; no extra visual override needed.
-     This modifier class exists as a hook for future extended styles. */
+.s2-adv-group__name-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1.5px solid color-mix(in srgb, var(--color-gray6) 40%, transparent);
+  border-radius: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-family-base);
+  color: var(--color-gray11);
+  padding: 2px var(--spacing-xs);
+  outline: none;
+  transition: border-color var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
-/* ── Tab: advanced mode indicator ───────────────────────────────── */
-/*
- * When a CriteriaButton tab is in advanced mode, it receives
- * .s2-criteria-tab--advanced which removes the glass class variant
- * and applies opal-glass treatment via a CSS cascade modifier.
- * The actual glass class swap is done in JSX; this class is a future hook.
- */
-.s2-criteria-tab--advanced {
-  /* placeholder for future advanced-tab-specific overrides */
+.s2-adv-group__name-input:focus {
+  border-bottom-color: var(--color-blue);
+}
+
+.dark .s2-adv-group__name-input {
+  color: var(--color-gray1);
+  border-bottom-color: color-mix(in srgb, var(--color-gray6) 30%, transparent);
+}
+
+/* ── Required button ────────────────────────────────────────────── */
+
+.s2-adv-group__required-btn {
+  flex-shrink: 0;
+  border: 1.5px solid color-mix(in srgb, var(--color-gray6) 40%, transparent);
+  border-radius: var(--border-radius-pill);
+  background: transparent;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-family-base);
+  color: var(--color-gray8);
+  padding: 2px var(--spacing-sm);
+  cursor: pointer;
+  transition:
+    color var(--motion-duration-normal) var(--motion-easing-easeInOut),
+    border-color var(--motion-duration-normal) var(--motion-easing-easeInOut),
+    background var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+.s2-adv-group__required-btn--active {
+  color: var(--color-blue);
+  border-color: var(--color-blue);
+  background: color-mix(in srgb, var(--color-blue) 10%, transparent);
+}
+
+.s2-adv-group__required-btn:hover:not(.s2-adv-group__required-btn--active) {
+  color: var(--color-gray11);
+  border-color: color-mix(in srgb, var(--color-gray8) 60%, transparent);
+}
+
+/* ── Tabs inside advanced group ─────────────────────────────────── */
+
+.s2-adv-group__tabs {
+  /* Same as .dz-criteria-tabs but allow tighter max-height in xs context */
+  max-height: 6rem;
+}
+
+/* ── Pane area ──────────────────────────────────────────────────── */
+
+.s2-adv-group__pane {
+  padding: 0 var(--spacing-xs);
+}
+
+/* ── Mini window adjustments ────────────────────────────────────── */
+
+.s2-criteria-window--mini .s2-criteria-window__header {
+  margin: var(--spacing-xs) var(--spacing-xs) 0 var(--spacing-xs) !important;
+}
+
+.s2-criteria-window--mini .s2-criteria-window__body {
+  max-height: 10rem;
+  padding: var(--spacing-xs);
+}
+
+.s2-criteria-window--mini .s2-criteria-window__footer {
+  margin: var(--spacing-xs);
 }
