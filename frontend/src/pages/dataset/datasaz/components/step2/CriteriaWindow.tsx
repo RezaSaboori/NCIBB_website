@@ -128,11 +128,16 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
 
       {/* Footer */}
       <div className="s2-criteria-window__footer">
-        <button className="blue-glass s2-criteria-window__btn" type="button" onClick={onMinimize}>
-          Submit
-        </button>
-        <button className="red-glass s2-criteria-window__btn" type="button" onClick={onDelete}>
-          Delete
+        <div className="s2-criteria-window__footer-left">
+          <button className="blue-glass s2-criteria-window__btn" type="button" onClick={onMinimize}>
+            Submit
+          </button>
+          <button className="red-glass s2-criteria-window__btn" type="button" onClick={onDelete}>
+            Delete
+          </button>
+        </div>
+        <button className="opal-glass s2-criteria-window__btn s2-criteria-window__btn--advanced" type="button">
+          Enter Advanced Mode
         </button>
       </div>
     </div>
