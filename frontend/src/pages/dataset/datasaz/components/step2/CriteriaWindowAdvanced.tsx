@@ -44,6 +44,8 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   onHelp,
 }) => {
   const [spotlightOpen, setSpotlightOpen] = useState(false);
+  const spotlightOpenRef = useRef(false);
+  useEffect(() => { spotlightOpenRef.current = spotlightOpen; }, [spotlightOpen]);
   const [spotlightMinHeight, setSpotlightMinHeight] = useState(0);
   const spotlightRef = useRef<HTMLDivElement>(null);
   const spotlightRoRef = useRef<ResizeObserver | null>(null);
@@ -64,7 +66,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   const advWindowsContainerRef = useRef<HTMLDivElement | null>(null);
   const advTabsAnchorRef = useRef<HTMLDivElement | null>(null);
 
-  const { scrollToWindow: scrollToEntry } = useTabFocusScroll({
+  const { scrollToWindow: scrollToEntry, suppressNextCollapseRef: advSuppressRef } = useTabFocusScroll({
     selectedId: activeEntryId,
     setSelectedId: (id: number | null) => {
       if (id !== null) setActiveEntryId(id);
@@ -72,6 +74,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
     expandedIds: expandedEntryIds,
     windowsContainerRef: advWindowsContainerRef,
     tabsAnchorRef: advTabsAnchorRef,
+    spotlightOpenRef,
   });
 
   useEffect(() => {
@@ -142,6 +145,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
       setActiveEntryId(newEntryId);
       setExpandedEntryIds((prev) => { const s = new Set(prev); s.add(newEntryId); return s; });
       pendingScrollEntryIdRef.current = newEntryId;
+      advSuppressRef.current = true;
       handleCloseSpotlight();
     },
     [handleCloseSpotlight]

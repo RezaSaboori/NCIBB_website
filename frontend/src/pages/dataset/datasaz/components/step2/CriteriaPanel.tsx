@@ -49,6 +49,8 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   const [advancedIds, setAdvancedIds] = useState<Set<number>>(new Set());
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
+  const spotlightOpenRef = useRef(false);
+  useEffect(() => { spotlightOpenRef.current = spotlightOpen; }, [spotlightOpen]);
   const [spotlightMinHeight, setSpotlightMinHeight] = useState(0);
   const spotlightRef = useRef<HTMLDivElement>(null);
   const spotlightRoRef = useRef<ResizeObserver | null>(null);
@@ -95,12 +97,13 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   const windowsContainerRef = useRef<HTMLDivElement | null>(null);
   const tabsAnchorRef = useRef<HTMLDivElement | null>(null);
 
-  const { scrollToWindow } = useTabFocusScroll({
+  const { scrollToWindow, suppressNextCollapseRef } = useTabFocusScroll({
     selectedId,
     setSelectedId,
     expandedIds,
     windowsContainerRef,
     tabsAnchorRef,
+    spotlightOpenRef,
   });
 
   // Scroll to a newly added criteria tab after the DOM has painted the new window
@@ -149,6 +152,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
       setExpandedIds((prev) => { const next = new Set(prev); next.add(newId); return next; });
       setSelectedId(newId);
       pendingScrollIdRef.current = newId;
+      suppressNextCollapseRef.current = true;
       handleCloseSpotlight();
     },
     [nextId, handleCloseSpotlight]

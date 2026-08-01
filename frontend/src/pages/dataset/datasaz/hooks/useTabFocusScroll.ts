@@ -10,6 +10,7 @@ interface UseTabFocusScrollOptions {
   expandedIds: Set<number>;
   windowsContainerRef: React.RefObject<HTMLDivElement | null>;
   tabsAnchorRef: React.RefObject<HTMLDivElement | null>;
+  spotlightOpenRef?: React.RefObject<boolean>;
 }
 
 export function useTabFocusScroll({
@@ -18,6 +19,7 @@ export function useTabFocusScroll({
   expandedIds,
   windowsContainerRef,
   tabsAnchorRef,
+  spotlightOpenRef,
 }: UseTabFocusScrollOptions) {
   // Keep a live ref to expandedIds so scrollToWindow never reads a stale closure
   const expandedIdsRef = useRef(expandedIds);
@@ -28,19 +30,24 @@ export function useTabFocusScroll({
   // Collapse selected tab on outside click.
   // Guard: if the click target is inside a spotlight overlay (.s2-spotlight)
   // — i.e. the user just selected a suggestion — do NOT collapse.
+  // Suppress outside-click collapse for one tick after spotlight closes
+  const suppressNextCollapseRef = useRef(false);
+
   useEffect(() => {
     const handler = (e: MouseEvent) => {
+      if (suppressNextCollapseRef.current) {
+        suppressNextCollapseRef.current = false;
+        return;
+      }
       const target = e.target as Node;
       if (tabsAnchorRef.current?.contains(target)) return;
-      // Spotlight suggestions sit outside tabsAnchorRef; selecting one must
-      // not collapse the freshly-set selectedId.
-      const spotlight = document.querySelector(".s2-spotlight");
-      if (spotlight?.contains(target)) return;
+      // If spotlight is currently open, any click inside it must not collapse.
+      if (spotlightOpenRef?.current) return;
       setSelectedId(null);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [setSelectedId, tabsAnchorRef]);
+  }, [setSelectedId, tabsAnchorRef, spotlightOpenRef]);
 
   const scrollToWindow = useCallback(
     (id: number) => {
@@ -57,5 +64,5 @@ export function useTabFocusScroll({
     [windowsContainerRef]
   );
 
-  return { scrollToWindow };
+  return { scrollToWindow, suppressNextCollapseRef };
 }
