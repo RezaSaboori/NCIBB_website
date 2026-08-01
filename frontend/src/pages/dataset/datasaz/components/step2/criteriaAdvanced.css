@@ -67,8 +67,7 @@
 /* ── Tabs inside advanced group ─────────────────────────────────── */
 
 .s2-adv-group__tabs {
-  /* Same as .dz-criteria-tabs but allow tighter max-height in xs context */
-  max-height: 6rem;
+  max-height: 7rem;
 }
 
 /* ── Pane area ──────────────────────────────────────────────────── */
