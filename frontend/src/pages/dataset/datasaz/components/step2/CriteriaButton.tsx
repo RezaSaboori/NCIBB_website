@@ -25,7 +25,7 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
   onHelp,
   onExpand,
 }) => {
-  const titleRef = useScrollText<HTMLSpanElement>();
+  const { wrapperRef, innerRef } = useScrollText<HTMLSpanElement, HTMLSpanElement>();
 
   const handleActionClick = (e: React.MouseEvent, callback?: () => void) => {
     e.stopPropagation();
@@ -40,7 +40,9 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
       tabIndex={0}
       onKeyDown={(e) => e.key === "Enter" && onSelect?.()}
     >
-      <span ref={titleRef} className="dz-criteria-tab__title dz-scroll-text">{label}</span>
+      <span ref={wrapperRef} className="dz-criteria-tab__title dz-scroll-wrapper">
+        <span ref={innerRef} className="dz-scroll-inner">{label}</span>
+      </span>
       <div className="dz-criteria-tab__actions s2-criteria-tab__actions">
         <button
           className="teal-glass dz-icon-btn s2-icon-btn"

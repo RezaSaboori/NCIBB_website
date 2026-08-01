@@ -45,7 +45,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   initialRows,
   onRowsChange,
 }) => {
-  const titleRef = useScrollText<HTMLSpanElement>();
+  const { wrapperRef, innerRef } = useScrollText<HTMLSpanElement, HTMLSpanElement>();
   const [rows, setRows] = useState<RowState[]>(() => initialRows && initialRows.length > 0 ? initialRows : [makeRow()]);
 
   const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;
@@ -83,9 +83,11 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
     >
       {/* Header */}
       <div className="dz-glass-container__header s2-criteria-window__header">
-        <span ref={titleRef} className="s2-criteria-window__title dz-scroll-text">
-          {label}
-          {unit && <span className="s2-criteria-window__unit">{unit}</span>}
+        <span ref={wrapperRef} className="s2-criteria-window__title dz-scroll-wrapper">
+          <span ref={innerRef} className="dz-scroll-inner">
+            {label}
+            {unit && <span className="s2-criteria-window__unit">{unit}</span>}
+          </span>
         </span>
         <div className="s2-criteria-window__header-actions">
           <button

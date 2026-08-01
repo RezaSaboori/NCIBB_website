@@ -152,35 +152,38 @@
 
 /* ── Scrolling text on hover (tabs + window headers) ───────────── */
 /*
- * Applied to .dz-criteria-tab__title and .s2-criteria-window__title.
- * The element must be overflow:hidden + white-space:nowrap (already set).
- * useScrollText hook sets --scroll-distance on the element at runtime.
- * If the text fits, --scroll-distance is 0 and no visible motion occurs.
+ * Two-layer structure required:
+ *   .dz-scroll-wrapper  — the clip zone: overflow:hidden, fixed max-width, stays still.
+ *                          useScrollText writes --scroll-distance here.
+ *   .dz-scroll-inner    — the moving text: white-space:nowrap, no width limit.
+ *                          translateX animation runs only on this element.
+ *
+ * When text fits: --scroll-distance is 0px → translateX(0) → no movement.
+ * When text overflows: inner slides left by exactly --scroll-distance px.
  */
 
 @keyframes dz-text-scroll {
   0%   { transform: translateX(0); }
-  15%  { transform: translateX(0); }        /* hold at start */
+  15%  { transform: translateX(0); }
   85%  { transform: translateX(calc(-1 * var(--scroll-distance, 0px))); }
-  100% { transform: translateX(calc(-1 * var(--scroll-distance, 0px))); } /* hold at end */
+  100% { transform: translateX(calc(-1 * var(--scroll-distance, 0px))); }
 }
 
-.dz-scroll-text {
-  display: block;
-  white-space: nowrap;
+.dz-scroll-wrapper {
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
-  /* Reset on leave */
-  animation: none;
-  transform: translateX(0);
-  transition: transform 0.3s ease;
+  min-width: 0;
 }
 
-.dz-scroll-text:hover,
-.dz-scroll-text--hovered {
-  text-overflow: clip;
-  animation: dz-text-scroll 3s linear infinite;
-  transition: none;
+.dz-scroll-inner {
+  display: inline-block;
+  white-space: nowrap;
+  /* at rest: show ellipsis on the wrapper, inner does not move */
+}
+
+.dz-scroll-wrapper:hover .dz-scroll-inner {
+  animation: dz-text-scroll 3s linear forwards;
 }
 
 
@@ -290,9 +293,9 @@
   /* flex+gap for the unit suffix are moved to .dz-scroll-text override below */
 }
 
-/* When title uses dz-scroll-text, restore the unit suffix layout */
-.s2-criteria-window__title.dz-scroll-text {
-  display: flex;
+/* The unit suffix layout lives inside .dz-scroll-inner now */
+.s2-criteria-window__title .dz-scroll-inner {
+  display: inline-flex;
   align-items: baseline;
   gap: var(--spacing-xs);
 }
