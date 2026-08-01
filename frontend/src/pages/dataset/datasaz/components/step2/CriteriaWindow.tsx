@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { QuestionIcon, TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
 import { CriteriaWindowRow, RowState } from "./CriteriaWindowRow";
+import { useScrollText } from "../../hooks/useScrollText";
 
 interface CriteriaWindowProps {
   label: string;
@@ -44,6 +45,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   initialRows,
   onRowsChange,
 }) => {
+  const titleRef = useScrollText<HTMLSpanElement>();
   const [rows, setRows] = useState<RowState[]>(() => initialRows && initialRows.length > 0 ? initialRows : [makeRow()]);
 
   const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;
@@ -81,7 +83,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
     >
       {/* Header */}
       <div className="dz-glass-container__header s2-criteria-window__header">
-        <span className="s2-criteria-window__title">
+        <span ref={titleRef} className="s2-criteria-window__title dz-scroll-text">
           {label}
           {unit && <span className="s2-criteria-window__unit">{unit}</span>}
         </span>

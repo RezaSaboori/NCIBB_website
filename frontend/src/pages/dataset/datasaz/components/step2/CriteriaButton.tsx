@@ -2,6 +2,7 @@
 import React from "react";
 import "./step2.css";
 import { TrashIcon, QuestionIcon, ExpandIcon, MinimizeIcon } from "./icons/Step2Icons";
+import { useScrollText } from "../../hooks/useScrollText";
 
 interface CriteriaButtonProps {
   label?: string;
@@ -24,6 +25,8 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
   onHelp,
   onExpand,
 }) => {
+  const titleRef = useScrollText<HTMLSpanElement>();
+
   const handleActionClick = (e: React.MouseEvent, callback?: () => void) => {
     e.stopPropagation();
     callback?.();
@@ -37,7 +40,7 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
       tabIndex={0}
       onKeyDown={(e) => e.key === "Enter" && onSelect?.()}
     >
-      <span className="dz-criteria-tab__title">{label}</span>
+      <span ref={titleRef} className="dz-criteria-tab__title dz-scroll-text">{label}</span>
       <div className="dz-criteria-tab__actions s2-criteria-tab__actions">
         <button
           className="teal-glass dz-icon-btn s2-icon-btn"
