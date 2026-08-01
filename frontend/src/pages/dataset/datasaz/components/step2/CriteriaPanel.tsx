@@ -37,17 +37,22 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   // (advGroupCounterRef removed — group number derived from live advancedIds size)
   // Per-criteria group name (controlled from panel, reflected in tab label)
   const [groupNames, setGroupNames] = useState<Map<number, string>>(new Map());
+  const groupNamesRef = useRef<Map<number, string>>(new Map());
   // Per-criteria group required (controlled from panel)
   const [groupRequired, setGroupRequired] = useState<Map<number, boolean>>(new Map());
 
   useEffect(() => {
     onCountChange?.(criteria.length);
   }, [criteria.length, onCountChange]);
+
+  useEffect(() => { advancedIdsRef.current = advancedIds; }, [advancedIds]);
+  useEffect(() => { groupNamesRef.current = groupNames; }, [groupNames]);
   const { searchQuery, handleSearchChange, filteredCriteria, isFiltering } =
     useCriteriaSearch(criteria);
 
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [advancedIds, setAdvancedIds] = useState<Set<number>>(new Set());
+  const advancedIdsRef = useRef<Set<number>>(new Set());
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
   const spotlightOpenRef = useRef(false);
@@ -129,7 +134,15 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
       const newId = nextId;
       setCriteria((prev) => {
         const base = item.name;
-        const existingLabels = new Set(prev.map((c) => c.label));
+        // Advanced criteria display their group name in the tab — their c.label is hidden.
+        // Use the visual label (group name for advanced, c.label for simple) to determine occupancy.
+        const existingLabels = new Set(
+          prev.map((c) =>
+            advancedIdsRef.current.has(c.id)
+              ? (groupNamesRef.current.get(c.id) ?? c.label)
+              : c.label
+          )
+        );
         const label = resolveCriteriaLabel(base, existingLabels);
         return [
           ...prev,
@@ -185,10 +198,16 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
         setCriteria((prevCriteria) => {
           const target = prevCriteria.find((c) => c.id === id);
           if (!target) return prevCriteria;
-          // Strip any existing numbering to get the true base name
           const base = target.label.replace(/ \(\d+\)$/, "");
+          // Other advanced siblings show their group name visually — use that for occupancy check
           const otherLabels = new Set(
-            prevCriteria.filter((c) => c.id !== id).map((c) => c.label)
+            prevCriteria
+              .filter((c) => c.id !== id)
+              .map((c) =>
+                advancedIdsRef.current.has(c.id)
+                  ? (groupNamesRef.current.get(c.id) ?? c.label)
+                  : c.label
+              )
           );
           const label = resolveCriteriaLabel(base, otherLabels);
           return prevCriteria.map((c) => (c.id === id ? { ...c, label } : c));
