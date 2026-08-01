@@ -1,5 +1,6 @@
 /*CriteriaPanel.tsx*/
 import React, { useState, useCallback, useRef, useEffect } from "react";
+import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import "./step2.css";
 import { CriteriaButton } from "./CriteriaButton";
 import { AddCriteriaTab } from "./AddCriteriaTab";
@@ -167,10 +168,23 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     [nextId, handleCloseSpotlight]
   );
 
-  const handleDelete = useCallback((id: number) => {
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
+
+  const handleRequestDelete = useCallback((id: number) => {
+    setPendingDeleteId(id);
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (pendingDeleteId === null) return;
+    const id = pendingDeleteId;
+    setPendingDeleteId(null);
     setCriteria((prev) => prev.filter((c) => c.id !== id));
     setExpandedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
     setSelectedId((prev) => (prev === id ? null : prev));
+  }, [pendingDeleteId]);
+
+  const handleCancelDelete = useCallback(() => {
+    setPendingDeleteId(null);
   }, []);
 
   const handleSelect = useCallback(
@@ -263,7 +277,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
               isAdvanced={advancedIds.has(c.id)}
               onSelect={() => handleSelect(c.id)}
               onExpand={() => handleToggleExpand(c.id)}
-              onDelete={() => handleDelete(c.id)}
+              onDelete={() => handleRequestDelete(c.id)}
             />
           ))}
           {isFiltering && filteredCriteria.length === 0 && (
@@ -312,7 +326,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
                         initialRows={simpleRowsRef.current.get(c.id)}
                         onExitAdvanced={() => handleToggleAdvanced(c.id)}
                         onMinimize={() => handleToggleExpand(c.id)}
-                        onDelete={() => handleDelete(c.id)}
+                        onDelete={() => handleRequestDelete(c.id)}
                       />
                     </div>
                   ) : (
@@ -327,7 +341,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
                         isAdvanced={false}
                         onToggleAdvanced={() => handleToggleAdvanced(c.id)}
                         onMinimize={() => handleToggleExpand(c.id)}
-                        onDelete={() => handleDelete(c.id)}
+                        onDelete={() => handleRequestDelete(c.id)}
                         initialRows={simpleRowsRef.current.get(c.id)}
                         onRowsChange={(rows) => { simpleRowsRef.current.set(c.id, rows); }}
                       />
@@ -337,6 +351,21 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
             </div>
           )}
         </div>
+      )}
+      {pendingDeleteId !== null && (
+        <DeleteConfirmModal
+          itemLabel={
+            (() => {
+              const c = criteria.find((x) => x.id === pendingDeleteId);
+              if (!c) return "this item";
+              return advancedIds.has(pendingDeleteId)
+                ? (groupNames.get(pendingDeleteId) ?? c.label)
+                : c.label;
+            })()
+          }
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancelDelete}
+        />
       )}
     </div>
   );

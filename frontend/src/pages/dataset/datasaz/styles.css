@@ -325,3 +325,145 @@
   gap: var(--spacing-sm);
 }
 
+/* ── Datasaz Delete Confirm Modal ──────────────────────────────── */
+
+.dz-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  background-color: color-mix(in srgb, #000 30%, transparent);
+}
+
+.dz-modal {
+  display: flex;
+  flex-direction: column;
+  width: clamp(280px, 90vw, 420px);
+  border-radius: var(--border-radius-container-md);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Header */
+.dz-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-lg);
+  flex-shrink: 0;
+}
+
+.dz-modal__title {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray12);
+}
+
+.dark .dz-modal__title {
+  color: var(--color-gray1);
+}
+
+/* Windows-style single close button */
+.dz-modal__close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--color-gray10);
+  padding: 0;
+  flex-shrink: 0;
+  transition: color var(--motion-duration-fast) ease;
+}
+
+.dz-modal__close-btn:hover {
+  color: var(--color-gray12);
+}
+
+.dark .dz-modal__close-btn {
+  color: var(--color-gray6);
+}
+
+.dark .dz-modal__close-btn:hover {
+  color: var(--color-gray1);
+}
+
+/* Body */
+.dz-modal__body {
+  padding: var(--spacing-lg);
+  flex: 1;
+}
+
+.dz-modal__message {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray11);
+  line-height: 1.6;
+  margin: 0;
+  direction: ltr;
+  text-align: left;
+}
+
+.dark .dz-modal__message {
+  color: var(--color-gray4);
+}
+
+.dz-modal__item-name {
+  color: var(--color-gray12);
+  font-weight: var(--font-weight-semibold);
+}
+
+.dark .dz-modal__item-name {
+  color: var(--color-gray1);
+}
+
+/* Footer */
+.dz-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  flex-shrink: 0;
+}
+
+.dz-modal__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--spacing-lg);
+  height: var(--dz-input-h);
+  border: none;
+  border-radius: var(--border-radius-pill);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: opacity var(--motion-duration-fast) ease;
+}
+
+.dz-modal__btn:hover {
+  opacity: 0.85;
+}
+
+.dz-modal__btn--cancel {
+  color: var(--color-gray11);
+}
+
+.dark .dz-modal__btn--cancel {
+  color: var(--color-gray4);
+}
+
+.dz-modal__btn--delete {
+  color: var(--color-gray1);
+}
+
