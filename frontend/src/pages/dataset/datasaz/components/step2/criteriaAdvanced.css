@@ -68,6 +68,7 @@
 
 .s2-adv-group__tabs {
   max-height: 7rem;
+  padding: var(--spacing-sm);
 }
 
 /* ── Pane area ──────────────────────────────────────────────────── */
@@ -76,8 +77,15 @@
   padding: 0 var(--spacing-xs);
 }
 
-/* ── Mini window adjustments ────────────────────────────────────── */
+.s2-criteria-body .s2-adv-group__pane {
+  padding: var(--spacing-sm) !important;
+}
 
+
+/* ── Mini window adjustments ────────────────────────────────────── */
+.s2-criteria-window--mini {
+    margin-bottom : var(--spacing-md)
+}
 .s2-criteria-window--mini .s2-criteria-window__header {
   margin: var(--spacing-xs) var(--spacing-xs) 0 var(--spacing-xs) !important;
 }
