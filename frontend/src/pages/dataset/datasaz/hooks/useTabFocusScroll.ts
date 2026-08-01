@@ -39,10 +39,17 @@ export function useTabFocusScroll({
         suppressNextCollapseRef.current = false;
         return;
       }
-      const target = e.target as Node;
-      if (tabsAnchorRef.current?.contains(target)) return;
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      const clickedInteractiveTab = target.closest(
+        ".s2-criteria-tab, .s2-add-criteria-tab"
+      );
+      if (clickedInteractiveTab) return;
+
       // If spotlight is currently open, any click inside it must not collapse.
       if (spotlightOpenRef?.current) return;
+
       setSelectedId(null);
     };
     document.addEventListener("mousedown", handler);
