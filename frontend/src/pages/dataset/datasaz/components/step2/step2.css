@@ -324,6 +324,11 @@
   color: var(--color-gray6);
 }
 
+/* Mini window: explicit spacing between title and unit */
+.s2-criteria-window--mini .s2-criteria-window__unit {
+  margin-left: var(--spacing-xs);
+}
+
 .s2-criteria-window__header-actions {
   display: flex;
   align-items: center;
