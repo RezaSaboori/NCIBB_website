@@ -7,6 +7,7 @@ interface CriteriaButtonProps {
   label?: string;
   isSelected?: boolean;
   isExpanded?: boolean;
+  isAdvanced?: boolean;
   onSelect?: () => void;
   onDelete?: () => void;
   onHelp?: () => void;
@@ -17,6 +18,7 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
   label = "Criteria 1",
   isSelected = false,
   isExpanded = false,
+  isAdvanced = false,
   onSelect,
   onDelete,
   onHelp,
@@ -29,7 +31,7 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
 
   return (
     <div
-      className={`glass dz-criteria-tab s2-criteria-tab ${isSelected ? "s2-criteria-tab--selected" : ""}`}
+      className={`${isAdvanced ? "opal-glass" : "glass"} dz-criteria-tab s2-criteria-tab${isSelected ? " s2-criteria-tab--selected" : ""}${isAdvanced ? " s2-criteria-tab--advanced" : ""}`}
       onClick={onSelect}
       role="button"
       tabIndex={0}
