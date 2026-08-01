@@ -69,9 +69,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
 
   const { scrollToWindow: scrollToEntry, suppressNextCollapseRef: advSuppressRef } = useTabFocusScroll({
     selectedId: activeEntryId,
-    setSelectedId: (id: number | null) => {
-      setActiveEntryId((prev) => (id !== null ? id : prev));
-    },
+    setSelectedId: setActiveEntryId,
     expandedIds: expandedEntryIds,
     windowsContainerRef: advWindowsContainerRef,
     tabsAnchorRef: advTabsAnchorRef,
