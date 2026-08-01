@@ -1,4 +1,5 @@
 import React from "react";
+import { createPortal } from "react-dom";
 
 interface DeleteConfirmModalProps {
   itemLabel: string;
@@ -11,7 +12,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
-  return (
+  return createPortal(
     <div className="dz-modal-overlay" onClick={onCancel}>
       <div
         className="glass dz-modal"
@@ -62,6 +63,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

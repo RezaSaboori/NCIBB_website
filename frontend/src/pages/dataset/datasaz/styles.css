@@ -409,8 +409,8 @@
   color: var(--color-gray11);
   line-height: 1.6;
   margin: 0;
-  direction: ltr;
-  text-align: left;
+  direction: ltr !important;
+  text-align: left !important;
 }
 
 .dark .dz-modal__message {
@@ -429,7 +429,7 @@
 /* Footer */
 .dz-modal__footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: var(--spacing-sm);
   padding: var(--spacing-lg);
   flex-shrink: 0;
