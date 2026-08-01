@@ -112,6 +112,14 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
     visibility: "hidden",
   });
 
+  const HIDDEN_PANEL_STYLE: React.CSSProperties = {
+    position: "fixed",
+    top: -9999,
+    left: -9999,
+    visibility: "hidden",
+    pointerEvents: "none",
+  };
+
   const updatePanelPosition = useCallback(() => {
     const el = triggerRef.current;
     if (!el) return;
@@ -126,11 +134,18 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
       direction: resolvedDir,
       textAlign: "start",
       visibility: "visible",
+      pointerEvents: "auto",
     });
-  }, []);
+  }, [dir]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      // Reset panel to hidden position so it never intercepts pointer events
+      // while visually closed. This is the fix for phantom clicks on the panel
+      // after it has been opened and positioned at real coordinates once.
+      setPanelStyle(HIDDEN_PANEL_STYLE);
+      return;
+    }
     updatePanelPosition();
     window.addEventListener("scroll", updatePanelPosition, true);
     window.addEventListener("resize", updatePanelPosition);
