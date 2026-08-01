@@ -58,7 +58,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   const [entries, setEntries] = useState<AdvancedCriteriaEntry[]>([
     { ...origin, entryId: firstEntryId },
   ]);
-  const [activeEntryId, setActiveEntryId] = useState<number>(firstEntryId);
+  const [activeEntryId, setActiveEntryId] = useState<number | null>(firstEntryId);
   const [expandedEntryIds, setExpandedEntryIds] = useState<Set<number>>(
     new Set([firstEntryId])
   );
@@ -70,7 +70,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   const { scrollToWindow: scrollToEntry, suppressNextCollapseRef: advSuppressRef } = useTabFocusScroll({
     selectedId: activeEntryId,
     setSelectedId: (id: number | null) => {
-      if (id !== null) setActiveEntryId(id);
+      setActiveEntryId((prev) => (id !== null ? id : prev));
     },
     expandedIds: expandedEntryIds,
     windowsContainerRef: advWindowsContainerRef,
@@ -159,10 +159,10 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
       setActiveEntryId((prev) => {
         if (prev !== entryId) return prev;
         const remaining = entries.filter((e) => e.entryId !== entryId);
-        return remaining[0]?.entryId ?? firstEntryId;
+        return remaining[0]?.entryId ?? null;
       });
     },
-    [entries, firstEntryId]
+    [entries]
   );
 
   const handleToggleExpand = useCallback((entryId: number) => {
@@ -173,7 +173,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
     });
   }, []);
 
-  const activeEntry = entries.find((e) => e.entryId === activeEntryId) ?? entries[0];
+  const activeEntry = entries.find((e) => e.entryId === activeEntryId) ?? null;
 
   return (
     <div className={`opal-glass dz-glass-container dz-glass-container--sm s2-criteria-window s2-criteria-window--advanced s2-adv-group${spotlightOpen ? " s2-adv-group--spotlight-open" : ""}`}>
@@ -225,11 +225,13 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
             <CriteriaButton
               key={entry.entryId}
               label={entry.label}
-              isSelected={activeEntryId === entry.entryId}
+              isSelected={activeEntryId !== null && activeEntryId === entry.entryId}
               isExpanded={expandedEntryIds.has(entry.entryId)}
               isAdvanced={false}
               onSelect={() => {
-                setActiveEntryId(entry.entryId);
+                setActiveEntryId((prev) =>
+                  prev === entry.entryId ? null : entry.entryId
+                );
                 scrollToEntry(entry.entryId);
               }}
               onExpand={() => {
