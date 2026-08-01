@@ -1,18 +1,5 @@
 /* criteriaAdvanced.css — Advanced mode styles */
 
-/* ── Existing hooks (preserved) ────────────────────────────────── */
-
-.s2-criteria-window--advanced {
-  /* opal-glass applied on container in JSX */
-}
-
-.s2-criteria-window__btn--advanced-active {
-  /* hook for future overrides */
-}
-
-.s2-criteria-tab--advanced {
-  /* hook for future overrides */
-}
 
 /* ── Advanced Group: header layout ─────────────────────────────── */
 
@@ -24,8 +11,7 @@
 .s2-adv-group__name-input.ui-input-shell {
   flex: 1;
   min-width: 0;
-  background: transparent;
-  border-color: color-mix(in srgb, var(--color-gray6) 35%, transparent);
+  border-color: var(--color-gray1);
   height: 2rem;
   min-height: 2rem;
 }
@@ -38,7 +24,8 @@
 /* ── Tabs inside advanced group ─────────────────────────────────── */
 
 .s2-adv-group__tabs {
-  max-height: 6rem;
+  max-height: 7rem;
+  padding: var(--spacing-sm)
 }
 
 /* ── Pane area ──────────────────────────────────────────────────── */
@@ -48,6 +35,10 @@
 }
 
 /* ── Mini window adjustments ────────────────────────────────────── */
+.s2-criteria-body .s2-adv-group__pane {
+    padding: var(--spacing-sm);
+}
+
 
 .s2-criteria-window--mini .s2-criteria-window__header {
   margin: var(--spacing-xs) var(--spacing-xs) 0 var(--spacing-xs) !important;
