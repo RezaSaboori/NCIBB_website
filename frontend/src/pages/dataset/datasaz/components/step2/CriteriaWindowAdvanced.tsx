@@ -205,15 +205,11 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
               isSelected={activeEntryId === entry.entryId}
               isExpanded={expandedEntryIds.has(entry.entryId)}
               isAdvanced={false}
-              onSelect={() => {
+              onSelect={() => setActiveEntryId(entry.entryId)}
+              onExpand={() => {
                 setActiveEntryId(entry.entryId);
-                setExpandedEntryIds((prev) => {
-                  const s = new Set(prev);
-                  s.add(entry.entryId);
-                  return s;
-                });
+                handleToggleExpand(entry.entryId);
               }}
-              onExpand={() => handleToggleExpand(entry.entryId)}
               onDelete={() => handleDeleteEntry(entry.entryId)}
             />
           ))}
