@@ -136,9 +136,7 @@
   flex: 1;
   min-width: 0;
   max-width: 8rem;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  /* overflow/ellipsis removed: scroll-wrapper handles clipping and fade */
   padding: 1px var(--spacing-xs) 0 var(--spacing-xs);
 }
 
@@ -173,9 +171,17 @@
   overflow: hidden;
   white-space: nowrap;
   min-width: 0;
-  /* Fade-out mask simulates ellipsis when text overflows */
-  -webkit-mask-image: linear-gradient(to right, black calc(100% - 1.5rem), transparent 100%);
-  mask-image: linear-gradient(to right, black calc(100% - 1.5rem), transparent 100%);
+  /* Fade-out mask is only active when --dz-scroll-overflow is 1 (set by useScrollText) */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    black calc(100% - calc(var(--dz-scroll-overflow, 0) * 1.5rem)),
+    transparent calc(100% - calc((1 - var(--dz-scroll-overflow, 0)) * 100%))
+  );
+  mask-image: linear-gradient(
+    to right,
+    black calc(100% - calc(var(--dz-scroll-overflow, 0) * 1.5rem)),
+    transparent calc(100% - calc((1 - var(--dz-scroll-overflow, 0)) * 100%))
+  );
 }
 
 .dz-scroll-inner {

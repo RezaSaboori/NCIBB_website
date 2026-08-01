@@ -13,10 +13,11 @@ export function useScrollText<W extends HTMLElement, I extends HTMLElement>() {
     if (!wrapper || !inner) return;
 
     const measure = () => {
-      // inner.scrollWidth is the true rendered text width (no clipping).
-      // wrapper.clientWidth is the visible clip zone width.
       const overflow = inner.scrollWidth - wrapper.clientWidth;
-      wrapper.style.setProperty("--scroll-distance", `${overflow > 0 ? overflow : 0}px`);
+      const hasOverflow = overflow > 0;
+      wrapper.style.setProperty("--scroll-distance", `${hasOverflow ? overflow : 0}px`);
+      // Drive the mask: 1 = text overflows (show fade), 0 = fits (no fade)
+      wrapper.style.setProperty("--dz-scroll-overflow", hasOverflow ? "1" : "0");
     };
 
     measure();
