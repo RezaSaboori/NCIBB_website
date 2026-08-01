@@ -15,6 +15,8 @@ interface CriteriaWindowProps {
   onMinimize: () => void;
   onHelp?: () => void;
   onDelete: () => void;
+  initialRows?: RowState[];
+  onRowsChange?: (rows: RowState[]) => void;
 }
 
 let _rowIdCounter = 0;
@@ -39,20 +41,28 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   onMinimize,
   onHelp,
   onDelete,
+  initialRows,
+  onRowsChange,
 }) => {
-  const [rows, setRows] = useState<RowState[]>([makeRow()]);
+  const [rows, setRows] = useState<RowState[]>(() => initialRows && initialRows.length > 0 ? initialRows : [makeRow()]);
 
   const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;
   const isNumeric = value_type === "numeric";
 
   const handleRowChange = (id: number, patch: Partial<RowState>) => {
-    setRows((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, ...patch } : r))
-    );
+    setRows((prev) => {
+      const next = prev.map((r) => (r.id === id ? { ...r, ...patch } : r));
+      onRowsChange?.(next);
+      return next;
+    });
   };
 
   const handleAddRow = () => {
-    setRows((prev) => [...prev, makeRow()]);
+    setRows((prev) => {
+      const next = [...prev, makeRow()];
+      onRowsChange?.(next);
+      return next;
+    });
   };
 
   // Hide "Add more rule" if:

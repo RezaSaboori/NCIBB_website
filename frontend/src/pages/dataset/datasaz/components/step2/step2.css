@@ -231,9 +231,7 @@
   color: var(--color-gray10) !important;
 }
 
-.dark .s2-criteria-window__btn--advanced {
-  color: var(--color-gray2) !important;
-}
+
 
 .s2-criteria-window__btn {
   border: none;

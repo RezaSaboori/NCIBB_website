@@ -1,11 +1,4 @@
-/* CriteriaWindowAdvanced.tsx
- * Advanced group wrapper for a CriteriaWindow.
- * Structure:
- *   - Header: editable group name input + Required toggle btn + action icons
- *   - Tabs row: one tab per entry (first = original field) + "Add criteria" tab (spotlight)
- *   - Pane area: shows CriteriaWindowMini for the active tab
- *                + FieldSearchSpotlight when adding
- */
+/* CriteriaWindowAdvanced.tsx */
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import "./criteriaAdvanced.css";
 import { QuestionIcon, TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
@@ -13,13 +6,21 @@ import { CriteriaButton } from "./CriteriaButton";
 import { AddCriteriaTab } from "./AddCriteriaTab";
 import { CriteriaWindowMini } from "./CriteriaWindowMini";
 import { FieldSearchSpotlight } from "./FieldSearchSpotlight";
+import { TextInput, RadioToggle } from "../../../../../components/ui/inputs";
 import { useFieldSearch } from "../../hooks/useFieldSearch";
 import type { CriteriaItem, AdvancedCriteriaEntry } from "../../types";
+import type { RowState } from "./CriteriaWindowRow";
 
 interface CriteriaWindowAdvancedProps {
-  /** The originating CriteriaItem — always the first entry */
   origin: CriteriaItem;
-  defaultGroupName?: string;
+  /** Controlled: group name shown in the panel tab */
+  groupName: string;
+  onGroupNameChange: (name: string) => void;
+  /** Controlled: group-level required toggle */
+  isGroupRequired: boolean;
+  onGroupRequiredChange: (val: boolean) => void;
+  /** Rows snapshot from simple mode — seeds the first mini entry */
+  initialRows?: RowState[];
   onExitAdvanced: () => void;
   onMinimize: () => void;
   onDelete: () => void;
@@ -31,14 +32,16 @@ const nextEntryId = () => ++_advEntryIdCounter;
 
 export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   origin,
-  defaultGroupName = "Group 1",
+  groupName,
+  onGroupNameChange,
+  isGroupRequired,
+  onGroupRequiredChange,
+  initialRows,
   onExitAdvanced,
   onMinimize,
   onDelete,
   onHelp,
 }) => {
-  const [groupName, setGroupName] = useState(defaultGroupName);
-  const [isRequired, setIsRequired] = useState(false);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
   const [spotlightMinHeight, setSpotlightMinHeight] = useState(0);
   const spotlightRef = useRef<HTMLDivElement>(null);
@@ -46,16 +49,18 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
 
   const { query, suggestions, isLoading, error, handleQueryChange, reset } = useFieldSearch();
 
-  // Build entries: first entry is always the origin field
-  const [entries, setEntries] = useState<AdvancedCriteriaEntry[]>([
-    { ...origin, entryId: nextEntryId() },
-  ]);
-  const [activeEntryId, setActiveEntryId] = useState<number>(entries[0].entryId);
-  const [expandedEntryIds, setExpandedEntryIds] = useState<Set<number>>(
-    new Set([entries[0].entryId])
-  );
+  const firstEntryId = useRef(nextEntryId()).current;
 
-  // Mirror spotlight min-height from CriteriaPanel logic
+  const [entries, setEntries] = useState<AdvancedCriteriaEntry[]>([
+    { ...origin, entryId: firstEntryId },
+  ]);
+  const [activeEntryId, setActiveEntryId] = useState<number>(firstEntryId);
+  const [expandedEntryIds, setExpandedEntryIds] = useState<Set<number>>(
+    new Set([firstEntryId])
+  );
+  // Per-entry rows snapshot so switching tabs doesn't lose state
+  const entryRowsRef = useRef<Map<number, RowState[]>>(new Map());
+
   useEffect(() => {
     if (!spotlightOpen) {
       setSpotlightMinHeight(0);
@@ -121,18 +126,20 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
 
   const handleDeleteEntry = useCallback(
     (entryId: number) => {
-      // Cannot delete the last entry
       setEntries((prev) => {
         if (prev.length === 1) return prev;
-        return prev.filter((e) => e.entryId !== entryId);
+        const next = prev.filter((e) => e.entryId !== entryId);
+        entryRowsRef.current.delete(entryId);
+        return next;
       });
       setExpandedEntryIds((prev) => { const s = new Set(prev); s.delete(entryId); return s; });
       setActiveEntryId((prev) => {
         if (prev !== entryId) return prev;
-        return entries.find((e) => e.entryId !== entryId)?.entryId ?? entries[0].entryId;
+        const remaining = entries.filter((e) => e.entryId !== entryId);
+        return remaining[0]?.entryId ?? firstEntryId;
       });
     },
-    [entries]
+    [entries, firstEntryId]
   );
 
   const handleToggleExpand = useCallback((entryId: number) => {
@@ -149,20 +156,17 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
     <div className="opal-glass dz-glass-container dz-glass-container--sm s2-criteria-window s2-criteria-window--advanced s2-adv-group">
       {/* Header */}
       <div className="dz-glass-container__header s2-criteria-window__header s2-adv-group__header">
-        <input
-          className="s2-adv-group__name-input"
+        <TextInput
           value={groupName}
-          onChange={(e) => setGroupName(e.target.value)}
-          aria-label="Group name"
-          type="text"
+          onChange={onGroupNameChange}
+          placeholder="Group name…"
+          className="s2-adv-group__name-input"
         />
-        <button
-          className={`s2-adv-group__required-btn${isRequired ? " s2-adv-group__required-btn--active" : ""}`}
-          type="button"
-          onClick={() => setIsRequired((v) => !v)}
-        >
-          Required
-        </button>
+        <RadioToggle
+          checked={isGroupRequired}
+          onChange={onGroupRequiredChange}
+          label="Required ?"
+        />
         <div className="s2-criteria-window__header-actions">
           <button
             className="teal-glass dz-icon-btn s2-icon-btn"
@@ -214,7 +218,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
         </div>
       </div>
 
-      {/* Pane: spotlight + active mini window */}
+      {/* Pane */}
       <div
         className="s2-criteria-body s2-adv-group__pane"
         style={{ minHeight: spotlightMinHeight > 0 ? spotlightMinHeight : undefined }}
@@ -232,12 +236,19 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
         />
         {expandedEntryIds.has(activeEntryId) && (
           <CriteriaWindowMini
+            key={activeEntryId}
             label={activeEntry.label}
             unit={activeEntry.unit}
             value_type={activeEntry.value_type}
             value_min={activeEntry.value_min}
             value_max={activeEntry.value_max}
             values={activeEntry.values}
+            initialRows={
+              activeEntryId === firstEntryId
+                ? (entryRowsRef.current.get(firstEntryId) ?? initialRows)
+                : entryRowsRef.current.get(activeEntryId)
+            }
+            onRowsChange={(rows) => entryRowsRef.current.set(activeEntryId, rows)}
             onClose={() => handleToggleExpand(activeEntryId)}
             onDelete={() => handleDeleteEntry(activeEntryId)}
           />

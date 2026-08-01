@@ -1,5 +1,18 @@
 /* criteriaAdvanced.css — Advanced mode styles */
 
+/* ── Existing hooks (preserved) ────────────────────────────────── */
+
+.s2-criteria-window--advanced {
+  /* opal-glass applied on container in JSX */
+}
+
+.s2-criteria-window__btn--advanced-active {
+  /* hook for future overrides */
+}
+
+.s2-criteria-tab--advanced {
+  /* hook for future overrides */
+}
 
 /* ── Advanced Group: header layout ─────────────────────────────── */
 
@@ -7,66 +20,25 @@
   gap: var(--spacing-sm) !important;
 }
 
-.s2-adv-group__name-input {
+/* Adapt ui-input-shell inside the group header to be transparent/compact */
+.s2-adv-group__name-input.ui-input-shell {
   flex: 1;
   min-width: 0;
   background: transparent;
-  border: none;
-  border-bottom: 1.5px solid color-mix(in srgb, var(--color-gray6) 40%, transparent);
-  border-radius: 0;
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-semibold);
-  font-family: var(--font-family-base);
-  color: var(--color-gray11);
-  padding: 2px var(--spacing-xs);
-  outline: none;
-  transition: border-color var(--motion-duration-normal) var(--motion-easing-easeInOut);
+  border-color: color-mix(in srgb, var(--color-gray6) 35%, transparent);
+  height: 2rem;
+  min-height: 2rem;
 }
 
-.s2-adv-group__name-input:focus {
-  border-bottom-color: var(--color-blue);
-}
-
-.dark .s2-adv-group__name-input {
-  color: var(--color-gray1);
-  border-bottom-color: color-mix(in srgb, var(--color-gray6) 30%, transparent);
-}
-
-/* ── Required button ────────────────────────────────────────────── */
-
-.s2-adv-group__required-btn {
-  flex-shrink: 0;
-  border: 1.5px solid color-mix(in srgb, var(--color-gray6) 40%, transparent);
-  border-radius: var(--border-radius-pill);
-  background: transparent;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  font-family: var(--font-family-base);
-  color: var(--color-gray8);
-  padding: 2px var(--spacing-sm);
-  cursor: pointer;
-  transition:
-    color var(--motion-duration-normal) var(--motion-easing-easeInOut),
-    border-color var(--motion-duration-normal) var(--motion-easing-easeInOut),
-    background var(--motion-duration-normal) var(--motion-easing-easeInOut);
-}
-
-.s2-adv-group__required-btn--active {
-  color: var(--color-blue);
+.s2-adv-group__name-input.ui-input-shell:focus-within {
   border-color: var(--color-blue);
-  background: color-mix(in srgb, var(--color-blue) 10%, transparent);
-}
-
-.s2-adv-group__required-btn:hover:not(.s2-adv-group__required-btn--active) {
-  color: var(--color-gray11);
-  border-color: color-mix(in srgb, var(--color-gray8) 60%, transparent);
+  box-shadow: none;
 }
 
 /* ── Tabs inside advanced group ─────────────────────────────────── */
 
 .s2-adv-group__tabs {
-  max-height: 7rem;
-  padding: var(--spacing-sm);
+  max-height: 6rem;
 }
 
 /* ── Pane area ──────────────────────────────────────────────────── */
@@ -75,15 +47,8 @@
   padding: 0 var(--spacing-xs);
 }
 
-.s2-criteria-body .s2-adv-group__pane {
-  padding: var(--spacing-sm) !important;
-}
-
-
 /* ── Mini window adjustments ────────────────────────────────────── */
-.s2-criteria-window--mini {
-    margin-bottom : var(--spacing-md)
-}
+
 .s2-criteria-window--mini .s2-criteria-window__header {
   margin: var(--spacing-xs) var(--spacing-xs) 0 var(--spacing-xs) !important;
 }

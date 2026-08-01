@@ -19,6 +19,8 @@ interface CriteriaWindowMiniProps {
   onClose: () => void;
   onDelete: () => void;
   onHelp?: () => void;
+  initialRows?: RowState[];
+  onRowsChange?: (rows: RowState[]) => void;
 }
 
 let _miniRowIdCounter = 0;
@@ -41,14 +43,20 @@ export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
   onClose,
   onDelete,
   onHelp,
+  initialRows,
+  onRowsChange,
 }) => {
-  const [rows, setRows] = useState<RowState[]>([makeMiniRow()]);
+  const [rows, setRows] = useState<RowState[]>(() => initialRows && initialRows.length > 0 ? initialRows : [makeMiniRow()]);
 
   const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;
   const isNumeric = value_type === "numeric";
 
   const handleRowChange = (id: number, patch: Partial<RowState>) => {
-    setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+    setRows((prev) => {
+      const next = prev.map((r) => (r.id === id ? { ...r, ...patch } : r));
+      onRowsChange?.(next);
+      return next;
+    });
   };
 
   const showAddMoreRule = (() => {
@@ -107,14 +115,22 @@ export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
             value_max={value_max}
             onChange={handleRowChange}
             showDelete={rows.length > 1}
-            onDelete={(id) => setRows((prev) => prev.filter((r) => r.id !== id))}
+            onDelete={(id) => setRows((prev) => {
+              const next = prev.filter((r) => r.id !== id);
+              onRowsChange?.(next);
+              return next;
+            })}
           />
         ))}
         {showAddMoreRule && (
           <button
             className="s2-criteria-window__add-rule-btn"
             type="button"
-            onClick={() => setRows((prev) => [...prev, makeMiniRow()])}
+            onClick={() => setRows((prev) => {
+              const next = [...prev, makeMiniRow()];
+              onRowsChange?.(next);
+              return next;
+            })}
           >
             <span className="s2-criteria-window__add-rule-btn-icon">+</span>
             Add more rule

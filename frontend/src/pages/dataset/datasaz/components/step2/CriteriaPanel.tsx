@@ -11,6 +11,7 @@ import { SearchInput } from "../../../../../components/ui/inputs";
 import { useFieldSearch } from "../../hooks/useFieldSearch";
 import { useCriteriaSearch } from "../../hooks/useCriteriaSearch";
 import type { SuggestionItem, CriteriaItem } from "../../types";
+import type { RowState } from "./CriteriaWindowRow";
 
 interface CriteriaPanelProps {
   type: "inclusion" | "exclusion";
@@ -29,6 +30,12 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
 
   const [criteria, setCriteria] = useState<CriteriaItem[]>([]);
   const [nextId, setNextId] = useState(1);
+  // Per-criteria rows snapshot: preserved across simple↔advanced mode switches
+  const simpleRowsRef = useRef<Map<number, RowState[]>>(new Map());
+  // Per-criteria group name (controlled from panel, reflected in tab label)
+  const [groupNames, setGroupNames] = useState<Map<number, string>>(new Map());
+  // Per-criteria group required (controlled from panel)
+  const [groupRequired, setGroupRequired] = useState<Map<number, boolean>>(new Map());
 
   useEffect(() => {
     onCountChange?.(criteria.length);
@@ -137,10 +144,22 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   const handleToggleAdvanced = useCallback((id: number) => {
     setAdvancedIds((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        // Seed group name from label on first entry into advanced mode
+        setGroupNames((gn) => {
+          if (gn.has(id)) return gn;
+          const item = criteria.find((c) => c.id === id);
+          const m = new Map(gn);
+          m.set(id, item ? `Group: ${item.label}` : `Group ${id}`);
+          return m;
+        });
+        next.add(id);
+      }
       return next;
     });
-  }, []);
+  }, [criteria]);
 
   return (
     <div className={`glass dz-glass-container dz-glass-container--md s2-criteria-panel${spotlightOpen ? " s2-criteria-panel--spotlight-open" : ""}`}>
@@ -173,7 +192,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
           {filteredCriteria.map((c) => (
             <CriteriaButton
               key={c.id}
-              label={c.label}
+              label={advancedIds.has(c.id) ? (groupNames.get(c.id) ?? c.label) : c.label}
               isSelected={selectedId === c.id}
               isExpanded={expandedIds.has(c.id)}
               isAdvanced={advancedIds.has(c.id)}
@@ -217,7 +236,15 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
                     <CriteriaWindowAdvanced
                       key={c.id}
                       origin={c}
-                      defaultGroupName={`Group ${c.id}`}
+                      groupName={groupNames.get(c.id) ?? `Group ${c.id}`}
+                      onGroupNameChange={(name) =>
+                        setGroupNames((prev) => { const m = new Map(prev); m.set(c.id, name); return m; })
+                      }
+                      isGroupRequired={groupRequired.get(c.id) ?? false}
+                      onGroupRequiredChange={(val) =>
+                        setGroupRequired((prev) => { const m = new Map(prev); m.set(c.id, val); return m; })
+                      }
+                      initialRows={simpleRowsRef.current.get(c.id)}
                       onExitAdvanced={() => handleToggleAdvanced(c.id)}
                       onMinimize={() => handleToggleExpand(c.id)}
                       onDelete={() => handleDelete(c.id)}
@@ -235,6 +262,8 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
                       onToggleAdvanced={() => handleToggleAdvanced(c.id)}
                       onMinimize={() => handleToggleExpand(c.id)}
                       onDelete={() => handleDelete(c.id)}
+                      initialRows={simpleRowsRef.current.get(c.id)}
+                      onRowsChange={(rows) => { simpleRowsRef.current.set(c.id, rows); }}
                     />
                   )
                 )}

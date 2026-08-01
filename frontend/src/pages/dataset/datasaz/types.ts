@@ -33,6 +33,9 @@ export interface CriteriaItem {
   value_min?: number;
   value_max?: number;
   values?: string[];
+  /** Owned by CriteriaPanel; only relevant when in advanced mode */
+  groupName?: string;
+  isGroupRequired?: boolean;
 }
 
 export interface AdvancedCriteriaEntry extends CriteriaItem {
