@@ -45,8 +45,6 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     onCountChange?.(criteria.length);
   }, [criteria.length, onCountChange]);
 
-  useEffect(() => { advancedIdsRef.current = advancedIds; }, [advancedIds]);
-  useEffect(() => { groupNamesRef.current = groupNames; }, [groupNames]);
   const { searchQuery, handleSearchChange, filteredCriteria, isFiltering } =
     useCriteriaSearch(criteria);
 
@@ -57,6 +55,8 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   const [spotlightOpen, setSpotlightOpen] = useState(false);
   const spotlightOpenRef = useRef(false);
   useEffect(() => { spotlightOpenRef.current = spotlightOpen; }, [spotlightOpen]);
+  useEffect(() => { advancedIdsRef.current = advancedIds; }, [advancedIds]);
+  useEffect(() => { groupNamesRef.current = groupNames; }, [groupNames]);
   const [spotlightMinHeight, setSpotlightMinHeight] = useState(0);
   const spotlightRef = useRef<HTMLDivElement>(null);
   const spotlightRoRef = useRef<ResizeObserver | null>(null);
