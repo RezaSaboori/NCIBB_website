@@ -187,13 +187,13 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
         next.delete(id);
       } else {
         // Seed group name as Group 1, Group 2, … based on current live count
+        next.add(id);
         setGroupNames((gn) => {
           if (gn.has(id)) return gn;
           const m = new Map(gn);
           m.set(id, `Group ${next.size}`);
           return m;
         });
-        next.add(id);
       }
       return next;
     });
