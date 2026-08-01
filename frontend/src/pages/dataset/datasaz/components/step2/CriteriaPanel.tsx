@@ -92,6 +92,17 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     reset();
   }, [reset]);
 
+  const windowsContainerRef = useRef<HTMLDivElement | null>(null);
+  const tabsAnchorRef = useRef<HTMLDivElement | null>(null);
+
+  const { scrollToWindow } = useTabFocusScroll({
+    selectedId,
+    setSelectedId,
+    expandedIds,
+    windowsContainerRef,
+    tabsAnchorRef,
+  });
+
   // Scroll to a newly added criteria tab after the DOM has rendered the window
   const pendingScrollIdRef = useRef<number | null>(null);
 
@@ -141,17 +152,6 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     setExpandedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
     setSelectedId((prev) => (prev === id ? null : prev));
   }, []);
-
-  const windowsContainerRef = useRef<HTMLDivElement | null>(null);
-  const tabsAnchorRef = useRef<HTMLDivElement | null>(null);
-
-  const { scrollToWindow } = useTabFocusScroll({
-    selectedId,
-    setSelectedId,
-    expandedIds,
-    windowsContainerRef,
-    tabsAnchorRef,
-  });
 
   const handleSelect = useCallback(
     (id: number) => {
