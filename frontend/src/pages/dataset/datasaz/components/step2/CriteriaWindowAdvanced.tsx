@@ -236,6 +236,8 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
         />
         {entries
           .filter((entry) => expandedEntryIds.has(entry.entryId))
+          .slice()
+          .reverse()
           .map((entry) => (
             <CriteriaWindowMini
               key={entry.entryId}
