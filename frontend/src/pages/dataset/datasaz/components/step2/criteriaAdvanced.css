@@ -1,6 +1,5 @@
 /* criteriaAdvanced.css — Advanced mode styles */
 
-
 /* ── Advanced Group: header layout ─────────────────────────────── */
 
 .s2-adv-group__header {
@@ -31,15 +30,20 @@
 /* ── Pane area ──────────────────────────────────────────────────── */
 
 .s2-adv-group__pane {
-  padding: 0 var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm) var(--spacing-md) var(--spacing-sm);
+  position: relative;
+  max-height: 300rem;
+  overflow-y: auto;
+}
+
+/* Blur the mini window body when the advanced spotlight is open */
+.s2-adv-group--spotlight-open .s2-criteria-window--mini {
+  filter: blur(3px);
+  transition: filter var(--motion-duration-normal) var(--motion-easing-easeInOut);
+  pointer-events: none;
 }
 
 /* ── Mini window adjustments ────────────────────────────────────── */
-.s2-criteria-body .s2-adv-group__pane {
-    padding: var(--spacing-sm);
-}
-
-
 .s2-criteria-window--mini .s2-criteria-window__header {
   margin: var(--spacing-xs) var(--spacing-xs) 0 var(--spacing-xs) !important;
 }

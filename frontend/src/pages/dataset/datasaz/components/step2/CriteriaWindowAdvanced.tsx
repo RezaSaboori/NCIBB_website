@@ -153,7 +153,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   const activeEntry = entries.find((e) => e.entryId === activeEntryId) ?? entries[0];
 
   return (
-    <div className="opal-glass dz-glass-container dz-glass-container--sm s2-criteria-window s2-criteria-window--advanced s2-adv-group">
+    <div className={`opal-glass dz-glass-container dz-glass-container--sm s2-criteria-window s2-criteria-window--advanced s2-adv-group${spotlightOpen ? " s2-adv-group--spotlight-open" : ""}`}>
       {/* Header */}
       <div className="dz-glass-container__header s2-criteria-window__header s2-adv-group__header">
         <TextInput

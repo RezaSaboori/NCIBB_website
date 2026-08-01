@@ -274,6 +274,7 @@
   max-width: 0;
   opacity: 0;
   pointer-events: none;
+  border-radius: var(--border-radius-pill);
   transition:
     max-width var(--motion-duration-slow) var(--motion-easing-easeInOut),
     opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
