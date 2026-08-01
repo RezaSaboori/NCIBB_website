@@ -45,13 +45,23 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
 
   useEffect(() => {
     if (!open) { setSearch(""); return; }
+    // Use capture=true so this fires before React's synthetic onClick on the
+    // new dropdown trigger. We skip closing if the click originated inside
+    // ANY .ui-dropdown element — this prevents the race condition where this
+    // instance's handler closes another row's dropdown that was just opened.
     const handler = (e: MouseEvent) => {
-      const inTrigger = ref.current?.contains(e.target as Node);
-      const inPanel = panelRef.current?.contains(e.target as Node);
-      if (!inTrigger && !inPanel) setOpen(false);
+      const target = e.target as Node;
+      const inSelf =
+        ref.current?.contains(target) || panelRef.current?.contains(target);
+      if (inSelf) return;
+      // If the click is inside any other dropdown trigger/panel, don't close —
+      // let that dropdown's own toggle handle its state.
+      const inOtherDropdown = (target as Element).closest?.(".ui-dropdown");
+      if (inOtherDropdown) return;
+      setOpen(false);
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("mousedown", handler, true);
+    return () => document.removeEventListener("mousedown", handler, true);
   }, [open]);
 
   useEffect(() => {
