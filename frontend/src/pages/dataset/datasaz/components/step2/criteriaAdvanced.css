@@ -1,0 +1,25 @@
+/* criteriaAdvanced.css — Advanced mode overrides for CriteriaWindow and its tab */
+
+/* ── Window: advanced mode switches glass → opal-glass ─────────── */
+
+.s2-criteria-window--advanced {
+  /* opal-glass replaces glass on the container itself */
+}
+
+/* ── Footer advanced btn: flips to glass, label changes via React ── */
+
+.s2-criteria-window__btn--advanced-active {
+  /* Inherits .glass from className; no extra visual override needed.
+     This modifier class exists as a hook for future extended styles. */
+}
+
+/* ── Tab: advanced mode indicator ───────────────────────────────── */
+/*
+ * When a CriteriaButton tab is in advanced mode, it receives
+ * .s2-criteria-tab--advanced which removes the glass class variant
+ * and applies opal-glass treatment via a CSS cascade modifier.
+ * The actual glass class swap is done in JSX; this class is a future hook.
+ */
+.s2-criteria-tab--advanced {
+  /* placeholder for future advanced-tab-specific overrides */
+}

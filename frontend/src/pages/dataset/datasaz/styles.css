@@ -1,6 +1,7 @@
 @import "../../../styles/theme.css";
 @import "./components/step1/step1.css";
 @import "./components/step2/step2.css";
+@import "./components/step2/criteriaAdvanced.css";
 @import "./components/step2/fieldSearchSpotlight.css";
 
 /* ── Datasaz Unified Control Height Token ──────────────────────── */

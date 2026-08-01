@@ -36,6 +36,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     useCriteriaSearch(criteria);
 
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  const [advancedIds, setAdvancedIds] = useState<Set<number>>(new Set());
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
   const [spotlightMinHeight, setSpotlightMinHeight] = useState(0);
@@ -132,6 +133,14 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     });
   }, []);
 
+  const handleToggleAdvanced = useCallback((id: number) => {
+    setAdvancedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }, []);
+
   return (
     <div className={`glass dz-glass-container dz-glass-container--md s2-criteria-panel${spotlightOpen ? " s2-criteria-panel--spotlight-open" : ""}`}>
       {/* Header */}
@@ -166,6 +175,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
               label={c.label}
               isSelected={selectedId === c.id}
               isExpanded={expandedIds.has(c.id)}
+              isAdvanced={advancedIds.has(c.id)}
               onSelect={() => handleSelect(c.id)}
               onExpand={() => handleToggleExpand(c.id)}
               onDelete={() => handleDelete(c.id)}
@@ -210,6 +220,8 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
                     value_min={c.value_min}
                     value_max={c.value_max}
                     values={c.values}
+                    isAdvanced={advancedIds.has(c.id)}
+                    onToggleAdvanced={() => handleToggleAdvanced(c.id)}
                     onMinimize={() => handleToggleExpand(c.id)}
                     onDelete={() => handleDelete(c.id)}
                   />

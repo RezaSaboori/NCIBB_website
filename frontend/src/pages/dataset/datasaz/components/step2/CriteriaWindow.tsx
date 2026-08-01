@@ -10,6 +10,8 @@ interface CriteriaWindowProps {
   value_min?: number;
   value_max?: number;
   values?: string[];
+  isAdvanced?: boolean;
+  onToggleAdvanced?: () => void;
   onMinimize: () => void;
   onHelp?: () => void;
   onDelete: () => void;
@@ -32,6 +34,8 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   value_min,
   value_max,
   values,
+  isAdvanced = false,
+  onToggleAdvanced,
   onMinimize,
   onHelp,
   onDelete,
@@ -62,7 +66,9 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   })();
 
   return (
-    <div className="glass dz-glass-container dz-glass-container--sm s2-criteria-window">
+    <div
+      className={`${isAdvanced ? "opal-glass" : "glass"} dz-glass-container dz-glass-container--sm s2-criteria-window${isAdvanced ? " s2-criteria-window--advanced" : ""}`}
+    >
       {/* Header */}
       <div className="dz-glass-container__header s2-criteria-window__header">
         <span className="s2-criteria-window__title">
@@ -136,8 +142,12 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
             Delete
           </button>
         </div>
-        <button className="opal-glass s2-criteria-window__btn s2-criteria-window__btn--advanced" type="button">
-          Enter Advanced Mode
+        <button
+          className={`${isAdvanced ? "glass" : "opal-glass"} s2-criteria-window__btn s2-criteria-window__btn--advanced${isAdvanced ? " s2-criteria-window__btn--advanced-active" : ""}`}
+          type="button"
+          onClick={onToggleAdvanced}
+        >
+          {isAdvanced ? "Enter Simple Mode" : "Enter Advanced Mode"}
         </button>
       </div>
     </div>
