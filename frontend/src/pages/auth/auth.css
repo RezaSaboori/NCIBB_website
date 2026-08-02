@@ -1,39 +1,38 @@
-/* ==========================================================================
-   AUTH PAGES — /login and /signup standalone page layout
-   ========================================================================== */
+@import "../../styles/theme.css";
 
-.auth-page-backdrop {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 5rem 1rem 6rem;
-  overflow-y: auto;
-}
+/* ==========================================================================
+   AUTH PAGE CARDS — used inside AuthLayout (no header/footer)
+   ========================================================================== */
 
 .auth-page-card {
   width: 100%;
   max-width: 28rem;
-  min-width: 340px;
-  border-radius: var(--border-radius-container-md);
-  padding: var(--spacing-lg);
+  min-width: 320px;
+  border-radius: var(--border-radius-container-sm);
+  padding: var(--spacing-xl);
+  box-sizing: border-box;
 }
 
 .auth-page-card-scroll {
   width: 100%;
   max-width: 28rem;
-  min-width: 340px;
-  border-radius: 1rem;
-  padding: 2rem;
+  min-width: 320px;
+  border-radius: var(--border-radius-container-sm);
+  padding: var(--spacing-xl);
+  box-sizing: border-box;
   overflow-y: auto;
-  max-height: 90vh;
+  max-height: calc(100vh - var(--spacing-5xl));
 }
 
 .auth-page-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 1.5rem;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  margin-bottom: var(--spacing-lg);
   text-align: right;
+  color: var(--color-gray11);
+}
+
+.dark .auth-page-title {
+  color: var(--color-gray12);
 }
