@@ -17,8 +17,8 @@
   width: 100%;
   max-width: 28rem;
   min-width: 340px;
-  border-radius: 1rem;
-  padding: 2rem;
+  border-radius: var(--border-radius-container-md);
+  padding: var(--spacing-lg);
 }
 
 .auth-page-card-scroll {
