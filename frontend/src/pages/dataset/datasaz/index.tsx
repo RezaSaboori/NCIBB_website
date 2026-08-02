@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useDatasazSteps } from "./hooks/useDatasazSteps";
+import { useActiveProject } from "./hooks/useActiveProject";
 import { DatasazStepTabs } from "./components/DatasazStepTabs";
 import { Step1Initiation } from "./components/Step1Initiation";
 import { Step2Definition } from "./components/Step2Definition";
@@ -9,19 +10,30 @@ import { DefinitionCounters } from "./components/step2/DefinitionCounters";
 import "./styles.css";
 
 export const DatasazMode: React.FC = () => {
-  const { activeStep, goToStep } = useDatasazSteps();
+  const { activeStep, goToStep, nextStep } = useDatasazSteps();
+  const { activeProject, saving, initProject, persistStep } = useActiveProject();
 
   const [inclusionCount, setInclusionCount] = useState(0);
   const [exclusionCount, setExclusionCount] = useState(0);
 
-  const handleStartProcessing = useCallback(() => {
-    // TODO: trigger Step 3 navigation when wired
-  }, []);
+  const handleProjectInit = useCallback(
+    async (name: string, estimatedCount?: number) => {
+      const project = await initProject(name, estimatedCount);
+      if (project) nextStep();
+    },
+    [initProject, nextStep]
+  );
+
+  const handleStartProcessing = useCallback(async () => {
+    // step2_definition is assembled by CriteriaPanel; placeholder for now
+    await persistStep(2, { definition: {} });
+    nextStep();
+  }, [persistStep, nextStep]);
 
   const renderStep = () => {
     switch (activeStep) {
       case 1:
-        return <Step1Initiation />;
+        return <Step1Initiation onProjectInit={handleProjectInit} />;
       case 2:
         return (
           <Step2Definition
@@ -39,6 +51,7 @@ export const DatasazMode: React.FC = () => {
   return (
     <div className="datasaz-mode-wrapper">
       <DatasazStepTabs activeStep={activeStep} onStepChange={goToStep} />
+      {saving && <div className="dz-saving-indicator">در حال ذخیره...</div>}
       {activeStep === 2 && (
         <DefinitionCounters
           inclusionCount={inclusionCount}
