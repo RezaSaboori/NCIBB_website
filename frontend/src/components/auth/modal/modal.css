@@ -62,18 +62,49 @@
   padding-top: 0.25rem;
 }
 
-/* ── Tabs ── */
+/* ── Custom pill tab bar ── */
 
 .auth-modal-tablist {
-  border-radius: var(--border-radius-pill) !important;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: var(--border-radius-pill);
   padding: 4px;
   width: 100%;
-}
-
-.auth-modal-tab-cursor {
-  border-radius: var(--border-radius-pill) !important;
+  gap: 4px;
+  box-sizing: border-box;
 }
 
 .auth-modal-tab {
-  border-radius: var(--border-radius-pill) !important;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px var(--spacing-md);
+  border-radius: var(--border-radius-pill);
+  border: none;
+  background: transparent;
+  font-family: var(--font-family-persian);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray8);
+  cursor: pointer;
+  transition: color var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+.auth-modal-tab:hover {
+  color: var(--color-blue);
+}
+
+.auth-modal-tab--active {
+  color: var(--color-gray1);
+  cursor: default;
+}
+
+.dark .auth-modal-tab {
+  color: var(--color-gray5);
+}
+
+.dark .auth-modal-tab--active {
+  color: var(--color-gray1);
 }

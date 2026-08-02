@@ -1,10 +1,9 @@
+import { useState } from "react"
 import {
   Modal,
   ModalContent,
   ModalHeader,
   ModalBody,
-  Tabs,
-  Tab,
   Button,
 } from "@heroui/react"
 import { Icon } from "@iconify/react"
@@ -18,7 +17,11 @@ interface AuthModalProps {
   onOpenChange: (isOpen: boolean) => void
 }
 
+type AuthTab = "login" | "signup"
+
 export const AuthModal = ({ isOpen, onOpenChange }: AuthModalProps) => {
+  const [activeTab, setActiveTab] = useState<AuthTab>("login")
+
   return (
     <Modal
       isOpen={isOpen}
@@ -41,28 +44,43 @@ export const AuthModal = ({ isOpen, onOpenChange }: AuthModalProps) => {
                 size="sm"
                 variant="flat"
                 onPress={onClose}
-                className="auth-modal-close-btn"
+                className="red-glass auth-modal-close-btn"
                 aria-label="بستن"
               >
                 <Icon icon="mdi:close" width={18} />
               </Button>
             </ModalHeader>
             <ModalBody className="auth-modal-body">
-              <Tabs
-                aria-label="Authentication Tabs"
-                classNames={{
-                  tabList: "glass auth-modal-tablist",
-                  cursor: "blue-glass auth-modal-tab-cursor",
-                  tab: "auth-modal-tab",
-                }}
-              >
-                <Tab key="login" title="ورود">
+              {/* Custom pill tab bar — same pattern as header nav */}
+              <div className="auth-modal-tablist glass" role="tablist" aria-label="Authentication Tabs">
+                <button
+                  role="tab"
+                  aria-selected={activeTab === "login"}
+                  className={`auth-modal-tab${activeTab === "login" ? " auth-modal-tab--active blue-glass" : ""}`}
+                  onClick={() => setActiveTab("login")}
+                  type="button"
+                >
+                  ورود
+                </button>
+                <button
+                  role="tab"
+                  aria-selected={activeTab === "signup"}
+                  className={`auth-modal-tab${activeTab === "signup" ? " auth-modal-tab--active blue-glass" : ""}`}
+                  onClick={() => setActiveTab("signup")}
+                  type="button"
+                >
+                  ثبت نام
+                </button>
+              </div>
+
+              {/* Tab panels */}
+              <div role="tabpanel">
+                {activeTab === "login" ? (
                   <LoginForm onLoginSuccess={onClose} />
-                </Tab>
-                <Tab key="signup" title="ثبت نام">
+                ) : (
                   <RegisterForm onRegisterSuccess={onClose} />
-                </Tab>
-              </Tabs>
+                )}
+              </div>
             </ModalBody>
           </>
         )}

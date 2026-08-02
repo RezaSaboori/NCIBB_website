@@ -237,7 +237,7 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
           />
         )}
       />
-      <Button color="primary" type="submit">
+      <Button color="primary" type="submit" radius="full">
         ثبت نام
       </Button>
       <div className="flex items-center gap-4">
