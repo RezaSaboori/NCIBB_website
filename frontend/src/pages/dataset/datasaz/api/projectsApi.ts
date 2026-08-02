@@ -1,6 +1,6 @@
-import axios from "axios";
+import api from "../../../../dataset_services/api";
 
-const BASE = "/api/datasaz/projects/";
+const BASE = "/datasaz/projects/";
 
 export interface DatasazProjectPayload {
   name: string;
@@ -19,25 +19,25 @@ export interface DatasazProject {
 }
 
 export const fetchProjects = (): Promise<DatasazProject[]> =>
-  axios.get(BASE).then((r) => r.data);
+  api.get(BASE).then((r) => r.data);
 
 export const createProject = (
   payload: DatasazProjectPayload
 ): Promise<DatasazProject> =>
-  axios.post(BASE, payload).then((r) => r.data);
+  api.post(BASE, payload).then((r) => r.data);
 
 export const updateProject = (
   id: number,
   payload: Partial<DatasazProjectPayload>
 ): Promise<DatasazProject> =>
-  axios.patch(`${BASE}${id}/`, payload).then((r) => r.data);
+  api.patch(`${BASE}${id}/`, payload).then((r) => r.data);
 
 export const deleteProject = (id: number): Promise<void> =>
-  axios.delete(`${BASE}${id}/`).then(() => undefined);
+  api.delete(`${BASE}${id}/`).then(() => undefined);
 
 export const saveStep = (
   id: number,
   step: 1 | 2 | 3 | 4,
   data: Record<string, unknown>
 ): Promise<DatasazProject> =>
-  axios.patch(`${BASE}${id}/step/`, { step, data }).then((r) => r.data);
+  api.patch(`${BASE}${id}/step/`, { step, data }).then((r) => r.data);
