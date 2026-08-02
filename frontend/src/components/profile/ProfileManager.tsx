@@ -2,21 +2,22 @@
 import React, { useState, useEffect, useCallback } from "react"
 import { Spinner, Alert, Button } from "@heroui/react"
 import { useSelector, useDispatch } from "react-redux"
-// @ts-expect-error JS module without types
+// ts-expect-error JS module without types
 import { profileService } from "../../dataset_services/profileService"
 import { logoutSuccess } from "../../store/authSlice" // Import logout action
 import { authService } from "../../dataset_services/authService"
 import { useNavigate, useOutletContext } from "react-router-dom"
-// @ts-expect-error JSX module without types
+// ts-expect-error JSX module without types
 import ProfileForm from "./ProfileForm"
-// @ts-expect-error JSX module without types
+// ts-expect-error JSX module without types
 import SecuritySettings from "./SecuritySettings"
-// @ts-expect-error JSX module without types
+// ts-expect-error JSX module without types
 import PreferencesSettings from "./PreferencesSettings"
-// @ts-expect-error JSX module without types
+// ts-expect-error JSX module without types
 import ActivityLog from "./ActivityLog"
 import Sidebar from "./sidebar"
-// @ts-expect-error JSX module without types
+import { UserProjectsList } from "./UserProjectsList"
+// ts-expect-error JSX module without types
 import CompletionCard from "./CompletionCard"
 import { RootState } from "../../store/store"
 
@@ -174,7 +175,11 @@ const ProfileManager: React.FC = () => {
     {
       id: "projects",
       label: "پروژه ها",
-      content: <div className="p-4">بخش پروژه‌ها در دسترس نیست.</div>,
+      content: (
+        <div className="p-4">
+          <UserProjectsList />
+        </div>
+      ),
     },
     {
       id: "learning",
