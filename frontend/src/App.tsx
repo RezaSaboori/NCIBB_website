@@ -5,6 +5,8 @@ import ProfileManager from "./components/profile/ProfileManager"
 import { DatasetPage } from "./pages/dataset"
 import { PortalPage } from "./pages/portal"
 import LandingPage from "./pages/landing"
+import LoginPage from "./pages/LoginPage"
+import SignupPage from "./pages/SignupPage"
 
 function App() {
   return (
@@ -17,6 +19,8 @@ function App() {
         <Route path="/dataset" element={<DatasetPage />} />
         <Route path="/portal" element={<PortalPage />} />
         <Route path="/profile" element={<ProfileManager />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
       </Route>
     </Routes>
   )

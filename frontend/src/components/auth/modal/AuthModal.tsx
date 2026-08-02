@@ -5,12 +5,11 @@ import {
   ModalBody,
   Tabs,
   Tab,
-  Card,
-  CardBody,
 } from "@heroui/react"
 import LoginForm from "../LoginForm"
 import RegisterForm from "../RegisterForm"
 import "./modal.css"
+import "../../../styles/glass.css"
 
 interface AuthModalProps {
   isOpen: boolean
@@ -23,33 +22,26 @@ export const AuthModal = ({ isOpen, onOpenChange }: AuthModalProps) => {
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       placement="top-center"
-      className="modal-container"
+      className="glass-transparent modal-container"
+      backdrop="blur"
     >
       <ModalContent>
         {(onClose) => (
-          <>
+          <div className="p-2">
             <ModalHeader className="flex flex-col gap-1">
-              Log in or sign up
+              ورود یا ثبت نام
             </ModalHeader>
             <ModalBody>
               <Tabs aria-label="Authentication Tabs">
-                <Tab key="login" title="Login">
-                  <Card>
-                    <CardBody>
-                      <LoginForm onLoginSuccess={onClose} />
-                    </CardBody>
-                  </Card>
+                <Tab key="login" title="ورود">
+                  <LoginForm onLoginSuccess={onClose} />
                 </Tab>
-                <Tab key="signup" title="Sign Up">
-                  <Card>
-                    <CardBody>
-                      <RegisterForm />
-                    </CardBody>
-                  </Card>
+                <Tab key="signup" title="ثبت نام">
+                  <RegisterForm onRegisterSuccess={onClose} />
                 </Tab>
               </Tabs>
             </ModalBody>
-          </>
+          </div>
         )}
       </ModalContent>
     </Modal>

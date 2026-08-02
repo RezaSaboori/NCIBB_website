@@ -38,7 +38,11 @@ const registerSchema = yup.object().shape({
     .required("تایید رمز عبور الزامی است"),
 })
 
-const RegisterForm = () => {
+type RegisterFormProps = {
+  onRegisterSuccess?: () => void
+}
+
+const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
   const dispatch: AppDispatch = useDispatch()
   const navigate = useNavigate()
   const [serverError, setServerError] = useState<ServerError | null>(null)
@@ -57,7 +61,11 @@ const RegisterForm = () => {
       localStorage.setItem("refresh_token", userData.refresh)
       dispatch(loginSuccess(userData))
       dispatch(fetchUserProfile())
-      navigate("/")
+      if (onRegisterSuccess) {
+        onRegisterSuccess()
+      } else {
+        navigate("/")
+      }
     } catch (error: any) {
       console.error("Registration failed:", error)
       setServerError(error?.response?.data ?? "An unexpected error occurred.")

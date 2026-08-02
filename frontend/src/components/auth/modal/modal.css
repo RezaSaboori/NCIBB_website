@@ -1,3 +1,8 @@
 .modal-container {
   z-index: 1000000;
 }
+
+/* Glass-transparent modal panel */
+.modal-container {
+  border-radius: var(--border-radius-container-sm);
+}
