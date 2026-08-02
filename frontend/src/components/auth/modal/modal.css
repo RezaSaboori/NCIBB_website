@@ -28,13 +28,52 @@
 }
 
 .auth-modal-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   padding-bottom: 0.5rem;
+  /* HeroUI ModalHeader has gap by default; override so we fully control spacing */
+  gap: 0;
+}
+
+.auth-modal-title {
+  flex: 1;
+  text-align: right;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.auth-modal-close-btn {
+  flex-shrink: 0;
+  margin: var(--spacing-sm);
+  /* gray-11 in light, gray-2 in dark */
+  background-color: var(--color-gray11) !important;
+  color: var(--color-gray1) !important;
+  border-radius: var(--border-radius-pill) !important;
+}
+
+.dark .auth-modal-close-btn {
+  background-color: var(--color-gray2) !important;
+  color: var(--color-gray11) !important;
 }
 
 .auth-modal-body {
   padding-top: 0.25rem;
 }
 
-.auth-modal-close-btn {
-  margin: var(--spacing-sm);
+/* ── Tabs ── */
+
+.auth-modal-tablist {
+  border-radius: var(--border-radius-pill) !important;
+  padding: 4px;
+  width: 100%;
+}
+
+.auth-modal-tab-cursor {
+  border-radius: var(--border-radius-pill) !important;
+}
+
+.auth-modal-tab {
+  border-radius: var(--border-radius-pill) !important;
 }
