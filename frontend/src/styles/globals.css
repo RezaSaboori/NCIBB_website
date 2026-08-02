@@ -10,14 +10,21 @@
    AUTH PAGES — /login and /signup standalone page layout
    ========================================================================== */
 
+/*
+  Full-viewport centering backdrop.
+  padding-block (top/bottom) ensures the card never touches the header or
+  overlaps the footer — the bottom 6rem gap covers the footer height.
+  overflow-y: auto handles tall signup cards on short viewports.
+*/
 .auth-page-backdrop {
   position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* Must be above the footer's stacking context */
   z-index: 9999;
+  padding: 5rem 1rem 6rem;
+  overflow-y: auto;
 }
 
 .auth-page-card {

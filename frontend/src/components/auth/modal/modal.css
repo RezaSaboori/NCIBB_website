@@ -1,24 +1,29 @@
-/* Elevate above all page elements including footer */
-.modal-container {
+/* ==========================================================================
+   AUTH MODAL
+   ========================================================================== */
+
+/* The wrapper slot is the full-viewport scroll container — keep it above everything */
+.modal-wrapper {
   z-index: 1000000;
-  border-radius: var(--border-radius-container-sm);
 }
 
 /*
-  HeroUI injects an opaque bg onto [data-slot="base"] inside ModalContent.
-  We must strip it so the glass-transparent ::before pseudo-element
-  (which carries backdrop-filter + background-image) is visible.
+  .auth-modal-panel is on classNames.base — the actual visible panel div.
+  HeroUI injects an opaque background on this element via Tailwind
+  (bg-white / dark:bg-default-100).
+  Overriding directly on .auth-modal-panel (no ancestor needed) strips it
+  so the glass-transparent ::before backdrop-filter layer is visible.
 */
-.modal-container [data-slot="base"] {
+.auth-modal-panel {
   background: transparent !important;
   box-shadow: none !important;
-}
-
-/* Sizing and shape for the modal panel */
-.auth-modal-panel {
   border-radius: var(--border-radius-container-sm);
   overflow: hidden;
-  /* Force a new stacking context so ::before z-index: -1 clips inside */
+  /*
+    isolation: isolate creates a new stacking context so the ::before
+    pseudo-element with z-index: -1 inside .glass-transparent clips
+    inside this panel, not behind the whole page.
+  */
   isolation: isolate;
 }
 

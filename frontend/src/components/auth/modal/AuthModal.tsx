@@ -23,7 +23,7 @@ export const AuthModal = ({ isOpen, onOpenChange }: AuthModalProps) => {
       onOpenChange={onOpenChange}
       placement="top-center"
       classNames={{
-        wrapper: "modal-container",
+        wrapper: "modal-wrapper",
         base: "glass-transparent auth-modal-panel",
       }}
       backdrop="blur"
