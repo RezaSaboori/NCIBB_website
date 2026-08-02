@@ -119,7 +119,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             رمز عبور خود را فراموش کرده اید؟
           </Link>
         </div>
-        <Button color="primary" type="submit">
+        <Button color="primary" type="submit" radius="full">
           ورود
         </Button>
         <div className="flex items-center gap-4">

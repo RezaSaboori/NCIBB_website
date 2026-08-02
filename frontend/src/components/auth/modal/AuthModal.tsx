@@ -25,6 +25,7 @@ export const AuthModal = ({ isOpen, onOpenChange }: AuthModalProps) => {
       classNames={{
         wrapper: "modal-wrapper",
         base: "glass-transparent auth-modal-panel",
+        closeButton: "red-glass auth-modal-close-btn",
       }}
       backdrop="blur"
     >

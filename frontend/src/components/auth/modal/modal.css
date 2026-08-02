@@ -34,3 +34,7 @@
 .auth-modal-body {
   padding-top: 0.25rem;
 }
+
+.auth-modal-close-btn {
+  margin: var(--spacing-sm);
+}
