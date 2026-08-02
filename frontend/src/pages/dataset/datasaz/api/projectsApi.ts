@@ -21,7 +21,9 @@ export interface DatasazProject {
 export const fetchProjects = (): Promise<DatasazProject[]> =>
   axios.get(BASE).then((r) => r.data);
 
-export const createProject = (payload: DatasazProjectPayload): Promise<DatasazProject> =>
+export const createProject = (
+  payload: DatasazProjectPayload
+): Promise<DatasazProject> =>
   axios.post(BASE, payload).then((r) => r.data);
 
 export const updateProject = (
