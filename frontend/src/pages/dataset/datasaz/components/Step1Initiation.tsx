@@ -22,7 +22,7 @@ export const Step1Initiation: React.FC<Step1InitiationProps> = ({
   return (
     <StepPanel>
       <div className="s1-two-col-grid">
-        <TaahodCard onConfirm={handleConfirm} />
+        <TaahodCard />
         <ProjectInfoCard
           projectName={projectName}
           estimatedCount={estimatedCount}
@@ -30,6 +30,14 @@ export const Step1Initiation: React.FC<Step1InitiationProps> = ({
           onEstimatedCountChange={setEstimatedCount}
         />
       </div>
+      <button
+        className="s1-create-btn"
+        type="button"
+        onClick={handleConfirm}
+        disabled={!projectName.trim()}
+      >
+        ایجاد پروژه
+      </button>
     </StepPanel>
   );
 };

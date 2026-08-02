@@ -107,3 +107,76 @@
   color: var(--color-gray11);
 }
 
+/* ── ایجاد پروژه — blue-glass pill button ──────────────────────── */
+
+.s1-create-btn {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 2.75rem;
+  border: none;
+  border-radius: var(--border-radius-pill);
+  font-family: var(--font-family-persian);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray1);
+  cursor: pointer;
+  padding: 0 var(--spacing-xl);
+  box-sizing: border-box;
+  transition:
+    opacity var(--motion-duration-normal) var(--motion-easing-easeInOut),
+    transform var(--motion-duration-normal) var(--motion-easing-easeInOut);
+  overflow: hidden;
+}
+
+/* Blue-glass background layer */
+.s1-create-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background-color: color-mix(in srgb, var(--color-blue) 75%, transparent);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, #01eeff 20%, transparent),
+    inset 2px 1.5px 0px -1px color-mix(in srgb, #01eeff 85%, transparent),
+    inset -1.5px -1px 0px -1px color-mix(in srgb, #01eeff 70%, transparent),
+    inset -2px -6px 1px -5px color-mix(in srgb, #01eeff 55%, transparent),
+    inset -1px 2px 3px -1px color-mix(in srgb, #001130 20%, transparent),
+    inset 0px -4px 1px -2px color-mix(in srgb, #000820 12%, transparent),
+    0px 4px 16px 0px color-mix(in srgb, var(--color-blue) 30%, transparent),
+    0px 1px 4px 0px color-mix(in srgb, #000 12%, transparent);
+}
+
+.s1-create-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+.s1-create-btn:active:not(:disabled) {
+  transform: translateY(0px);
+  opacity: 0.85;
+}
+
+.s1-create-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.dark .s1-create-btn::before {
+  background-color: color-mix(in srgb, var(--color-blue) 85%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, #01eeff 25%, transparent),
+    inset 2px 1.5px 0px -1px color-mix(in srgb, #01eeff 90%, transparent),
+    inset -1.5px -1px 0px -1px color-mix(in srgb, #01eeff 75%, transparent),
+    inset -2px -6px 1px -5px color-mix(in srgb, #01eeff 60%, transparent),
+    inset -1px 2px 3px -1px color-mix(in srgb, #001130 30%, transparent),
+    inset 0px -4px 1px -2px color-mix(in srgb, #000820 20%, transparent),
+    0px 4px 20px 0px color-mix(in srgb, var(--color-blue) 40%, transparent),
+    0px 1px 4px 0px color-mix(in srgb, #000 20%, transparent);
+}

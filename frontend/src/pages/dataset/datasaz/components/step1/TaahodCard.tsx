@@ -1,11 +1,7 @@
 /*TaahodCard.tsx*/
 import React from "react";
 
-interface TaahodCardProps {
-  onConfirm: () => void;
-}
-
-export const TaahodCard: React.FC<TaahodCardProps> = ({ onConfirm }) => {
+export const TaahodCard: React.FC = () => {
   return (
     <div className="glass dz-glass-container dz-glass-container--lg">
       <div className="dz-glass-container__header">
@@ -34,15 +30,6 @@ export const TaahodCard: React.FC<TaahodCardProps> = ({ onConfirm }) => {
           با تکمیل و ثبت این فرم، تأیید می‌کنم که موارد فوق را خوانده،
           درک کرده و می‌پذیرم.
         </p>
-      </div>
-      <div className="dz-glass-container__footer">
-        <button
-          className="dz-btn dz-btn--primary s1-confirm-btn"
-          type="button"
-          onClick={onConfirm}
-        >
-          ایجاد پروژه
-        </button>
       </div>
     </div>
   );
