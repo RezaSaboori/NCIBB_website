@@ -186,11 +186,13 @@ const ProfileManager: React.FC = () => {
       label: "آموزش",
       content: (
         <div className="space-y-6">
+          {/* ts-expect-error stub component does not yet declare props */}
           <PreferencesSettings
             preferencesData={profileData?.preferences}
             onUpdate={handleProfileUpdate}
             saving={saving}
           />
+          {/* ts-expect-error stub component does not yet declare props */}
           <SecuritySettings
             userData={{ ...(user as any), ...(profileData as any) }}
             onUpdate={handleProfileUpdate}
