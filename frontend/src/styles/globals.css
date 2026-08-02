@@ -5,3 +5,42 @@
 [dir="rtl"] * {
   text-align: right;
 }
+
+/* ==========================================================================
+   AUTH PAGES — /login and /signup standalone page layout
+   ========================================================================== */
+
+.auth-page-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Must be above the footer's stacking context */
+  z-index: 9999;
+}
+
+.auth-page-card {
+  width: 100%;
+  max-width: 28rem;    /* 448px — equivalent to max-w-md */
+  min-width: 340px;
+  border-radius: 1rem;
+  padding: 2rem;
+}
+
+.auth-page-card-scroll {
+  width: 100%;
+  max-width: 28rem;
+  min-width: 340px;
+  border-radius: 1rem;
+  padding: 2rem;
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+.auth-page-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: right;
+}

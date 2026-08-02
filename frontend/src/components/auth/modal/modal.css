@@ -1,8 +1,31 @@
+/* Elevate above all page elements including footer */
 .modal-container {
   z-index: 1000000;
+  border-radius: var(--border-radius-container-sm);
 }
 
-/* Glass-transparent modal panel */
-.modal-container {
+/*
+  HeroUI injects an opaque bg onto [data-slot="base"] inside ModalContent.
+  We must strip it so the glass-transparent ::before pseudo-element
+  (which carries backdrop-filter + background-image) is visible.
+*/
+.modal-container [data-slot="base"] {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Sizing and shape for the modal panel */
+.auth-modal-panel {
   border-radius: var(--border-radius-container-sm);
+  overflow: hidden;
+  /* Force a new stacking context so ::before z-index: -1 clips inside */
+  isolation: isolate;
+}
+
+.auth-modal-header {
+  padding-bottom: 0.5rem;
+}
+
+.auth-modal-body {
+  padding-top: 0.25rem;
 }

@@ -22,16 +22,19 @@ export const AuthModal = ({ isOpen, onOpenChange }: AuthModalProps) => {
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       placement="top-center"
-      className="glass-transparent modal-container"
+      classNames={{
+        wrapper: "modal-container",
+        base: "glass-transparent auth-modal-panel",
+      }}
       backdrop="blur"
     >
       <ModalContent>
         {(onClose) => (
-          <div className="p-2">
-            <ModalHeader className="flex flex-col gap-1">
+          <>
+            <ModalHeader className="auth-modal-header">
               ورود یا ثبت نام
             </ModalHeader>
-            <ModalBody>
+            <ModalBody className="auth-modal-body">
               <Tabs aria-label="Authentication Tabs">
                 <Tab key="login" title="ورود">
                   <LoginForm onLoginSuccess={onClose} />
@@ -41,7 +44,7 @@ export const AuthModal = ({ isOpen, onOpenChange }: AuthModalProps) => {
                 </Tab>
               </Tabs>
             </ModalBody>
-          </div>
+          </>
         )}
       </ModalContent>
     </Modal>
