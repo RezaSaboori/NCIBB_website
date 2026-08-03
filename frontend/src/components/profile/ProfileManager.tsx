@@ -28,6 +28,7 @@ type ProfileTab = "dashboard" | "account" | "messages" | "projects" | "learning"
 
 const ProfileManager: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ProfileTab>("dashboard")
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false)
   const { user, isAuthenticated } = useSelector((state: RootState) => state.auth)
   const [profileData, setProfileData] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
@@ -35,7 +36,7 @@ const ProfileManager: React.FC = () => {
   const [saving, setSaving] = useState<boolean>(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { setSidebar } = useOutletContext<any>()
+  const { setSidebar, setSidebarWidth } = useOutletContext<any>()
 
   const handleLogout = async () => {
     try {
@@ -47,16 +48,25 @@ const ProfileManager: React.FC = () => {
     }
   }
 
+  const SIDEBAR_EXPANDED_WIDTH = 260
+  const SIDEBAR_COLLAPSED_WIDTH = 72
+
   useEffect(() => {
     setSidebar(
       <ProfileSidebar
         activeTab={activeTab}
         onTabChange={(tab) => setActiveTab(tab as ProfileTab)}
         onLogout={handleLogout}
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed((prev) => !prev)}
       />
     )
-    return () => setSidebar(null)
-  }, [activeTab, setSidebar])
+    setSidebarWidth(sidebarCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH)
+    return () => {
+      setSidebar(null)
+      setSidebarWidth(260)
+    }
+  }, [activeTab, setSidebar, setSidebarWidth, sidebarCollapsed])
 
   const loadProfile = useCallback(async () => {
     if (!isAuthenticated) {

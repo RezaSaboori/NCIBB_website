@@ -5,6 +5,7 @@ import { Footer } from "../components/global/Footer"
 
 export default function DefaultLayout() {
   const [sidebar, setSidebar] = useState<React.ReactNode | null>(null)
+  const [sidebarWidth, setSidebarWidth] = useState<number>(260)
   const location = useLocation()
   const isHomePage = location.pathname === "/"
   const hasSidebar = !!sidebar
@@ -15,27 +16,28 @@ export default function DefaultLayout() {
     >
       <Header
         className={isHomePage ? "bg-transparent" : ""}
-        sidebarOffset={hasSidebar ? "calc(260px + 2rem)" : undefined}
+        sidebarOffset={hasSidebar ? `calc(${sidebarWidth}px + 2rem)` : undefined}
       />
       {hasSidebar ? (
         <div className="flex flex-1">
           {sidebar}
           <main
-            className={`flex-grow w-full max-w-none ${isHomePage ? "" : "pt-16 pr-[calc(260px+2rem)] pl-6"}`}
+            className={`flex-grow w-full max-w-none ${isHomePage ? "" : "pt-16 pl-6"}`}
+            style={!isHomePage ? { paddingRight: `calc(${sidebarWidth}px + 2rem)` } : undefined}
           >
-            <Outlet context={{ setSidebar }} />
+            <Outlet context={{ setSidebar, setSidebarWidth }} />
           </main>
         </div>
       ) : (
         <main
           className={`flex-grow w-full max-w-none ${isHomePage ? "" : "pt-16 px-6"}`}
         >
-          <Outlet context={{ setSidebar }} />
+          <Outlet context={{ setSidebar, setSidebarWidth }} />
         </main>
       )}
       <div
         className="mt-auto px-6 pb-6"
-        style={hasSidebar ? { paddingRight: "calc(260px + 2rem + 1.5rem)" } : undefined}
+        style={hasSidebar ? { paddingRight: `calc(${sidebarWidth}px + 2rem + 1.5rem)` } : undefined}
       >
         <Footer />
       </div>

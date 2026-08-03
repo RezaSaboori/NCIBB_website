@@ -1,18 +1,86 @@
 @import "../../../components/layout/sidebar.css";
 
-/* Profile sidebar shape — uses theme vars per request */
+/* ── Profile sidebar geometry ────────────────────────────────── */
 .sidebar-nav {
+  width: 260px;
   border-radius: var(--border-radius-container-lg);
   padding: var(--spacing-md);
   gap: var(--spacing-md);
+  transition:
+    width var(--motion-duration-slow) var(--motion-easing-easeInOut),
+    padding var(--motion-duration-slow) var(--motion-easing-easeInOut);
 }
 
-/* Menu group gap override */
+/* ── Collapsed state ─────────────────────────────────────────── */
+.sidebar-nav--collapsed {
+  width: 72px;
+  padding: var(--spacing-md) var(--spacing-sm);
+}
+
+/* Center icons when collapsed */
+.sidebar-nav--collapsed .sidebar-nav__item {
+  justify-content: center;
+  padding: 12px;
+}
+
+/* ── Collapse toggle button ──────────────────────────────────── */
+.sidebar-nav__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-end;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--border-radius-item-md);
+  background: transparent;
+  color: var(--color-gray6);
+  cursor: pointer;
+  padding: 0;
+  transition:
+    color var(--motion-duration-fast) var(--motion-easing-easeOut),
+    background-color var(--motion-duration-fast) var(--motion-easing-easeOut);
+}
+
+.sidebar-nav__toggle:hover {
+  color: var(--color-blue);
+  background-color: color-mix(in srgb, var(--color-blue) 10%, transparent);
+}
+
+.sidebar-nav--collapsed .sidebar-nav__toggle {
+  align-self: center;
+}
+
+/* ── Chevron icon inside toggle ──────────────────────────────── */
+.sidebar-nav__toggle-icon {
+  width: 14px;
+  height: 14px;
+  /* Points left (collapse) — chevron SVG points down by default, rotate to point left */
+  transform: rotate(90deg);
+  transition: transform var(--motion-duration-slow) var(--motion-easing-easeInOut);
+}
+
+/* When collapsed, flip to point right (expand) */
+.sidebar-nav__toggle-icon--flipped {
+  transform: rotate(-90deg);
+}
+
+/* ── Menu group gap ──────────────────────────────────────────── */
 .sidebar-nav__menu {
   gap: var(--spacing-md);
 }
 
-/* Danger variant for destructive actions like logout */
+/* ── Danger variant ──────────────────────────────────────────── */
 .sidebar-nav__item--danger:hover {
   --c: var(--color-red);
+}
+
+/* ── Dark mode toggle ────────────────────────────────────────── */
+[data-theme="dark"] .sidebar-nav__toggle {
+  color: var(--color-gray7);
+}
+
+[data-theme="dark"] .sidebar-nav__toggle:hover {
+  color: var(--color-blue);
 }
