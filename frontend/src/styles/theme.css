@@ -353,6 +353,41 @@ body {
   text-align: justify !important;
 }
 
+/*
+ * ========================================
+ * Page Content Wrapper
+ * ========================================
+ * Single source of truth for page-level
+ * horizontal padding and max-width.
+ *
+ * Usage: wrap every page's root element with
+ *   <div className="page-content"> ... </div>
+ *
+ * Do NOT add extra px-* / padding / mx-auto
+ * on top of this. Let the layout breathe.
+ */
+.page-content {
+  --page-padding-x: var(--spacing-xl);   /* 32px each side */
+  --page-padding-y: var(--spacing-xl);   /* 32px top/bottom */
+  --page-max-width: 1200px;
+
+  width: 100%;
+  max-width: var(--page-max-width);
+  box-sizing: border-box;
+  padding: var(--page-padding-y) var(--page-padding-x);
+  margin-inline: auto;   /* centres when narrower than viewport */
+}
+
+/* Fluid variant — no max-width cap, for full-bleed sections */
+.page-content--fluid {
+  --page-max-width: none;
+}
+
+/* Narrow variant — for forms, single-column reading content */
+.page-content--narrow {
+  --page-max-width: 760px;
+}
+
 .custom-scrollbar {
   overflow-y: auto;
   overflow-x: hidden;

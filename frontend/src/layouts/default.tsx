@@ -22,7 +22,7 @@ export default function DefaultLayout() {
         <div className="flex flex-1">
           {sidebar}
           <main
-            className={`flex-grow w-full max-w-none ${isHomePage ? "" : "pt-16 pl-6"}`}
+            className={`flex-grow w-full max-w-none ${isHomePage ? "" : "pt-16"}`}
             style={!isHomePage ? { paddingRight: `calc(${sidebarWidth}px + 2rem)` } : undefined}
           >
             <Outlet context={{ setSidebar, setSidebarWidth }} />
@@ -30,7 +30,7 @@ export default function DefaultLayout() {
         </div>
       ) : (
         <main
-          className={`flex-grow w-full max-w-none ${isHomePage ? "" : "pt-16 px-6"}`}
+          className={`flex-grow w-full max-w-none ${isHomePage ? "" : "pt-16"}`}
         >
           <Outlet context={{ setSidebar, setSidebarWidth }} />
         </main>

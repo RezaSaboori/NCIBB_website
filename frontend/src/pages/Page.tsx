@@ -71,23 +71,11 @@ const Page: React.FC<PageProps> = ({ pageName }) => {
   }, [pageName])
 
   if (loading)
-    return (
-      <div className="container mx-auto px-6 py-20 text-center">
-        در حال بارگذاری...
-      </div>
-    )
+    return <div className="page-content text-center">در حال بارگذاری...</div>
   if (error)
-    return (
-      <div className="container mx-auto px-6 py-20 text-center text-red-500">
-        {error}
-      </div>
-    )
+    return <div className="page-content text-center" style={{ color: "var(--color-red)" }}>{error}</div>
   if (!pageData || !pageData.sections)
-    return (
-      <div className="container mx-auto px-6 py-20 text-center">
-        محتوای صفحه یافت نشد.
-      </div>
-    )
+    return <div className="page-content text-center">محتوای صفحه یافت نشد.</div>
 
   return (
     <div>

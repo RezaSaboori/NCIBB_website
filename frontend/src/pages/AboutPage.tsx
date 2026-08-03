@@ -2,7 +2,7 @@ import React from "react"
 
 export const AboutPage = () => {
   return (
-    <div className="container mx-auto px-6 py-20 text-center">
+    <div className="page-content text-center">
       <h1 className="text-5xl font-bold text-gray-800 dark:text-white">
         درباره ما
       </h1>

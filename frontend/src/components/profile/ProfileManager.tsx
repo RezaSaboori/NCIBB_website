@@ -149,11 +149,7 @@ const ProfileManager: React.FC = () => {
       case "messages":
         return <MessagesTab />
       case "projects":
-        return (
-          <div className="max-w-4xl mx-auto w-full">
-            <UserProjectsList />
-          </div>
-        )
+        return <UserProjectsList />
       case "learning":
         return (
           <LearningTab
@@ -168,10 +164,8 @@ const ProfileManager: React.FC = () => {
   }
 
   return (
-    <div className="p-6 ml-0 mr-7 w-full overflow-x-hidden">
-      <div className="mx-auto w-full min-w-0">
-        {renderTab()}
-      </div>
+    <div className="page-content">
+      {renderTab()}
     </div>
   )
 }
