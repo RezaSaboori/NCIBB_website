@@ -1,6 +1,0 @@
-@import "../layout/sidebar.css";
-
-/* Danger variant for destructive actions like logout */
-.sidebar-nav__item--danger:hover {
-  --c: var(--color-red);
-}
