@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useRef } from "react"
 import { Icon } from "@iconify/react"
 import { primaryNavItems, bottomNavItems } from "./navItems"
 import { ChevronIcon } from "../../../pages/dataset/datasaz/components/step2/icons/Step2Icons"
@@ -19,51 +19,60 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
   isCollapsed,
   onToggleCollapse,
 }) => {
+  const sidebarRef = useRef<HTMLFieldSetElement>(null)
+
   useEffect(() => {
-    if (isCollapsed) return
+    const container = sidebarRef.current
+    if (!container) return
 
-    const navMenus = document.querySelectorAll(".sidebar-nav__menu")
-
-    const updateActiveIndicator = (menu: Element) => {
+    const updateActiveIndicator = (menu: HTMLElement) => {
       const activeItem = menu.querySelector(
         ".sidebar-nav__item:has(input:checked)"
-      ) as HTMLElement
+      ) as HTMLElement | null
+
       if (!activeItem) {
-        ;(menu as HTMLElement).style.setProperty("--active-indicator-height", "0px")
+        menu.style.setProperty("--active-indicator-height", "0px")
+        menu.style.setProperty("--active-indicator-top", "0px")
         return
       }
-      ;(menu as HTMLElement).style.setProperty(
-        "--active-indicator-height",
-        `${activeItem.offsetHeight}px`
-      )
-      ;(menu as HTMLElement).style.setProperty(
-        "--active-indicator-top",
-        `${activeItem.offsetTop}px`
-      )
+
+      menu.style.setProperty("--active-indicator-height", `${activeItem.offsetHeight}px`)
+      menu.style.setProperty("--active-indicator-top", `${activeItem.offsetTop}px`)
     }
 
-    if (navMenus.length > 0) {
-      navMenus.forEach((menu) => updateActiveIndicator(menu))
-      const resizeObserver = new ResizeObserver(() =>
-        navMenus.forEach((menu) => updateActiveIndicator(menu))
-      )
-      resizeObserver.observe(document.body)
-      return () => resizeObserver.disconnect()
+    const runAll = () => {
+      container.querySelectorAll<HTMLElement>(".sidebar-nav__menu").forEach(updateActiveIndicator)
+    }
+
+    // Run immediately, then after the CSS transition completes (width/padding animation)
+    runAll()
+    const transitionTimer = setTimeout(runAll, 320)
+
+    const resizeObserver = new ResizeObserver(runAll)
+    resizeObserver.observe(container)
+
+    return () => {
+      clearTimeout(transitionTimer)
+      resizeObserver.disconnect()
     }
   }, [activeTab, isCollapsed])
 
   return (
-    <fieldset className={`sidebar-nav${isCollapsed ? " sidebar-nav--collapsed" : ""}`}>
+    <fieldset
+      ref={sidebarRef}
+      className={`sidebar-nav${isCollapsed ? " sidebar-nav--collapsed" : ""}`}
+    >
       <legend className="sidebar-nav__legend">Profile Navigation</legend>
 
-      {/* Collapse toggle button */}
       <button
         className="sidebar-nav__toggle"
         onClick={onToggleCollapse}
         aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         type="button"
       >
-        <ChevronIcon className={`sidebar-nav__toggle-icon${isCollapsed ? " sidebar-nav__toggle-icon--flipped" : ""}`} />
+        <ChevronIcon
+          className={`sidebar-nav__toggle-icon${isCollapsed ? " sidebar-nav__toggle-icon--flipped" : ""}`}
+        />
       </button>
 
       <div className="sidebar-nav__menu">
