@@ -40,7 +40,16 @@ export const DatasazMode: React.FC = () => {
   const renderStep = () => {
     switch (activeStep) {
       case 1:
-        return <Step1Initiation onProjectInit={handleProjectInit} existingProject={activeProject} />;
+        return (
+          <Step1Initiation
+            onProjectInit={handleProjectInit}
+            existingProject={activeProject}
+            onLoadExistingProject={(project) => {
+              setActiveProject(project);
+              goToStep(project.current_step ?? 1);
+            }}
+          />
+        );
       case 2:
         return (
           <Step2Definition

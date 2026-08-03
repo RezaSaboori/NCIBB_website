@@ -231,3 +231,27 @@
     transition: none;
   }
 }
+
+
+/* ── Card header with inline mode toggle ────────────────────────── */
+
+.s1-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row-reverse; /* title on right, toggle on left (RTL card) */
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+/* Compact sizing for the toggle when placed inside a card header */
+.s1-mode-toggle {
+  height: 2rem;
+  padding: 0 var(--spacing-xs);
+}
+
+.s1-mode-toggle .data-finder-mode {
+  height: 1.55rem;
+  padding: 0 var(--spacing-sm);
+  font-size: var(--font-size-xs);
+}
