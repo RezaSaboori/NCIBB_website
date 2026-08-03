@@ -1,7 +1,6 @@
 import React from "react";
+import { createPortal } from "react-dom";
 import type { UserProject } from "../../../types/profile.types";
-import "../../../styles/glass.css";
-import "./projects.css";
 
 interface ProjectDeleteConfirmModalProps {
   project: UserProject;
@@ -14,24 +13,58 @@ export const ProjectDeleteConfirmModal: React.FC<ProjectDeleteConfirmModalProps>
   onConfirm,
   onCancel,
 }) => {
-  return (
-    <div className="project-delete-modal__overlay" onClick={onCancel}>
+  return createPortal(
+    <div className="dz-modal-overlay" onClick={onCancel}>
       <div
-        className="glass project-delete-modal__box"
+        className="glass dz-modal"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="profile-modal-title"
       >
-        <p className="text-headline project-delete-modal__message">
-          آیا از حذف پروژه «{project.name}» مطمئن هستید؟
-        </p>
-        <div className="project-delete-modal__actions">
-          <button className="glass project-delete-modal__btn" type="button" onClick={onCancel}>
+        {/* Header */}
+        <div className="dz-modal__header">
+          <span id="profile-modal-title" className="dz-modal__title">
+            تأیید حذف
+          </span>
+          <button
+            className="glass dz-modal__close-btn"
+            aria-label="بستن"
+            onClick={onCancel}
+            type="button"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="dz-modal__body">
+          <p className="dz-modal__message" dir="rtl" style={{ textAlign: "right" }}>
+            آیا از حذف پروژه{" "}
+            <strong className="dz-modal__item-name">«{project.name}»</strong>{" "}
+            مطمئن هستید؟
+          </p>
+        </div>
+
+        {/* Footer */}
+        <div className="dz-modal__footer">
+          <button
+            className="glass dz-modal__btn dz-modal__btn--cancel"
+            onClick={onCancel}
+            type="button"
+          >
             لغو
           </button>
-          <button className="red-glass project-delete-modal__btn" type="button" onClick={onConfirm}>
+          <button
+            className="red-glass dz-modal__btn dz-modal__btn--delete"
+            onClick={onConfirm}
+            type="button"
+          >
             حذف
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

@@ -1,5 +1,6 @@
 import React from "react";
 import type { UserProject } from "../../../types/profile.types";
+import { TrashIcon, QuestionIcon } from "../../../pages/dataset/datasaz/components/step2/icons/Step2Icons";
 import "../../../styles/glass.css";
 import "./projects.css";
 
@@ -9,55 +10,38 @@ interface ProjectCardProps {
   onOpen: (project: UserProject) => void;
 }
 
-const TrashIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="3 6 5 6 21 6" />
-    <path d="M19 6l-1 14H6L5 6" />
-    <path d="M10 11v6M14 11v6" />
-    <path d="M9 6V4h6v2" />
-  </svg>
-);
-
-const QuestionIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="10" />
-    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-    <line x1="12" y1="17" x2="12.01" y2="17" />
-  </svg>
-);
-
 export const ProjectCard: React.FC<ProjectCardProps> = ({
   project,
   onDelete,
   onOpen,
 }) => {
   return (
-    <div className="glass project-card">
+    <div className="glass dz-glass-container dz-glass-container--sm project-card">
       {/* Header */}
-      <div className="project-card__header">
+      <div className="dz-glass-container__header project-card__header">
         <span className="project-card__title text-headline">{project.name}</span>
         <div className="project-card__header-actions">
           <button
-            className="teal-glass project-card__icon-btn"
+            className="teal-glass dz-icon-btn"
             aria-label="راهنما"
             type="button"
             title={`سرویس: ${project.serviceLabel}`}
           >
-            <QuestionIcon className="project-card__icon" />
+            <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
           </button>
           <button
-            className="red-glass project-card__icon-btn"
+            className="red-glass dz-icon-btn"
             aria-label="حذف"
             type="button"
             onClick={() => onDelete(project)}
           >
-            <TrashIcon className="project-card__icon" />
+            <TrashIcon className="dz-icon-btn__icon dz-icon-btn__icon--trash" />
           </button>
         </div>
       </div>
 
       {/* Body — Stage */}
-      <div className="project-card__body">
+      <div className="dz-glass-container__body project-card__body">
         <span className="project-card__stage text-subhead">{project.stageLabel}</span>
         <span className="project-card__status text-caption1">{project.statusLabel}</span>
       </div>
@@ -65,14 +49,14 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       {/* Footer */}
       <div className="project-card__footer">
         <button
-          className="red-glass project-card__action-btn"
+          className="red-glass s2-criteria-window__btn project-card__action-btn"
           type="button"
           onClick={() => onDelete(project)}
         >
           حذف
         </button>
         <button
-          className="blue-glass project-card__action-btn"
+          className="blue-glass s2-criteria-window__btn project-card__action-btn"
           type="button"
           onClick={() => onOpen(project)}
         >
