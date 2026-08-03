@@ -1,0 +1,18 @@
+@import "../../../components/layout/sidebar.css";
+
+/* Profile sidebar shape — uses theme vars per request */
+.sidebar-nav {
+  border-radius: var(--border-radius-container-lg);
+  padding: var(--spacing-md);
+  gap: var(--spacing-md);
+}
+
+/* Menu group gap override */
+.sidebar-nav__menu {
+  gap: var(--spacing-md);
+}
+
+/* Danger variant for destructive actions like logout */
+.sidebar-nav__item--danger:hover {
+  --c: var(--color-red);
+}
