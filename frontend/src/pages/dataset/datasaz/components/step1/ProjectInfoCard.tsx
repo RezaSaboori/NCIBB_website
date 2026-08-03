@@ -7,6 +7,9 @@ interface ProjectInfoCardProps {
   estimatedCount: string;
   onProjectNameChange: (value: string) => void;
   onEstimatedCountChange: (value: string) => void;
+  btnState: "idle" | "loading" | "done";
+  btnLabel: string;
+  onConfirm: () => void;
 }
 
 export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
@@ -14,6 +17,9 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
   estimatedCount,
   onProjectNameChange,
   onEstimatedCountChange,
+  btnState,
+  btnLabel,
+  onConfirm,
 }) => {
   return (
     <div className="glass dz-glass-container dz-glass-container--lg">
@@ -50,6 +56,33 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
           />
           <span className="s1-hint">تعداد تقریبی رکوردهای داده‌ای که قرار است پردازش شوند</span>
         </div>
+      </div>
+      <div className="dz-glass-container__footer">
+        <button
+          className={`s1-create-btn blue-glass s1-create-btn--${btnState}`}
+          type="button"
+          onClick={onConfirm}
+          disabled={!projectName.trim() || btnState !== "idle"}
+          aria-busy={btnState === "loading"}
+          aria-label={btnLabel}
+        >
+          <span className="s1-create-btn__icon">
+            {btnState === "loading" && (
+              <span className="s1-create-btn__spinner" aria-hidden="true" />
+            )}
+            {btnState === "done" && (
+              <svg className="s1-create-btn__check" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M3 8l3.5 3.5L13 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+            {btnState === "idle" && (
+              <svg className="s1-create-btn__plus" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            )}
+          </span>
+          <span className="s1-create-btn__label">{btnLabel}</span>
+        </button>
       </div>
     </div>
   );
