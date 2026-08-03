@@ -176,7 +176,7 @@ const ProfileManager: React.FC = () => {
       id: "projects",
       label: "پروژه ها",
       content: (
-        <div className="p-4">
+        <div className="max-w-4xl mx-auto w-full">
           <UserProjectsList />
         </div>
       ),
