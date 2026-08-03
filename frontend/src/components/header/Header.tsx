@@ -16,12 +16,15 @@ const navigationItems: NavigationItem[] = [
   { value: "contact", label: "تماس با ما" },
 ]
 
-export const Header = ({ className }: HeaderProps) => {
+export const Header = ({ className, sidebarOffset }: HeaderProps) => {
   const { theme } = useTheme()
   useActiveIndicator()
 
   return (
-    <div className={`header-container ${className || ""} ${theme === "dark" ? "theme-dark" : "theme-light"}`}>
+    <div
+      className={`header-container ${className || ""} ${theme === "dark" ? "theme-dark" : "theme-light"}`}
+      style={sidebarOffset ? { transform: `translateX(calc(-50% - ${sidebarOffset} / 2))` } : undefined}
+    >
       <HomeButton ariaLabel="خانه" title="خانه" />
 
       <Navigation items={navigationItems} />

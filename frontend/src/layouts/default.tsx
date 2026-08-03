@@ -7,13 +7,17 @@ export default function DefaultLayout() {
   const [sidebar, setSidebar] = useState<React.ReactNode | null>(null)
   const location = useLocation()
   const isHomePage = location.pathname === "/"
+  const hasSidebar = !!sidebar
 
   return (
     <div
       className={`relative flex flex-col ${isHomePage ? "min-h-screen bg-[var(--color-gray1)]" : "min-h-screen"}`}
     >
-      <Header className={isHomePage ? "bg-transparent" : ""} />
-      {sidebar ? (
+      <Header
+        className={isHomePage ? "bg-transparent" : ""}
+        sidebarOffset={hasSidebar ? "calc(260px + 2rem)" : undefined}
+      />
+      {hasSidebar ? (
         <div className="flex flex-1">
           {sidebar}
           <main
@@ -29,7 +33,10 @@ export default function DefaultLayout() {
           <Outlet context={{ setSidebar }} />
         </main>
       )}
-      <div className="mt-auto px-6 pb-6">
+      <div
+        className="mt-auto px-6 pb-6"
+        style={hasSidebar ? { paddingRight: "calc(260px + 2rem + 1.5rem)" } : undefined}
+      >
         <Footer />
       </div>
     </div>
