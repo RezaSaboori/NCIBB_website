@@ -13,6 +13,13 @@ export const DatasazMode: React.FC = () => {
   const { activeStep, goToStep, nextStep } = useDatasazSteps();
   const { activeProject, saving, initProject, persistStep } = useActiveProject();
 
+  // When a project is restored from URL, sync the UI to its saved step
+  React.useEffect(() => {
+    if (activeProject?.current_step) {
+      goToStep(activeProject.current_step);
+    }
+  }, [activeProject?.id]); // only re-sync when project identity changes
+
   const [inclusionCount, setInclusionCount] = useState(0);
   const [exclusionCount, setExclusionCount] = useState(0);
 

@@ -1,14 +1,31 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   DatasazProject,
   createProject,
   saveStep,
+  fetchProjectById,
 } from "../api/projectsApi";
 
 export const useActiveProject = () => {
   const [activeProject, setActiveProject] = useState<DatasazProject | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchParams] = useSearchParams();
+
+  // On mount: if ?project=<id> is present, load that project and restore its step
+  useEffect(() => {
+    const projectId = searchParams.get("project");
+    if (!projectId) return;
+    (async () => {
+      try {
+        const project = await fetchProjectById(Number(projectId));
+        setActiveProject(project);
+      } catch {
+        setError("خطا در بارگذاری پروژه");
+      }
+    })();
+  }, []); // intentionally runs once on mount
 
   const initProject = useCallback(
     async (name: string, estimatedCount?: number) => {

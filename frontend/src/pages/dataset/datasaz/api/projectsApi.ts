@@ -41,3 +41,9 @@ export const saveStep = (
   data: Record<string, unknown>
 ): Promise<DatasazProject> =>
   api.patch(`${BASE}${id}/step/`, { step, data }).then((r) => r.data);
+
+export async function fetchProjectById(id: number): Promise<DatasazProject> {
+  const { axiosInstance } = await import("../../../../config/axiosInstance");
+  const response = await axiosInstance.get<DatasazProject>(`/api/datasaz/projects/${id}/`);
+  return response.data;
+}

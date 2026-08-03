@@ -22,7 +22,7 @@ function mapDatasazProject(p: DatasazProject): UserProject {
     serviceLabel: "داده‌ساز",
     stageLabel: STEP_LABELS[p.current_step] ?? `مرحله ${p.current_step}`,
     statusLabel: p.status,
-    openUrl: `/datasaz?project=${p.id}`,
+    openUrl: `/dataset?project=${p.id}`,
     createdAt: p.created_at,
     updatedAt: p.updated_at,
   };
