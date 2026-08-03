@@ -3,8 +3,8 @@
 /* ── Profile sidebar geometry ────────────────────────────────── */
 .sidebar-nav {
   width: 260px;
-  border-radius: var(--border-radius-container-md);
-  padding: var(--spacing-md);
+  border-radius: var(--border-radius-container-lg);
+  padding: var(--spacing-lg) var(--spacing-md);
   gap: var(--spacing-md);
   transition:
     width var(--motion-duration-slow) var(--motion-easing-easeInOut),
@@ -29,6 +29,7 @@
   align-items: center;
   justify-content: center;
   align-self: flex-end;
+  margin: 0 var(--spacing-sm);
   width: 28px;
   height: 28px;
   flex-shrink: 0;
