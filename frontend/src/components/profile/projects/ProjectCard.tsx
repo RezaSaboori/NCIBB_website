@@ -32,9 +32,6 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
       {/* Body */}
       <div className="dz-glass-container__body project-card__body">
-        <span className="project-card__stage text-subhead">{project.stageLabel}</span>
-        <span className="project-card__status text-caption1">{project.statusLabel}</span>
-        
         <div className="project-card__dates">
           <div className="project-card__date-item">
             <span className="project-card__date-label">تاریخ ایجاد:</span>
@@ -49,6 +46,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             </span>
           </div>
         </div>
+        <span className="project-card__stage text-subhead">{project.stageLabel}</span>
+        <span className="project-card__status text-caption1">{project.statusLabel}</span>
       </div>
 
       {/* Footer */}
