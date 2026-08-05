@@ -34,10 +34,10 @@ export const ProjectsGrid: React.FC = () => {
     navigate(project.openUrl);
   };
 
-  if (loading) return <div className="project-grid__loading text-body">در حال بارگذاری...</div>;
-  if (error) return <div className="project-grid__error text-body">{error}</div>;
+  if (loading) return <div className="project-grid__loading">در حال بارگذاری...</div>;
+  if (error) return <div className="project-grid__error">{error}</div>;
   if (!projects.length)
-    return <div className="project-grid__empty text-body">هنوز پروژه‌ای ایجاد نشده است.</div>;
+    return <div className="project-grid__empty">هنوز پروژه‌ای ایجاد نشده است.</div>;
 
   return (
     <>

@@ -7,7 +7,7 @@
 /* Grid layout */
 .project-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: var(--spacing-lg);
   padding: var(--spacing-md) 0;
 }
@@ -17,10 +17,13 @@
   flex: 1;
   min-width: 0;
   white-space: nowrap;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--color-gray12);
   text-align: center !important;
+  padding: var(--spacing-sm);
 }
 
 /* Body */
@@ -35,18 +38,21 @@
 
 .project-card__dates {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-  margin-bottom: var(--spacing-md);
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+  justify-content: space-between;
   padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid var(--color-gray4);
 }
 
 .project-card__date-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--spacing-sm);
+  flex-direction: row;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  width: 100%;
+  border-radius: var(--border-radius-container-sm);
+  background: var(--color-gray3);
+  border: var(--border-width-thin) solid var(--color-gray4);
 }
 
 .project-card__date-label {
@@ -56,7 +62,7 @@
 }
 
 .project-card__date-value {
-  color: var(--color-gray11);
+  color: var(--color-gray10);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
 }
@@ -66,6 +72,7 @@
   display: flex;
   gap: var(--spacing-sm);
   padding:0;
+  padding-top: var(--spacing-sm);
 }
 
 .project-card__action-btn {

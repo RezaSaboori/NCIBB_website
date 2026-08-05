@@ -27,14 +27,14 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     <div className="glass dz-glass-container dz-glass-container--sm project-card">
       {/* Header */}
       <div className="dz-glass-container__header project-card__header">
-        <span className="project-card__title text-headline">{project.name}</span>
+        <span className="project-card__title">{project.name}</span>
       </div>
 
       {/* Body */}
       <div className="dz-glass-container__body project-card__body">
         <div className="project-card__dates">
           <div className="project-card__date-item">
-            <span className="project-card__date-label">تاریخ ایجاد:</span>
+            <span className="project-card__date-label">تاریخ ایجاد پروژه:</span>
             <span className="project-card__date-value">
               {formatPersianDate(project.createdAt)}
             </span>
@@ -46,8 +46,8 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
             </span>
           </div>
         </div>
-        <span className="project-card__stage text-subhead">{project.stageLabel}</span>
-        <span className="project-card__status text-caption1">{project.statusLabel}</span>
+        <span className="project-card__stage">{project.stageLabel}</span>
+        <span className="project-card__status">{project.statusLabel}</span>
       </div>
 
       {/* Footer */}
