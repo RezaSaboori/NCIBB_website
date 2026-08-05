@@ -155,10 +155,25 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
     };
   }, [open, updatePanelPosition]);
 
-  const portalRoot =
-    typeof document !== "undefined"
-      ? document.getElementById("ui-dropdown-portals") ?? document.body
-      : null;
+  // React 18 attaches event listeners to the root container (#root).
+  // If the portal target is outside #root, synthetic events (like onClick)
+  // on portaled children will not fire. We ensure #ui-dropdown-portals is
+  // created inside #root dynamically to fix this without requiring manual
+  // index.html changes.
+  const portalRoot = React.useMemo(() => {
+    if (typeof document === "undefined") return null;
+    const reactRoot = document.getElementById("root");
+    if (!reactRoot) return document.body;
+    let root = document.getElementById("ui-dropdown-portals");
+    if (!root) {
+      root = document.createElement("div");
+      root.id = "ui-dropdown-portals";
+      reactRoot.appendChild(root);
+    } else if (root.parentElement !== reactRoot) {
+      reactRoot.appendChild(root);
+    }
+    return root;
+  }, []);
 
   const resolvedDir = (panelStyle.direction as "ltr" | "rtl") ?? "ltr";
 
