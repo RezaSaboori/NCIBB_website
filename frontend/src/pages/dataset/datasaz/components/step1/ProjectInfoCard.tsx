@@ -1,7 +1,8 @@
 /*ProjectInfoCard.tsx*/
-import React from "react";
+import React, { useRef } from "react";
 import { TextInput, NumberInput, DropdownInput } from "../../../../../components/ui/inputs";
 import { ChevronIcon } from "../step2/icons/Step2Icons";
+import { useDataFinderModeIndicator } from "../../../hooks/useDataFinderModeIndicator";
 
 type ProjectMode = "new" | "existing";
 type BtnState = "idle" | "loading" | "done";
@@ -38,14 +39,25 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
   // Show detail fields: always in "new" mode; in "existing" only after a project is selected
   const showDetailFields = mode === "new" || (mode === "existing" && !!selectedProjectName);
 
+  // Blue-glass active indicator — mirrors the datafinder mode toggle.
+  // The hook measures the active button and drives the ::after indicator
+  // via --active-indicator-* CSS custom properties on the container.
+  const modeToggleRef = useRef<HTMLDivElement>(null);
+  const activeModeId =
+    mode === "new" ? "project-info-mode-new" : "project-info-mode-existing";
+  useDataFinderModeIndicator(modeToggleRef, activeModeId);
+
   return (
     <div className="glass dz-glass-container dz-glass-container--lg">
       <div className="dz-glass-container__header s1-card-header">
-        <h2 className="s1-card-header__title">اطلاعات پروژه</h2>
-        {/* Mode toggle — styled like the datafinder mode toggle */}
-        <div className="data-finder-modes-container glass s1-mode-toggle" dir="rtl">
+        <div
+          ref={modeToggleRef}
+          className="data-finder-modes-container glass s1-mode-toggle"
+          dir="rtl"
+        >
           <button
             type="button"
+            id="project-info-mode-new"
             className={`data-finder-mode${mode === "new" ? " active" : ""}`}
             onClick={() => onModeChange("new")}
           >
@@ -53,12 +65,16 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
           </button>
           <button
             type="button"
+            id="project-info-mode-existing"
             className={`data-finder-mode${mode === "existing" ? " active" : ""}`}
             onClick={() => onModeChange("existing")}
           >
             پروژه قبلی
           </button>
         </div>
+        <h2 className="s1-card-header__title">اطلاعات پروژه</h2>
+        {/* Mode toggle — styled like the datafinder mode toggle */}
+
       </div>
 
       <div className="dz-glass-container__body">
