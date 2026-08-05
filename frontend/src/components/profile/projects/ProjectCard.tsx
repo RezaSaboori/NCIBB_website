@@ -9,6 +9,15 @@ interface ProjectCardProps {
   onOpen: (project: UserProject) => void;
 }
 
+const formatPersianDate = (dateString?: string) => {
+  if (!dateString) return "—";
+  try {
+    return new Date(dateString).toLocaleDateString("fa-IR");
+  } catch {
+    return "—";
+  }
+};
+
 export const ProjectCard: React.FC<ProjectCardProps> = ({
   project,
   onDelete,
@@ -25,6 +34,21 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       <div className="dz-glass-container__body project-card__body">
         <span className="project-card__stage text-subhead">{project.stageLabel}</span>
         <span className="project-card__status text-caption1">{project.statusLabel}</span>
+        
+        <div className="project-card__dates">
+          <div className="project-card__date-item">
+            <span className="project-card__date-label">تاریخ ایجاد:</span>
+            <span className="project-card__date-value">
+              {formatPersianDate(project.createdAt)}
+            </span>
+          </div>
+          <div className="project-card__date-item">
+            <span className="project-card__date-label">تاریخ آخرین تغییر:</span>
+            <span className="project-card__date-value">
+              {formatPersianDate(project.updatedAt)}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Footer */}

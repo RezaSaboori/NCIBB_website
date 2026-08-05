@@ -33,6 +33,33 @@
   color: var(--color-gray7);
 }
 
+.project-card__dates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-sm);
+}
+
+.project-card__date-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.project-card__date-label {
+  color: var(--color-gray8);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-regular);
+}
+
+.project-card__date-value {
+  color: var(--color-gray11);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
 /* Footer */
 .project-card__footer {
   display: flex;
