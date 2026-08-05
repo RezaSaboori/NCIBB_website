@@ -81,8 +81,13 @@ export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
         : [...current, opt];
       (props as MultiDropdownProps).onChange(next);
     } else {
-      (props as SingleDropdownProps).onChange(opt);
+      // Close first so the menu always dismisses on selection, even if the
+      // parent's onChange triggers re-renders, cross-component cascades, or
+      // throws. Prevents the "stays open after selecting" symptom seen in
+      // ProjectInfoCard, where onChange mutates the dropdown's own `value`
+      // and propagates up to a grandparent (goToStep/setActiveProject).
       setOpen(false);
+      (props as SingleDropdownProps).onChange(opt);
     }
   };
 
