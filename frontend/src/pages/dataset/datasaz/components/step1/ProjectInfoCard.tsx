@@ -8,6 +8,7 @@ type ProjectMode = "new" | "existing";
 type BtnState = "idle" | "loading" | "done";
 
 interface ProjectInfoCardProps {
+  showModeToggle: boolean;
   mode: ProjectMode;
   onModeChange: (mode: ProjectMode) => void;
   projectName: string;
@@ -23,6 +24,7 @@ interface ProjectInfoCardProps {
 }
 
 export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
+  showModeToggle,
   mode,
   onModeChange,
   projectName,
@@ -50,28 +52,30 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
   return (
     <div className="glass dz-glass-container dz-glass-container--lg">
       <div className="dz-glass-container__header s1-card-header">
-        <div
-          ref={modeToggleRef}
-          className="data-finder-modes-container glass s1-mode-toggle"
-          dir="rtl"
-        >
-          <button
-            type="button"
-            id="project-info-mode-new"
-            className={`data-finder-mode${mode === "new" ? " active" : ""}`}
-            onClick={() => onModeChange("new")}
+        {showModeToggle && (
+          <div
+            ref={modeToggleRef}
+            className="data-finder-modes-container glass s1-mode-toggle"
+            dir="rtl"
           >
-            پروژه جدید
-          </button>
-          <button
-            type="button"
-            id="project-info-mode-existing"
-            className={`data-finder-mode${mode === "existing" ? " active" : ""}`}
-            onClick={() => onModeChange("existing")}
-          >
-            پروژه قبلی
-          </button>
-        </div>
+            <button
+              type="button"
+              id="project-info-mode-new"
+              className={`data-finder-mode${mode === "new" ? " active" : ""}`}
+              onClick={() => onModeChange("new")}
+            >
+              پروژه جدید
+            </button>
+            <button
+              type="button"
+              id="project-info-mode-existing"
+              className={`data-finder-mode${mode === "existing" ? " active" : ""}`}
+              onClick={() => onModeChange("existing")}
+            >
+              پروژه قبلی
+            </button>
+          </div>
+        )}
         <h2 className="s1-card-header__title">اطلاعات پروژه</h2>
         {/* Mode toggle — styled like the datafinder mode toggle */}
 

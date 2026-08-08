@@ -1,10 +1,12 @@
 /*Step1Initiation.tsx*/
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { StepPanel } from "./StepPanel";
 import { TaahodCard } from "./step1/TaahodCard";
 import { ProjectInfoCard } from "./step1/ProjectInfoCard";
 import { useProjectList } from "../hooks/useProjectList";
 import type { DatasazProject } from "../api/projectsApi";
+import type { RootState } from "../../../../store/store";
 
 type BtnState = "idle" | "loading" | "done";
 type ProjectMode = "new" | "existing";
@@ -30,6 +32,8 @@ export const Step1Initiation: React.FC<Step1InitiationProps> = ({
   const [btnState, setBtnState] = useState<BtnState>(existingProject ? "done" : "idle");
 
   const { projects } = useProjectList();
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const showModeToggle = isAuthenticated && projects.length > 0;
 
   // Re-sync when an existing project loads asynchronously (e.g. from URL param)
   useEffect(() => {
@@ -86,6 +90,7 @@ export const Step1Initiation: React.FC<Step1InitiationProps> = ({
       <div className="s1-two-col-grid">
         <TaahodCard />
         <ProjectInfoCard
+          showModeToggle={showModeToggle}
           mode={mode}
           onModeChange={handleModeChange}
           projectName={projectName}
