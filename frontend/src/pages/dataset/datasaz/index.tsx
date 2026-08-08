@@ -3,6 +3,7 @@ import { useDatasazSteps } from "./hooks/useDatasazSteps";
 import type { DatasazStep, SerializedCriteriaItem, Step2DefinitionPayload } from "./types";
 import { useActiveProject } from "./hooks/useActiveProject";
 import { useDebouncedCallback } from "./hooks/useDebouncedCallback";
+import { useDelayedFlag } from "./hooks/useDelayedFlag";
 import { DatasazStepTabs } from "./components/DatasazStepTabs";
 import { Step1Initiation } from "./components/Step1Initiation";
 import { Step2Definition } from "./components/Step2Definition";
@@ -14,6 +15,9 @@ import "./styles.css";
 export const DatasazMode: React.FC = () => {
   const { activeStep, goToStep, nextStep } = useDatasazSteps();
   const { activeProject, setActiveProject, saving, initProject, persistStep } = useActiveProject();
+
+  // Show the tab-bar spinner only when a save takes longer than 2s
+  const showSaveSpinner = useDelayedFlag(saving, 2000);
 
   // Block navigation beyond step 1 until a project is created or chosen
   const handleStepChange = useCallback(
@@ -117,8 +121,8 @@ export const DatasazMode: React.FC = () => {
         activeStep={activeStep}
         onStepChange={handleStepChange}
         isStepDisabled={(step) => !activeProject && step !== 1}
+        isSaving={showSaveSpinner}
       />
-      {saving && <div className="dz-saving-indicator">در حال ذخیره...</div>}
       {activeStep === 2 && (
         <DefinitionCounters
           inclusionCount={inclusionCount}

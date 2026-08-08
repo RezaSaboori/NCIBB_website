@@ -38,6 +38,8 @@ const nextEntryId = () => ++_advEntryIdCounter;
 
 export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   origin,
+  initialEntries,
+  onEntriesChange,
   groupName,
   onGroupNameChange,
   isGroupRequired,
@@ -58,20 +60,16 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   const { query, suggestions, isLoading, error, handleQueryChange, reset } = useFieldSearch();
 
   // Seed from a restored definition when available; otherwise start with the origin criterion
-  const seededEntriesRef = useRef<AdvancedCriteriaEntry[] | null>(null);
-  if (seededEntriesRef.current === null) {
+  const [entries, setEntries] = useState<AdvancedCriteriaEntry[]>(() => {
     if (initialEntries && initialEntries.length > 0) {
-      seededEntriesRef.current = initialEntries.map(({ rows, ...entry }) => entry);
       // Keep the module entry-id counter ahead of restored ids to prevent key collisions
       const maxId = Math.max(...initialEntries.map((e) => e.entryId));
       if (maxId > _advEntryIdCounter) _advEntryIdCounter = maxId;
-    } else {
-      seededEntriesRef.current = [{ ...origin, entryId: nextEntryId() }];
+      return initialEntries.map(({ rows, ...entry }) => entry);
     }
-  }
-  const firstEntryId = seededEntriesRef.current[0].entryId;
-
-  const [entries, setEntries] = useState<AdvancedCriteriaEntry[]>(seededEntriesRef.current);
+    return [{ ...origin, entryId: nextEntryId() }];
+  });
+  const firstEntryId = useRef(entries[0].entryId).current;
   const [activeEntryId, setActiveEntryId] = useState<number | null>(firstEntryId);
   const [expandedEntryIds, setExpandedEntryIds] = useState<Set<number>>(
     new Set([firstEntryId])

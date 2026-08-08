@@ -466,3 +466,55 @@
   color: var(--color-gray1);
 }
 
+/* ── Save Spinner (iOS-style, lives inside the step tab bar) ───── */
+/* Always mounted; blurs/fades in only when a save exceeds the delay. */
+
+.dz-save-spinner {
+  position: relative;
+  flex: 0 0 auto;
+  width: 0;
+  height: 0.9rem;
+  margin-inline-start: 0;
+  overflow: hidden;
+  opacity: 0;
+  filter: blur(3px);
+  pointer-events: none;
+  color: var(--color-gray10);
+  transition:
+    width var(--motion-duration-slow) var(--motion-easing-easeInOut),
+    margin-inline-start var(--motion-duration-slow) var(--motion-easing-easeInOut),
+    opacity var(--motion-duration-slow) var(--motion-easing-easeInOut),
+    filter var(--motion-duration-slow) var(--motion-easing-easeInOut);
+}
+
+.dz-save-spinner--visible {
+  width: 0.9rem;
+  margin-inline-start: var(--spacing-xs);
+  opacity: 1;
+  filter: blur(0);
+}
+
+.dark .dz-save-spinner {
+  color: var(--color-gray12);
+}
+
+.dz-save-spinner__blade {
+  position: absolute;
+  top: 0;
+  left: calc(50% - 0.75px);
+  width: 1.5px;
+  height: 4px;
+  border-radius: var(--border-radius-pill);
+  background-color: currentColor;
+  transform-origin: 50% 0.45rem;
+  animation: dz-save-spinner-fade 0.8s linear infinite;
+}
+
+@keyframes dz-save-spinner-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.15;
+  }
+}
