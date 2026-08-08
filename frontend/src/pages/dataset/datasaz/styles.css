@@ -518,3 +518,26 @@
     opacity: 0.15;
   }
 }
+
+/* Save spinner container — sits beside the step tabs */
+/* Tabs row: step tabs + save spinner side by side */
+.datasaz-tabs-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.datasaz-tabs-row > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.datasaz-save-spinner-container {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}

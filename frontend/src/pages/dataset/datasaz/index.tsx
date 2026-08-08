@@ -5,6 +5,7 @@ import { useActiveProject } from "./hooks/useActiveProject";
 import { useDebouncedCallback } from "./hooks/useDebouncedCallback";
 import { useDelayedFlag } from "./hooks/useDelayedFlag";
 import { DatasazStepTabs } from "./components/DatasazStepTabs";
+import { SaveSpinner } from "./components/SaveSpinner";
 import { Step1Initiation } from "./components/Step1Initiation";
 import { Step2Definition } from "./components/Step2Definition";
 import { Step3Processing } from "./components/Step3Processing";
@@ -117,12 +118,18 @@ export const DatasazMode: React.FC = () => {
 
   return (
     <div className="datasaz-mode-wrapper">
-      <DatasazStepTabs
-        activeStep={activeStep}
-        onStepChange={handleStepChange}
-        isStepDisabled={(step) => !activeProject && step !== 1}
-        isSaving={showSaveSpinner}
-      />
+      <div className="datasaz-tabs-row">
+        <DatasazStepTabs
+          activeStep={activeStep}
+          onStepChange={handleStepChange}
+          isStepDisabled={(step) => !activeProject && step !== 1}
+        />
+        {showSaveSpinner && (
+          <div className="datasaz-save-spinner-container glass">
+            <SaveSpinner />
+          </div>
+        )}
+      </div>
       {activeStep === 2 && (
         <DefinitionCounters
           inclusionCount={inclusionCount}
