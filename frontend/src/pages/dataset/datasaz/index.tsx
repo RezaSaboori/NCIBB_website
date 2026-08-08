@@ -126,7 +126,7 @@ export const DatasazMode: React.FC = () => {
         />
         {showSaveSpinner && (
           <div className="datasaz-save-spinner-container glass">
-            <SaveSpinner />
+            <SaveSpinner visible />
           </div>
         )}
       </div>

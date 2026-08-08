@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
 import type { DatasazStep, DatasazStepConfig } from "../types";
-import { SaveSpinner } from "./SaveSpinner";
 import "../styles.css";
 
 const STEPS: DatasazStepConfig[] = [
@@ -14,14 +13,12 @@ interface DatasazStepTabsProps {
   activeStep: DatasazStep;
   onStepChange: (step: DatasazStep) => void;
   isStepDisabled?: (step: DatasazStep) => boolean;
-  isSaving?: boolean;
 }
 
 export const DatasazStepTabs: React.FC<DatasazStepTabsProps> = ({
   activeStep,
   onStepChange,
   isStepDisabled,
-  isSaving = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -68,7 +65,6 @@ export const DatasazStepTabs: React.FC<DatasazStepTabsProps> = ({
           </button>
         );
       })}
-      <SaveSpinner visible={isSaving} />
     </div>
   );
 };
