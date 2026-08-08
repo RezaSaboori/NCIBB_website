@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from "react";
 import { useDatasazSteps } from "./hooks/useDatasazSteps";
-import type { DatasazStep } from "./types";
+import type { DatasazStep, SerializedCriteriaItem, Step2DefinitionPayload } from "./types";
 import { useActiveProject } from "./hooks/useActiveProject";
+import { useDebouncedCallback } from "./hooks/useDebouncedCallback";
 import { DatasazStepTabs } from "./components/DatasazStepTabs";
 import { Step1Initiation } from "./components/Step1Initiation";
 import { Step2Definition } from "./components/Step2Definition";
@@ -33,6 +34,38 @@ export const DatasazMode: React.FC = () => {
   const [inclusionCount, setInclusionCount] = useState(0);
   const [exclusionCount, setExclusionCount] = useState(0);
 
+  // Latest step-2 definition, kept in a ref so it can be persisted synchronously
+  const definitionRef = React.useRef<Step2DefinitionPayload>({ inclusion: [], exclusion: [] });
+
+  // Seed the ref from the restored project so editing one panel never wipes the other
+  React.useEffect(() => {
+    const def = activeProject?.step2_definition as Partial<Step2DefinitionPayload> | undefined;
+    if (def) {
+      definitionRef.current = {
+        inclusion: def.inclusion ?? [],
+        exclusion: def.exclusion ?? [],
+      };
+    }
+  }, [activeProject?.id]);
+
+  const persistDefinition = useCallback(
+    (definition: Step2DefinitionPayload) => {
+      persistStep(2, { definition });
+    },
+    [persistStep]
+  );
+
+  const { debounced: persistDefinitionDebounced, cancel: cancelDefinitionSave } =
+    useDebouncedCallback(persistDefinition, 800);
+
+  const handleDefinitionChange = useCallback(
+    (type: "inclusion" | "exclusion", def: SerializedCriteriaItem[]) => {
+      definitionRef.current = { ...definitionRef.current, [type]: def };
+      persistDefinitionDebounced(definitionRef.current);
+    },
+    [persistDefinitionDebounced]
+  );
+
   const handleProjectInit = useCallback(
     async (name: string, estimatedCount?: number) => {
       const project = await initProject(name, estimatedCount);
@@ -42,10 +75,11 @@ export const DatasazMode: React.FC = () => {
   );
 
   const handleStartProcessing = useCallback(async () => {
-    // step2_definition is assembled by CriteriaPanel; placeholder for now
-    await persistStep(2, { definition: {} });
+    // Cancel any pending debounced save and persist the latest definition now
+    cancelDefinitionSave();
+    await persistStep(2, { definition: definitionRef.current });
     nextStep();
-  }, [persistStep, nextStep]);
+  }, [cancelDefinitionSave, persistStep, nextStep]);
 
   const renderStep = () => {
     switch (activeStep) {
@@ -63,6 +97,9 @@ export const DatasazMode: React.FC = () => {
       case 2:
         return (
           <Step2Definition
+            key={activeProject?.id ?? "no-project"}
+            initialDefinition={activeProject?.step2_definition as Step2DefinitionPayload | undefined}
+            onDefinitionChange={handleDefinitionChange}
             onInclusionCountChange={setInclusionCount}
             onExclusionCountChange={setExclusionCount}
           />

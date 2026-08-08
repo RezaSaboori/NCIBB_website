@@ -9,12 +9,16 @@ import { FieldSearchSpotlight } from "./FieldSearchSpotlight";
 import { TextInput, RadioToggle } from "../../../../../components/ui/inputs";
 import { useFieldSearch } from "../../hooks/useFieldSearch";
 import { useTabFocusScroll } from "../../hooks/useTabFocusScroll";
-import type { CriteriaItem, AdvancedCriteriaEntry } from "../../types";
+import type { CriteriaItem, AdvancedCriteriaEntry, SerializedAdvancedEntry } from "../../types";
 import { resolveCriteriaLabel } from "../../../utils/criteriaLabel";
 import type { RowState } from "./CriteriaWindowRow";
 
 interface CriteriaWindowAdvancedProps {
   origin: CriteriaItem;
+  /** Restored entries (with rows) from a saved definition — seeds state when present */
+  initialEntries?: SerializedAdvancedEntry[];
+  /** Fired on mount and on every change so CriteriaPanel can autosave the group */
+  onEntriesChange?: (entries: AdvancedCriteriaEntry[], entryRows: Record<number, RowState[]>) => void;
   /** Controlled: group name shown in the panel tab */
   groupName: string;
   onGroupNameChange: (name: string) => void;
@@ -53,17 +57,51 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
 
   const { query, suggestions, isLoading, error, handleQueryChange, reset } = useFieldSearch();
 
-  const firstEntryId = useRef(nextEntryId()).current;
+  // Seed from a restored definition when available; otherwise start with the origin criterion
+  const seededEntriesRef = useRef<AdvancedCriteriaEntry[] | null>(null);
+  if (seededEntriesRef.current === null) {
+    if (initialEntries && initialEntries.length > 0) {
+      seededEntriesRef.current = initialEntries.map(({ rows, ...entry }) => entry);
+      // Keep the module entry-id counter ahead of restored ids to prevent key collisions
+      const maxId = Math.max(...initialEntries.map((e) => e.entryId));
+      if (maxId > _advEntryIdCounter) _advEntryIdCounter = maxId;
+    } else {
+      seededEntriesRef.current = [{ ...origin, entryId: nextEntryId() }];
+    }
+  }
+  const firstEntryId = seededEntriesRef.current[0].entryId;
 
-  const [entries, setEntries] = useState<AdvancedCriteriaEntry[]>([
-    { ...origin, entryId: firstEntryId },
-  ]);
+  const [entries, setEntries] = useState<AdvancedCriteriaEntry[]>(seededEntriesRef.current);
   const [activeEntryId, setActiveEntryId] = useState<number | null>(firstEntryId);
   const [expandedEntryIds, setExpandedEntryIds] = useState<Set<number>>(
     new Set([firstEntryId])
   );
   // Per-entry rows snapshot so switching tabs doesn't lose state
-  const entryRowsRef = useRef<Map<number, RowState[]>>(new Map());
+  const entryRowsRef = useRef<Map<number, RowState[]>>(
+    new Map(
+      (initialEntries ?? []).map((e) => [e.entryId, (e.rows ?? []) as RowState[]] as [number, RowState[]])
+    )
+  );
+
+  // Mirror entries + rows upward so CriteriaPanel can autosave the full definition
+  const entriesRef = useRef(entries);
+  const onEntriesChangeRef = useRef(onEntriesChange);
+  useEffect(() => { entriesRef.current = entries; }, [entries]);
+  useEffect(() => { onEntriesChangeRef.current = onEntriesChange; }, [onEntriesChange]);
+
+  const notifyEntriesChange = useCallback(() => {
+    const entryRows: Record<number, RowState[]> = {};
+    entryRowsRef.current.forEach((rows, id) => {
+      entryRows[id] = rows;
+    });
+    onEntriesChangeRef.current?.(entriesRef.current, entryRows);
+  }, []);
+
+  // Fires on mount (seeds the panel's mirror) and on every entries change
+  useEffect(() => {
+    notifyEntriesChange();
+  }, [entries, notifyEntriesChange]);
+
   const advWindowsContainerRef = useRef<HTMLDivElement | null>(null);
   const advTabsAnchorRef = useRef<HTMLDivElement | null>(null);
 
@@ -283,7 +321,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
                   ? (entryRowsRef.current.get(firstEntryId) ?? initialRows)
                   : entryRowsRef.current.get(entry.entryId)
               }
-              onRowsChange={(rows) => entryRowsRef.current.set(entry.entryId, rows)}
+              onRowsChange={(rows) => { entryRowsRef.current.set(entry.entryId, rows); notifyEntriesChange(); }}
               onClose={() => handleToggleExpand(entry.entryId)}
               onDelete={() => handleDeleteEntry(entry.entryId)}
             />

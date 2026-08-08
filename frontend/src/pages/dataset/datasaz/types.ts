@@ -54,3 +54,43 @@ export interface DefinitionSummary {
   exclusionCount: number;
   errorCount: number;
 }
+
+/** Serializable mirror of CriteriaWindowRow's RowState (kept here so types.ts doesn't import a component) */
+export interface SerializedRow {
+  id: number;
+  inputValue: string;
+  numericOperator: string;
+  isRequired: boolean;
+}
+
+export interface SerializedAdvancedEntry {
+  entryId: number;
+  id: number;
+  label: string;
+  unit?: string;
+  value_type?: "numeric" | "enum" | string;
+  value_min?: number;
+  value_max?: number;
+  values?: string[];
+  rows: SerializedRow[];
+}
+
+export interface SerializedCriteriaItem {
+  id: number;
+  label: string;
+  unit?: string;
+  value_type?: "numeric" | "enum" | string;
+  value_min?: number;
+  value_max?: number;
+  values?: string[];
+  mode: "simple" | "advanced";
+  rows: SerializedRow[];
+  groupName?: string;
+  isGroupRequired?: boolean;
+  entries?: SerializedAdvancedEntry[];
+}
+
+export type Step2DefinitionPayload = {
+  inclusion: SerializedCriteriaItem[];
+  exclusion: SerializedCriteriaItem[];
+};

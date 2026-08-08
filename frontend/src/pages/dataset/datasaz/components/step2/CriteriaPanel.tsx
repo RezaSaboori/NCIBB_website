@@ -12,16 +12,18 @@ import { SearchInput } from "../../../../../components/ui/inputs";
 import { useFieldSearch } from "../../hooks/useFieldSearch";
 import { useCriteriaSearch } from "../../hooks/useCriteriaSearch";
 import { useTabFocusScroll } from "../../hooks/useTabFocusScroll";
-import type { SuggestionItem, CriteriaItem } from "../../types";
+import type { SuggestionItem, CriteriaItem, SerializedCriteriaItem, SerializedAdvancedEntry } from "../../types";
 import type { RowState } from "./CriteriaWindowRow";
 import { resolveCriteriaLabel } from "../../../utils/criteriaLabel";
 
 interface CriteriaPanelProps {
   type: "inclusion" | "exclusion";
   onCountChange?: (count: number) => void;
+  initialDefinition?: SerializedCriteriaItem[];
+  onDefinitionChange?: (def: SerializedCriteriaItem[]) => void;
 }
 
-export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChange }) => {
+export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChange, initialDefinition, onDefinitionChange }) => {
   const isInclusion = type === "inclusion";
 
   const titleClass = isInclusion
@@ -31,16 +33,36 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   const title = isInclusion ? "Inclusion Criteria" : "Exclusion Criteria";
   const btnLabel = isInclusion ? "Add inclusion" : "Add exclusion";
 
-  const [criteria, setCriteria] = useState<CriteriaItem[]>([]);
-  const [nextId, setNextId] = useState(1);
+  const [criteria, setCriteria] = useState<CriteriaItem[]>(() =>
+    (initialDefinition ?? []).map(({ mode, rows, entries, ...item }) => item)
+  );
+  const [nextId, setNextId] = useState(() =>
+    initialDefinition && initialDefinition.length > 0
+      ? Math.max(...initialDefinition.map((d) => d.id)) + 1
+      : 1
+  );
   // Per-criteria rows snapshot: preserved across simple↔advanced mode switches
-  const simpleRowsRef = useRef<Map<number, RowState[]>>(new Map());
+  const simpleRowsRef = useRef<Map<number, RowState[]>>(
+    new Map((initialDefinition ?? []).map((d) => [d.id, d.rows as RowState[]] as [number, RowState[]]))
+  );
+  // Live advanced-group entries (with rows) mirrored up from CriteriaWindowAdvanced
+  const advancedEntriesRef = useRef<Map<number, SerializedAdvancedEntry[]>>(
+    new Map(
+      (initialDefinition ?? [])
+        .filter((d) => d.mode === "advanced" && d.entries)
+        .map((d) => [d.id, d.entries!] as [number, SerializedAdvancedEntry[]])
+    )
+  );
   // (advGroupCounterRef removed — group number derived from live advancedIds size)
   // Per-criteria group name (controlled from panel, reflected in tab label)
-  const [groupNames, setGroupNames] = useState<Map<number, string>>(new Map());
+  const [groupNames, setGroupNames] = useState<Map<number, string>>(
+    () => new Map((initialDefinition ?? []).filter((d) => d.groupName).map((d) => [d.id, d.groupName!] as [number, string]))
+  );
   const groupNamesRef = useRef<Map<number, string>>(new Map());
   // Per-criteria group required (controlled from panel)
-  const [groupRequired, setGroupRequired] = useState<Map<number, boolean>>(new Map());
+  const [groupRequired, setGroupRequired] = useState<Map<number, boolean>>(
+    () => new Map((initialDefinition ?? []).filter((d) => d.isGroupRequired != null).map((d) => [d.id, d.isGroupRequired!] as [number, boolean]))
+  );
 
   useEffect(() => {
     onCountChange?.(criteria.length);
@@ -50,7 +72,9 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     useCriteriaSearch(criteria);
 
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
-  const [advancedIds, setAdvancedIds] = useState<Set<number>>(new Set());
+  const [advancedIds, setAdvancedIds] = useState<Set<number>>(
+    () => new Set((initialDefinition ?? []).filter((d) => d.mode === "advanced").map((d) => d.id))
+  );
   const advancedIdsRef = useRef<Set<number>>(new Set());
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [spotlightOpen, setSpotlightOpen] = useState(false);
@@ -58,6 +82,45 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   useEffect(() => { spotlightOpenRef.current = spotlightOpen; }, [spotlightOpen]);
   useEffect(() => { advancedIdsRef.current = advancedIds; }, [advancedIds]);
   useEffect(() => { groupNamesRef.current = groupNames; }, [groupNames]);
+  const criteriaRef = useRef(criteria);
+  const groupRequiredRef = useRef(groupRequired);
+  useEffect(() => { criteriaRef.current = criteria; }, [criteria]);
+  useEffect(() => { groupRequiredRef.current = groupRequired; }, [groupRequired]);
+
+  const onDefinitionChangeRef = useRef(onDefinitionChange);
+  useEffect(() => { onDefinitionChangeRef.current = onDefinitionChange; }, [onDefinitionChange]);
+
+  // Assemble the full serializable definition for this panel (simple + advanced)
+  const notifyDefinitionChange = useCallback(() => {
+    const def: SerializedCriteriaItem[] = criteriaRef.current.map((c) => {
+      if (advancedIdsRef.current.has(c.id)) {
+        return {
+          ...c,
+          mode: "advanced" as const,
+          rows: simpleRowsRef.current.get(c.id) ?? [],
+          groupName: groupNamesRef.current.get(c.id),
+          isGroupRequired: groupRequiredRef.current.get(c.id) ?? false,
+          entries: advancedEntriesRef.current.get(c.id) ?? [],
+        };
+      }
+      return {
+        ...c,
+        mode: "simple" as const,
+        rows: simpleRowsRef.current.get(c.id) ?? [],
+      };
+    });
+    onDefinitionChangeRef.current?.(def);
+  }, []);
+
+  // Notify on structural changes; skip the initial mount (state already came from the server)
+  const skipInitialNotifyRef = useRef(true);
+  useEffect(() => {
+    if (skipInitialNotifyRef.current) {
+      skipInitialNotifyRef.current = false;
+      return;
+    }
+    notifyDefinitionChange();
+  }, [criteria, groupNames, groupRequired, advancedIds, notifyDefinitionChange]);
   const [spotlightMinHeight, setSpotlightMinHeight] = useState(0);
   const spotlightRef = useRef<HTMLDivElement>(null);
   const spotlightRoRef = useRef<ResizeObserver | null>(null);
@@ -181,6 +244,8 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
     setCriteria((prev) => prev.filter((c) => c.id !== id));
     setExpandedIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
     setSelectedId((prev) => (prev === id ? null : prev));
+    simpleRowsRef.current.delete(id);
+    advancedEntriesRef.current.delete(id);
   }, [pendingDeleteId]);
 
   const handleCancelDelete = useCallback(() => {
@@ -315,6 +380,14 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
                     <div key={c.id} data-criteria-id={c.id}>
                       <CriteriaWindowAdvanced
                         origin={c}
+                        initialEntries={advancedEntriesRef.current.get(c.id)}
+                        onEntriesChange={(entries, entryRows) => {
+                          advancedEntriesRef.current.set(
+                            c.id,
+                            entries.map((e) => ({ ...e, rows: entryRows[e.entryId] ?? [] }))
+                          );
+                          notifyDefinitionChange();
+                        }}
                         groupName={groupNames.get(c.id) ?? `Group ${c.id}`}
                         onGroupNameChange={(name) =>
                           setGroupNames((prev) => { const m = new Map(prev); m.set(c.id, name); return m; })
@@ -343,7 +416,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
                         onMinimize={() => handleToggleExpand(c.id)}
                         onDelete={() => handleRequestDelete(c.id)}
                         initialRows={simpleRowsRef.current.get(c.id)}
-                        onRowsChange={(rows) => { simpleRowsRef.current.set(c.id, rows); }}
+                        onRowsChange={(rows) => { simpleRowsRef.current.set(c.id, rows); notifyDefinitionChange(); }}
                       />
                     </div>
                   )

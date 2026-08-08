@@ -46,7 +46,13 @@ export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
   initialRows,
   onRowsChange,
 }) => {
-  const [rows, setRows] = useState<RowState[]>(() => initialRows && initialRows.length > 0 ? initialRows : [makeMiniRow()]);
+  const [rows, setRows] = useState<RowState[]>(() => {
+    const init = initialRows && initialRows.length > 0 ? initialRows : [makeMiniRow()];
+    // Keep the module row-id counter ahead of restored ids to prevent key collisions
+    const maxId = Math.max(...init.map((r) => r.id));
+    if (maxId > _miniRowIdCounter) _miniRowIdCounter = maxId;
+    return init;
+  });
 
   const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;
   const isNumeric = value_type === "numeric";

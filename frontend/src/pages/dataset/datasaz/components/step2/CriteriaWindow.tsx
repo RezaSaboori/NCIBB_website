@@ -46,7 +46,13 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   onRowsChange,
 }) => {
   const { wrapperRef, innerRef } = useScrollText<HTMLSpanElement, HTMLSpanElement>();
-  const [rows, setRows] = useState<RowState[]>(() => initialRows && initialRows.length > 0 ? initialRows : [makeRow()]);
+  const [rows, setRows] = useState<RowState[]>(() => {
+    const init = initialRows && initialRows.length > 0 ? initialRows : [makeRow()];
+    // Keep the module row-id counter ahead of restored ids to prevent key collisions
+    const maxId = Math.max(...init.map((r) => r.id));
+    if (maxId > _rowIdCounter) _rowIdCounter = maxId;
+    return init;
+  });
 
   const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;
   const isNumeric = value_type === "numeric";
@@ -130,7 +136,13 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
             value_max={value_max}
             onChange={handleRowChange}
             showDelete={rows.length > 1}
-            onDelete={(id) => setRows((prev) => prev.filter((r) => r.id !== id))}
+            onDelete={(id) =>
+              setRows((prev) => {
+                const next = prev.filter((r) => r.id !== id);
+                onRowsChange?.(next);
+                return next;
+              })
+            }
           />
         ))}
 
