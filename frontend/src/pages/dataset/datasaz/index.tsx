@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { useDatasazSteps } from "./hooks/useDatasazSteps";
+import type { DatasazStep } from "./types";
 import { useActiveProject } from "./hooks/useActiveProject";
 import { DatasazStepTabs } from "./components/DatasazStepTabs";
 import { Step1Initiation } from "./components/Step1Initiation";
@@ -11,7 +12,16 @@ import "./styles.css";
 
 export const DatasazMode: React.FC = () => {
   const { activeStep, goToStep, nextStep } = useDatasazSteps();
-  const { activeProject, saving, initProject, persistStep } = useActiveProject();
+  const { activeProject, setActiveProject, saving, initProject, persistStep } = useActiveProject();
+
+  // Block navigation beyond step 1 until a project is created or chosen
+  const handleStepChange = useCallback(
+    (step: DatasazStep) => {
+      if (!activeProject && step !== 1) return;
+      goToStep(step);
+    },
+    [activeProject, goToStep]
+  );
 
   // When a project is restored from URL, sync the UI to its saved step
   React.useEffect(() => {
@@ -66,7 +76,11 @@ export const DatasazMode: React.FC = () => {
 
   return (
     <div className="datasaz-mode-wrapper">
-      <DatasazStepTabs activeStep={activeStep} onStepChange={goToStep} />
+      <DatasazStepTabs
+        activeStep={activeStep}
+        onStepChange={handleStepChange}
+        isStepDisabled={(step) => !activeProject && step !== 1}
+      />
       {saving && <div className="dz-saving-indicator">در حال ذخیره...</div>}
       {activeStep === 2 && (
         <DefinitionCounters

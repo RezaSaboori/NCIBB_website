@@ -67,5 +67,5 @@ export const useActiveProject = () => {
     [activeProject]
   );
 
-  return { activeProject, saving, error, initProject, persistStep };
+  return { activeProject, setActiveProject, saving, error, initProject, persistStep };
 };

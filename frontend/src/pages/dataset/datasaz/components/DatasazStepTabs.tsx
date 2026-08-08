@@ -12,11 +12,13 @@ const STEPS: DatasazStepConfig[] = [
 interface DatasazStepTabsProps {
   activeStep: DatasazStep;
   onStepChange: (step: DatasazStep) => void;
+  isStepDisabled?: (step: DatasazStep) => boolean;
 }
 
 export const DatasazStepTabs: React.FC<DatasazStepTabsProps> = ({
   activeStep,
   onStepChange,
+  isStepDisabled,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -48,16 +50,21 @@ export const DatasazStepTabs: React.FC<DatasazStepTabsProps> = ({
         } as React.CSSProperties
       }
     >
-      {STEPS.map((step, index) => (
-        <button
-          key={step.id}
-          ref={(el) => (tabRefs.current[index] = el)}
-          className={`datasaz-step-tab ${activeStep === step.id ? "active" : ""}`}
-          onClick={() => onStepChange(step.id)}
-        >
-          {step.label}
-        </button>
-      ))}
+      {STEPS.map((step, index) => {
+        const disabled = isStepDisabled?.(step.id) ?? false;
+        return (
+          <button
+            key={step.id}
+            ref={(el) => (tabRefs.current[index] = el)}
+            className={`datasaz-step-tab ${activeStep === step.id ? "active" : ""}`}
+            onClick={() => onStepChange(step.id)}
+            disabled={disabled}
+            aria-disabled={disabled}
+          >
+            {step.label}
+          </button>
+        );
+      })}
     </div>
   );
 };
