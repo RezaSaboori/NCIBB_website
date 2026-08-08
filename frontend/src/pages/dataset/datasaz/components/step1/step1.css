@@ -244,6 +244,10 @@
   flex-wrap: wrap;
 }
 
+.s1-card-header--no-toggle {
+  justify-content: flex-end;
+}
+
 /* Compact sizing for the toggle when placed inside a card header */
 /* Compact sizing for the toggle when placed inside a card header */
 .s1-mode-toggle {

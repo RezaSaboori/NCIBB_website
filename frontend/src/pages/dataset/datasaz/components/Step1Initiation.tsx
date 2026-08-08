@@ -31,8 +31,8 @@ export const Step1Initiation: React.FC<Step1InitiationProps> = ({
   );
   const [btnState, setBtnState] = useState<BtnState>(existingProject ? "done" : "idle");
 
-  const { projects } = useProjectList();
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const { projects } = useProjectList(isAuthenticated);
   const showModeToggle = isAuthenticated && projects.length > 0;
 
   // Re-sync when an existing project loads asynchronously (e.g. from URL param)

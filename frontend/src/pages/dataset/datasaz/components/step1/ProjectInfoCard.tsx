@@ -47,11 +47,11 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
   const modeToggleRef = useRef<HTMLDivElement>(null);
   const activeModeId =
     mode === "new" ? "project-info-mode-new" : "project-info-mode-existing";
-  useDataFinderModeIndicator(modeToggleRef, activeModeId);
+  useDataFinderModeIndicator(modeToggleRef, activeModeId, [showModeToggle]);
 
   return (
     <div className="glass dz-glass-container dz-glass-container--lg">
-      <div className="dz-glass-container__header s1-card-header">
+      <div className={`dz-glass-container__header s1-card-header${showModeToggle ? "" : " s1-card-header--no-toggle"}`}>
         {showModeToggle && (
           <div
             ref={modeToggleRef}

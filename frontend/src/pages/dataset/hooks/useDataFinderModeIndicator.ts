@@ -2,7 +2,8 @@ import { useEffect } from "react"
 
 export const useDataFinderModeIndicator = (
   containerRef: React.RefObject<HTMLDivElement>,
-  activeModeId: string | null
+  activeModeId: string | null,
+  deps: React.DependencyList = []
 ) => {
   useEffect(() => {
     const updateActiveIndicator = () => {
@@ -42,5 +43,5 @@ export const useDataFinderModeIndicator = (
     return () => {
       window.removeEventListener("resize", updateActiveIndicator)
     }
-  }, [activeModeId, containerRef])
+  }, [activeModeId, containerRef, ...deps])
 }
