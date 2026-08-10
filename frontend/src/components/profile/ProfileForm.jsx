@@ -10,7 +10,6 @@ import {
   Input,
   Textarea,
   Button,
-  Avatar,
   Select,
   SelectItem,
   Divider,
@@ -26,6 +25,7 @@ import {
 import { Icon } from "@iconify/react"
 import { profileService } from "../../dataset_services/profileService"
 import ImageCropModal from "./ImageCropModal"
+import UserAvatar from "../common/UserAvatar"
 import CompletionCard from "./CompletionCard"
 import "./modal.css"
 
@@ -220,12 +220,13 @@ const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
         <Card className="h-52 w-52 lg:order-1 lg:justify-self-start p-0 shadow-none bg-transparent">
           <CardBody className="flex flex-col h-fit items-center p-0">
             <div className="relative">
-              <Avatar
-                src={profile?.profile_picture_url || "/default-profile.png"}
-                name={profile?.initials || "U"}
-                className="w-32 h-32 text-2xl shadow-lg"
+              <UserAvatar
+                src={profile?.profile_picture_url}
+                name={profile?.full_name || "کاربر ناشناس"}
+                seed={profileData?.id ?? profileData?.email ?? profile?.full_name}
+                size="lg"
+                className="shadow-lg"
               />
-
               <input
                 ref={fileInputRef}
                 type="file"

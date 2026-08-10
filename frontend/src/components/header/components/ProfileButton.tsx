@@ -1,9 +1,10 @@
 import { Icon } from "@iconify/react"
-import { useDisclosure, Avatar } from "@heroui/react"
+import { useDisclosure } from "@heroui/react"
 import { Link, useLocation } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { IconButtonProps } from "../types"
 import { AuthModal } from "../../auth/modal/AuthModal"
+import UserAvatar from "../../common/UserAvatar"
 
 export const ProfileButton = ({
   className,
@@ -30,12 +31,12 @@ export const ProfileButton = ({
               aria-label={ariaLabel}
               title={title}
             >
-              <Avatar
-                src={
-                  user?.profile?.profile_picture_url || "/default-profile.png"
-                }
-                className="header-nav__icon"
+              <UserAvatar
+                src={user?.profile?.profile_picture_url}
+                name={user?.profile?.full_name || user?.email || "User"}
+                seed={user?.id ?? user?.email}
                 size="sm"
+                className="header-nav__icon"
               />
             </button>
           </Link>
