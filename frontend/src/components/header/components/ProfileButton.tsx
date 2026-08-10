@@ -36,7 +36,6 @@ export const ProfileButton = ({
                 name={user?.profile?.full_name || user?.email || "User"}
                 seed={user?.id ?? user?.email}
                 size="sm"
-                className="header-nav__icon"
               />
             </button>
           </Link>
