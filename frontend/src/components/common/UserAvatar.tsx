@@ -40,7 +40,7 @@ interface UserAvatarProps {
 
 const getGlassVariantIndex = (seed?: string | number | null) => {
   if (seed === undefined || seed === null || seed === "") {
-    return Math.floor(Math.random() * glassVariants.length)
+    return 0
   }
 
   const hash = String(seed)

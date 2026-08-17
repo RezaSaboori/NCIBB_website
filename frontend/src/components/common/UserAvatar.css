@@ -44,8 +44,8 @@
 
 .user-avatar__eye {
   width: 12%;
-  height: 22%;
-  background: currentColor;
+  height: 25%;
+  background: var(--color-gray12);
   border-radius: var(--border-radius-pill);
   transform-origin: center;
   will-change: transform;

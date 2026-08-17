@@ -231,12 +231,13 @@
 }
 
 .header-nav--icon.is-authenticated {
-  width: calc(var(--header-icon-size) + 4px);
-  height: calc(var(--header-icon-size) + 4px);
+  padding: 0 0 !important;
 }
 
-.header-nav--icon.is-authenticated .header-nav__icon {
-  box-shadow: none;
+
+.header-nav--icon.is-authenticated .header-nav__avatar {
+  width: calc(var(--header-icon-size));
+  height: calc(var(--header-icon-size));
 }
 
 .header-nav__menu:not(:has(input:checked))::after {

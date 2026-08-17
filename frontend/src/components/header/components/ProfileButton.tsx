@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { Icon } from "@iconify/react"
 import { useDisclosure } from "@heroui/react"
 import { Link, useLocation } from "react-router-dom"
@@ -5,6 +6,7 @@ import { useSelector } from "react-redux"
 import { IconButtonProps } from "../types"
 import { AuthModal } from "../../auth/modal/AuthModal"
 import UserAvatar from "../../common/UserAvatar"
+import { getUserIdFromAccessToken } from "../../../utils/authToken"
 
 export const ProfileButton = ({
   className,
@@ -15,6 +17,10 @@ export const ProfileButton = ({
   const { isAuthenticated, user } = useSelector((state: any) => state.auth)
   const location = useLocation()
   const isActive = location.pathname.startsWith("/profile")
+  const tokenUserId = useMemo(
+    () => getUserIdFromAccessToken(),
+    [isAuthenticated, user?.id],
+  )
 
   return (
     <>
@@ -34,8 +40,9 @@ export const ProfileButton = ({
               <UserAvatar
                 src={user?.profile?.profile_picture_url}
                 name={user?.profile?.full_name || user?.email || "User"}
-                seed={user?.id ?? user?.email}
+                seed={user?.id ?? tokenUserId ?? user?.email}
                 size="sm"
+                className="header-nav__avatar"
               />
             </button>
           </Link>
