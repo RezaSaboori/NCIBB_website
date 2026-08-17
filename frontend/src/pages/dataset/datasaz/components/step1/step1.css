@@ -249,7 +249,6 @@
 }
 
 /* Compact sizing for the toggle when placed inside a card header */
-/* Compact sizing for the toggle when placed inside a card header */
 .s1-mode-toggle {
   height: 2rem;
   padding: 0 var(--spacing-xs);
