@@ -109,16 +109,6 @@
   color: var(--color-gray4);
 }
 
-.wrapper
-  .button-content
-  .button-content-inner
-  .search-results
-  .search-result
-  .search-result-title
-  .datayab-status-end {
-  flex: 0 0 1px;
-  height: 100%;
-}
 
 .wrapper
   .button-content

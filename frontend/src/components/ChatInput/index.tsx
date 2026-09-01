@@ -41,7 +41,7 @@ export const ChatInput = ({
 }: ChatInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const statusEndRef = useRef<HTMLSpanElement>(null)
+  const statusContainerRef = useRef<HTMLDivElement>(null)
 
   const [state, setState] = useState({
     step: 1, // 1: Initial, 2: Search
@@ -107,8 +107,14 @@ export const ChatInput = ({
     }
   }, [statusText, statusContent])
 
+  // Keep the newest end of the status line visible (RTL-safe manual scroll).
   useEffect(() => {
-    statusEndRef.current?.scrollIntoView({ block: "nearest", inline: "end" })
+    const container = statusContainerRef.current
+    if (!container) return
+    const maxScroll = container.scrollWidth - container.clientWidth
+    if (maxScroll <= 0) return
+    container.scrollLeft = -maxScroll
+    if (container.scrollLeft === 0) container.scrollLeft = maxScroll
   }, [statusText, typedStatusContent])
 
   useEffect(() => {
@@ -169,7 +175,7 @@ export const ChatInput = ({
                       className="search-result"
                       role="status"
                     >
-                      <div className="search-result-title">
+                      <div className="search-result-title" ref={statusContainerRef}>
                         <motion.span
                           key={statusText || "default"}
                           initial={{ opacity: 0 }}
@@ -184,7 +190,6 @@ export const ChatInput = ({
                             {typedStatusContent}
                           </span>
                         )}
-                        <span ref={statusEndRef} className="datayab-status-end" />
                       </div>
                     </motion.div>
                   )}

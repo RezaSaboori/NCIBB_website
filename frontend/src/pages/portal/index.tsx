@@ -179,8 +179,6 @@ export const PortalPage = () => {
     setSearchAttempted(true)
     setDatayabStatus("")
     setDatayabStatusContent("")
-    const searchStartTime = Date.now()
-    const minAnimationTime = 2000 // Corresponds to ChatInput's animation
     const fadeAnimationTime = 300
 
     // Fade out current results and wait for the animation to finish.
@@ -210,18 +208,8 @@ export const PortalPage = () => {
     } catch (error) {
       console.error("Datayab search failed:", error)
     }
-    const searchDuration = Date.now() - searchStartTime
-
-    // Ensure the loading animation is visible for a minimum duration.
-    if (searchDuration < minAnimationTime) {
-      await new Promise((resolve) =>
-        setTimeout(resolve, minAnimationTime - searchDuration)
-      )
-    }
-
+    // Cards take priority: render as soon as the stream delivers results.
     setSearchResults(results)
-
-    // Fade in new results.
     setDataContainerAnimationClass("fade-in")
     setResultsReady(true)
   }
