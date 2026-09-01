@@ -17,7 +17,7 @@ def datayab_search(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        results = search_databases(
+        payload = search_databases(
             serializer.validated_data["query"],
             top_k=serializer.validated_data.get("top_k"),
         )
@@ -28,4 +28,10 @@ def datayab_search(request):
     except RuntimeError as exc:
         return Response({"detail": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
 
-    return Response({"results": results, "count": len(results)})
+    return Response(
+        {
+            "results": payload["results"],
+            "count": len(payload["results"]),
+            "trace": payload["trace"],
+        }
+    )
