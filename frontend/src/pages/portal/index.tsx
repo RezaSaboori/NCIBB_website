@@ -509,7 +509,7 @@ export const PortalPage = () => {
               </div>
             )}
             <div className={`input-refresh-container step-${chatInputStep}`}>
-              {activeMode === "manual" && (
+              {(activeMode === "manual" || activeMode === "datayab") && (
                 <AnimatePresence>
                   {searchAttempted && (
                     <motion.div
