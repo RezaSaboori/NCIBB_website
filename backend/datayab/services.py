@@ -18,6 +18,7 @@ import logging
 
 import chromadb
 import httpx
+from chromadb.config import Settings
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -49,7 +50,10 @@ def _ollama_base() -> str:
 
 
 def _get_collection():
-    client = chromadb.PersistentClient(path=settings.DATAYAB_CHROMA_PATH)
+    client = chromadb.PersistentClient(
+        path=settings.DATAYAB_CHROMA_PATH,
+        settings=Settings(anonymized_telemetry=False),
+    )
     return client.get_or_create_collection(
         name=_COLLECTION_NAME, metadata={"hnsw:space": "cosine"}
     )
