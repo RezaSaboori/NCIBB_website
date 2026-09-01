@@ -105,8 +105,24 @@
   .search-results
   .search-result
   .search-result-title
+  .datayab-step-title {
+  flex-shrink: 0;
+}
+
+.wrapper
+  .button-content
+  .button-content-inner
+  .search-results
+  .search-result
+  .search-result-title
   .datayab-step-content {
   color: var(--color-gray4);
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  direction: ltr;
+  text-align: left;
 }
 
 

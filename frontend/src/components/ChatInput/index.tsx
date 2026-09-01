@@ -41,7 +41,7 @@ export const ChatInput = ({
 }: ChatInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const statusContainerRef = useRef<HTMLDivElement>(null)
+  const statusContentRef = useRef<HTMLSpanElement>(null)
 
   const [state, setState] = useState({
     step: 1, // 1: Initial, 2: Search
@@ -49,6 +49,7 @@ export const ChatInput = ({
     isLoading: false,
     isFocused: false,
   })
+  const [typedStatusContent, setTypedStatusContent] = useState("")
 
   const isUnsupported = useMemo(() => isUnsupportedBrowser(), [])
 
@@ -86,8 +87,6 @@ export const ChatInput = ({
     }
   }
 
-  const [typedStatusContent, setTypedStatusContent] = useState("")
-
   // Hold the step title alone for up to 2s, then type out the step's raw output.
   useEffect(() => {
     setTypedStatusContent("")
@@ -107,14 +106,11 @@ export const ChatInput = ({
     }
   }, [statusText, statusContent])
 
-  // Keep the newest end of the status line visible (RTL-safe manual scroll).
+  // The step content scrolls inside its own LTR box: a positive scrollLeft pins
+  // the newest characters in every browser, avoiding RTL scroll-direction quirks.
   useEffect(() => {
-    const container = statusContainerRef.current
-    if (!container) return
-    const maxScroll = container.scrollWidth - container.clientWidth
-    if (maxScroll <= 0) return
-    container.scrollLeft = -maxScroll
-    if (container.scrollLeft === 0) container.scrollLeft = maxScroll
+    const content = statusContentRef.current
+    if (content) content.scrollLeft = content.scrollWidth
   }, [statusText, typedStatusContent])
 
   useEffect(() => {
@@ -175,9 +171,10 @@ export const ChatInput = ({
                       className="search-result"
                       role="status"
                     >
-                      <div className="search-result-title" ref={statusContainerRef}>
+                      <div className="search-result-title">
                         <motion.span
                           key={statusText || "default"}
+                          className="datayab-step-title"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.15 }}
@@ -185,7 +182,11 @@ export const ChatInput = ({
                           {statusText || "در حال پردازش ..."}
                         </motion.span>
                         {typedStatusContent && (
-                          <span className="datayab-step-content" dir="auto">
+                          <span
+                            ref={statusContentRef}
+                            className="datayab-step-content"
+                            dir="ltr"
+                          >
                             {" — "}
                             {typedStatusContent}
                           </span>
