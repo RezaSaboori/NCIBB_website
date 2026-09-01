@@ -7,6 +7,7 @@ Flow:
                                        -> END
 """
 
+import json
 import logging
 from typing import TypedDict
 
@@ -179,8 +180,11 @@ def run_datayab_search(user_query: str, top_k: int | None = None) -> dict:
     return {"results": results, "trace": trace}
 
 
-def _node_status_event(node: str, update: dict) -> dict | None:
-    """Map a finished graph node to a user-facing progress event."""
+def _node_status_event(node: str, update: dict, trace: dict) -> dict | None:
+    """Map a finished graph node to a user-facing progress event.
+
+    "content" carries the step's raw output; the UI types it out after the title.
+    """
     if node == "analyze":
         intent = update.get("intent", {})
         return {
@@ -189,26 +193,41 @@ def _node_status_event(node: str, update: dict) -> dict | None:
             "search_query": intent.get("search_query"),
             "in_domain": intent.get("in_domain", True),
             "data_types": intent.get("data_types", []),
+            "content": trace.get("llm_raw") or json.dumps(intent, ensure_ascii=False),
         }
     if node == "retrieve":
         candidates = update.get("candidates", [])
+        in_range = [c for c in candidates if c["within_threshold"]]
+        content = " | ".join(
+            f"{c['metadata'].get('name', '')} ({c['distance']:.3f})" for c in in_range
+        )
         return {
             "type": "status",
             "step": "retrieve",
             "candidates": len(candidates),
-            "in_range": sum(1 for c in candidates if c["within_threshold"]),
+            "in_range": len(in_range),
+            "content": content or "—",
         }
     if node == "verify":
+        marks = {True: "✓", False: "✗", None: "•"}
+        content = " | ".join(
+            f"{marks[e['verified']]} {e['name']}: {e['reason']}"
+            for e in trace["candidates"]
+            if e["kept"]
+        )
         return {
             "type": "status",
             "step": "verify",
             "confirmed": len(update.get("results", [])),
+            "content": content or "—",
         }
     if node == "refine":
+        new_query = update.get("intent", {}).get("search_query")
         return {
             "type": "status",
             "step": "refine",
-            "search_query": update.get("intent", {}).get("search_query"),
+            "search_query": new_query,
+            "content": trace.get("refine_raw") or new_query or "—",
         }
     return None
 
@@ -243,7 +262,7 @@ def stream_datayab_search(user_query: str, top_k: int | None = None):
                     trace["where"] = update["where"]
                 if "retries" in update:
                     trace["retries"] = update["retries"]
-                event = _node_status_event(node, update)
+                event = _node_status_event(node, update, trace)
                 if event:
                     yield event
     except httpx.TimeoutException:

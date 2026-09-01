@@ -27,6 +27,7 @@ interface ChatInputProps {
   onSubmit?: (query: string) => Promise<void>
   onStepChange?: (step: number) => void
   statusText?: string
+  statusContent?: string
 }
 
 export const ChatInput = ({
@@ -36,10 +37,11 @@ export const ChatInput = ({
   onSubmit,
   onStepChange,
   statusText,
+  statusContent,
 }: ChatInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const statusRef = useRef<HTMLSpanElement>(null)
+  const statusEndRef = useRef<HTMLSpanElement>(null)
 
   const [state, setState] = useState({
     step: 1, // 1: Initial, 2: Search
@@ -84,9 +86,30 @@ export const ChatInput = ({
     }
   }
 
+  const [typedStatusContent, setTypedStatusContent] = useState("")
+
+  // Hold the step title alone for up to 2s, then type out the step's raw output.
   useEffect(() => {
-    statusRef.current?.scrollIntoView({ block: "nearest", inline: "end" })
-  }, [statusText])
+    setTypedStatusContent("")
+    if (!statusContent) return
+    let interval: ReturnType<typeof setInterval> | undefined
+    let index = 0
+    const timeout = setTimeout(() => {
+      interval = setInterval(() => {
+        index += 4
+        setTypedStatusContent(statusContent.slice(0, index))
+        if (index >= statusContent.length && interval) clearInterval(interval)
+      }, 20)
+    }, 2000)
+    return () => {
+      clearTimeout(timeout)
+      if (interval) clearInterval(interval)
+    }
+  }, [statusText, statusContent])
+
+  useEffect(() => {
+    statusEndRef.current?.scrollIntoView({ block: "nearest", inline: "end" })
+  }, [statusText, typedStatusContent])
 
   useEffect(() => {
     if (state.step === 2) {
@@ -148,14 +171,20 @@ export const ChatInput = ({
                     >
                       <div className="search-result-title">
                         <motion.span
-                          ref={statusRef}
-                          key={statusText ?? "default"}
+                          key={statusText || "default"}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.15 }}
                         >
-                          {statusText ?? "در حال پردازش ..."}
+                          {statusText || "در حال پردازش ..."}
                         </motion.span>
+                        {typedStatusContent && (
+                          <span className="datayab-step-content" dir="auto">
+                            {" — "}
+                            {typedStatusContent}
+                          </span>
+                        )}
+                        <span ref={statusEndRef} className="datayab-status-end" />
                       </div>
                     </motion.div>
                   )}

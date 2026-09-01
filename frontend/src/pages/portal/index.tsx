@@ -61,6 +61,7 @@ export const PortalPage = () => {
   const [searchAttempted, setSearchAttempted] = useState(false)
   const [resultsReady, setResultsReady] = useState(false)
   const [datayabStatus, setDatayabStatus] = useState("")
+  const [datayabStatusContent, setDatayabStatusContent] = useState("")
   const [selectedFilters, setSelectedFilters] = useState<"all" | Set<string>>(
     new Set()
   )
@@ -132,6 +133,7 @@ export const PortalPage = () => {
           setSearchResults([])
           setResultsReady(false)
           setDatayabStatus("")
+          setDatayabStatusContent("")
         }
         setTimeout(() => {
           setChatInputAnimationClass("fade-in")
@@ -176,6 +178,7 @@ export const PortalPage = () => {
   const handleDatayabSearch = async (query: string) => {
     setSearchAttempted(true)
     setDatayabStatus("")
+    setDatayabStatusContent("")
     const searchStartTime = Date.now()
     const minAnimationTime = 2000 // Corresponds to ChatInput's animation
     const fadeAnimationTime = 300
@@ -186,7 +189,10 @@ export const PortalPage = () => {
 
     let results: DatabaseInfo[] = []
     try {
-      const data = await searchDatayabStream(query, setDatayabStatus)
+      const data = await searchDatayabStream(query, (message, content) => {
+        setDatayabStatus(message)
+        setDatayabStatusContent(content ?? "")
+      })
       results = data.results
       console.groupCollapsed(`Datayab RAG trace: "${query}"`)
       console.log("LLM raw response:", data.trace.llm_raw)
@@ -229,6 +235,7 @@ export const PortalPage = () => {
     setSearchResults([])
     setResultsReady(false)
     setDatayabStatus("")
+    setDatayabStatusContent("")
     setDataContainerAnimationClass("fade-in")
   }
 
@@ -550,6 +557,9 @@ export const PortalPage = () => {
                       : undefined
                 }
                 statusText={activeMode === "datayab" ? datayabStatus : undefined}
+                statusContent={
+                  activeMode === "datayab" ? datayabStatusContent : undefined
+                }
                 onStepChange={setChatInputStep}
               />
             </div>

@@ -42,6 +42,7 @@ interface DatayabStatusEvent {
   candidates?: number
   in_range?: number
   confirmed?: number
+  content?: string
 }
 
 const datayabStatusMessage = (event: DatayabStatusEvent): string => {
@@ -74,7 +75,7 @@ const postSearch = (query: string, withAuth: boolean) => {
 
 export const searchDatayabStream = async (
   query: string,
-  onStatus: (message: string) => void
+  onStatus: (message: string, content?: string) => void
 ): Promise<DatayabSearchResponse> => {
   // Public endpoint: an expired JWT 401s before AllowAny runs, so retry anonymously.
   let response = await postSearch(query, true)
@@ -101,7 +102,7 @@ export const searchDatayabStream = async (
       if (!line.startsWith("data:")) continue
       const data = JSON.parse(line.slice(5))
       if (data.type === "status") {
-        onStatus(datayabStatusMessage(data))
+        onStatus(datayabStatusMessage(data), data.content)
       } else if (data.type === "result") {
         payload = { results: data.results, count: data.count, trace: data.trace }
       } else if (data.type === "error") {
