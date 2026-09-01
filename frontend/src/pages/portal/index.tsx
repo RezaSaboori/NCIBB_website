@@ -17,6 +17,7 @@ import { useDataFinderModeIndicator } from "./hooks/useDataFinderModeIndicator"
 import { getDatabases } from "./utils/csv"
 import { DatabaseInfo } from "../../types/database"
 import { searchInCsv } from "../../components/Search"
+import { searchDatayab } from "../../dataset_services/datayabService"
 import { refreshButtonVariants } from "../../components/ChatInput/animations"
 import { RefreshIcon } from "../../components/ChatInput/icons/RefreshIcon"
 import { HarmonicDensity } from "../../components/bot/components/HarmonicDensity"
@@ -167,6 +168,37 @@ export const PortalPage = () => {
     setDataContainerAnimationClass("fade-in")
   }
 
+  const handleDatayabSearch = async (query: string) => {
+    setSearchAttempted(true)
+    const searchStartTime = Date.now()
+    const minAnimationTime = 2000 // Corresponds to ChatInput's animation
+    const fadeAnimationTime = 300
+
+    // Fade out current results and wait for the animation to finish.
+    setDataContainerAnimationClass("fade-out")
+    await new Promise((resolve) => setTimeout(resolve, fadeAnimationTime))
+
+    let results: DatabaseInfo[] = []
+    try {
+      results = await searchDatayab(query)
+    } catch (error) {
+      console.error("Datayab search failed:", error)
+    }
+    const searchDuration = Date.now() - searchStartTime
+
+    // Ensure the loading animation is visible for a minimum duration.
+    if (searchDuration < minAnimationTime) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, minAnimationTime - searchDuration)
+      )
+    }
+
+    setSearchResults(results)
+
+    // Fade in new results.
+    setDataContainerAnimationClass("fade-in")
+  }
+
   const handleClearSearch = async () => {
     console.log("Refresh button clicked")
     const fadeAnimationTime = 300
@@ -188,7 +220,9 @@ export const PortalPage = () => {
   }, [databases])
 
   const displayedDatabases =
-    activeMode === "manual" && searchAttempted ? searchResults : databases
+    (activeMode === "manual" || activeMode === "datayab") && searchAttempted
+      ? searchResults
+      : databases
 
   const processedDatabases = useMemo(() => {
     let filtered = displayedDatabases
@@ -206,7 +240,7 @@ export const PortalPage = () => {
         ? selectedSort.values().next().value
         : selectedSort
 
-    if (sortKey) {
+    if (sortKey && !(activeMode === "datayab" && searchAttempted)) {
       return [...filtered].sort((a, b) => {
         switch (sortKey) {
           case "امتیاز":
@@ -224,7 +258,7 @@ export const PortalPage = () => {
     }
 
     return filtered
-  }, [displayedDatabases, selectedFilters, selectedSort])
+  }, [displayedDatabases, selectedFilters, selectedSort, activeMode, searchAttempted])
 
   return (
     <div className="holistic-page-wrapper">
@@ -485,7 +519,13 @@ export const PortalPage = () => {
                 className="chat-input-override"
                 buttonText={chatInputConfig[activeMode].buttonText}
                 placeholderText={chatInputConfig[activeMode].placeholderText}
-                onSubmit={activeMode === "manual" ? handleSearch : undefined}
+                onSubmit={
+                  activeMode === "manual"
+                    ? handleSearch
+                    : activeMode === "datayab"
+                      ? handleDatayabSearch
+                      : undefined
+                }
                 onStepChange={setChatInputStep}
               />
             </div>

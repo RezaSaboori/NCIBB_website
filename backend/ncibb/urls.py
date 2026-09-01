@@ -16,6 +16,7 @@ urlpatterns = [
     path('api/messaging/', include('messaging.urls')),
     path('api/core/', include('core.urls')),
     path('api/datasaz/', include('datasaz.urls')),
+    path('api/datayab/', include('datayab.urls')),
 ]
 
 # In production, serve the React SPA for any non-API route

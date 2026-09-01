@@ -43,6 +43,7 @@ LOCAL_APPS = [
     'messaging',
     'core',
     'datasaz',
+    'datayab',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -213,6 +214,15 @@ CORS_ALLOW_METHODS = [
 
 # Ontology Autocomplete microservice — server-internal address only
 ONTOLOGY_API_URL = os.environ.get("ONTOLOGY_API_URL", "http://127.0.0.1:5175")
+
+# Datayab RAG search (Ollama + ChromaDB)
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
+OLLAMA_LLM_MODEL = os.environ.get("OLLAMA_LLM_MODEL", "alibayram/medgemma:4b")
+OLLAMA_EMBED_MODEL = os.environ.get("OLLAMA_EMBED_MODEL", "qwen3-embedding:0.6b")
+DATAYAB_CHROMA_PATH = os.environ.get("DATAYAB_CHROMA_PATH", str(BASE_DIR / "chroma_db"))
+DATAYAB_CSV_PATH = os.environ.get("DATAYAB_CSV_PATH", str(BASE_DIR.parent / "frontend" / "data" / "databases_infos.csv"))
+DATAYAB_TOP_K = int(os.environ.get("DATAYAB_TOP_K", "12"))
+DATAYAB_MAX_DISTANCE = float(os.environ.get("DATAYAB_MAX_DISTANCE", "0.6"))
 
 # Logging Configuration
 LOGGING = {
