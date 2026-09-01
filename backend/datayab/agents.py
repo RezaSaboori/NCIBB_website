@@ -42,14 +42,17 @@ _VERIFIER_PROMPT = ChatPromptTemplate.from_messages(
     [
         (
             "system",
-            """You are the verification agent of a biomedical dataset catalog. You decide which retrieved candidates genuinely match the user's request.
+            """You are the verification agent of a biomedical dataset catalog. You filter retrieved candidate datasets down to those that genuinely satisfy the user's request.
+
+Judge each candidate with this rubric:
+1. CONDITION MATCH — applies only if the user's request names a condition, disease, or phenomenon. The dataset must explicitly involve it: subjects diagnosed with it, annotations/labels for it, or an experiment designed around it. Datasets with only healthy subjects, or datasets about a different condition of the same organ system, do NOT match. If the request names no condition, skip this criterion.
+2. PURPOSE MATCH — the dataset was collected for, or is demonstrably suited to, the user's stated task (prediction, diagnosis, benchmarking, analysis). A signal or variable that merely appears in the dataset as a side effect of another study goal is NOT a match.
+3. EVIDENCE — base the verdict strictly on what the candidate's summary, topics, and details state. Never infer a match from modality, organ system, or keywords alone. If the evidence does not explicitly confirm the requested condition or purpose, mark the candidate not relevant.
 
 For EVERY candidate output:
 - "n": the candidate number
-- "relevant": true only if the dataset's actual content directly serves the user's stated need. Sharing a modality or an organ system is NOT enough — the dataset must have been collected for a compatible purpose.
-- "reason": one short sentence justifying the verdict.
-
-Example: for the request "databases about heart failure", a dataset of ECG/PPG signals collected to benchmark respiratory-rate estimation is NOT relevant, even though it contains cardiac signals.
+- "relevant": true only when all applicable criteria hold
+- "reason": one short sentence citing the specific evidence behind the verdict
 
 Return JSON: {{"verdicts": [{{"n": 1, "relevant": true, "reason": "..."}}]}}
 Respond with JSON only, no prose.""",
@@ -112,7 +115,10 @@ def run_verifier(user_query: str, candidates: list[dict]) -> tuple[list[dict], s
     if not candidates:
         return [], None
     numbered = "\n".join(
-        f"{i + 1}. {c['metadata'].get('name', '')} — {c['metadata'].get('short_description', '')}"
+        f"{i + 1}. {c['metadata'].get('name', '')}\n"
+        f"   Summary: {c['metadata'].get('short_description', '')}\n"
+        f"   Topics: {c['metadata'].get('topics', '').replace('||', ', ') or '—'}\n"
+        f"   Details: {c['metadata'].get('description', '')}"
         for i, c in enumerate(candidates)
     )
     chain = _VERIFIER_PROMPT | _llm(settings.DATAYAB_VERIFIER_MODEL) | JsonOutputParser()
