@@ -18,7 +18,6 @@ import { getDatabases } from "./utils/csv"
 import { DatabaseInfo } from "../../types/database"
 import { searchInCsv } from "../../components/Search"
 import { searchDatayab } from "../../dataset_services/datayabService"
-import { searchDatayab } from "../../dataset_services/datayabService"
 import { refreshButtonVariants } from "../../components/ChatInput/animations"
 import { RefreshIcon } from "../../components/ChatInput/icons/RefreshIcon"
 import { HarmonicDensity } from "../../components/bot/components/HarmonicDensity"
@@ -154,37 +153,6 @@ export const PortalPage = () => {
         ? selectedSearchSubject.values().next().value
         : "همه"
     const results = await searchInCsv(query, subject)
-    const searchDuration = Date.now() - searchStartTime
-
-    // Ensure the loading animation is visible for a minimum duration.
-    if (searchDuration < minAnimationTime) {
-      await new Promise((resolve) =>
-        setTimeout(resolve, minAnimationTime - searchDuration)
-      )
-    }
-
-    setSearchResults(results)
-
-    // Fade in new results.
-    setDataContainerAnimationClass("fade-in")
-  }
-
-  const handleDatayabSearch = async (query: string) => {
-    setSearchAttempted(true)
-    const searchStartTime = Date.now()
-    const minAnimationTime = 2000 // Corresponds to ChatInput's animation
-    const fadeAnimationTime = 300
-
-    // Fade out current results and wait for the animation to finish.
-    setDataContainerAnimationClass("fade-out")
-    await new Promise((resolve) => setTimeout(resolve, fadeAnimationTime))
-
-    let results: DatabaseInfo[] = []
-    try {
-      results = await searchDatayab(query)
-    } catch (error) {
-      console.error("Datayab search failed:", error)
-    }
     const searchDuration = Date.now() - searchStartTime
 
     // Ensure the loading animation is visible for a minimum duration.
