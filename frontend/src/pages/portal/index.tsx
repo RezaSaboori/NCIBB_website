@@ -17,7 +17,7 @@ import { useDataFinderModeIndicator } from "./hooks/useDataFinderModeIndicator"
 import { getDatabases } from "./utils/csv"
 import { DatabaseInfo } from "../../types/database"
 import { searchInCsv } from "../../components/Search"
-import { searchDatayab } from "../../dataset_services/datayabService"
+import { searchDatayabStream } from "../../dataset_services/datayabService"
 import { refreshButtonVariants } from "../../components/ChatInput/animations"
 import { RefreshIcon } from "../../components/ChatInput/icons/RefreshIcon"
 import { HarmonicDensity } from "../../components/bot/components/HarmonicDensity"
@@ -59,6 +59,8 @@ export const PortalPage = () => {
     useState("")
   const [searchResults, setSearchResults] = useState<DatabaseInfo[]>([])
   const [searchAttempted, setSearchAttempted] = useState(false)
+  const [resultsReady, setResultsReady] = useState(false)
+  const [datayabStatus, setDatayabStatus] = useState("")
   const [selectedFilters, setSelectedFilters] = useState<"all" | Set<string>>(
     new Set()
   )
@@ -128,6 +130,8 @@ export const PortalPage = () => {
         if (mode !== "manual") {
           setSearchAttempted(false)
           setSearchResults([])
+          setResultsReady(false)
+          setDatayabStatus("")
         }
         setTimeout(() => {
           setChatInputAnimationClass("fade-in")
@@ -166,10 +170,12 @@ export const PortalPage = () => {
 
     // Fade in new results.
     setDataContainerAnimationClass("fade-in")
+    setResultsReady(true)
   }
 
   const handleDatayabSearch = async (query: string) => {
     setSearchAttempted(true)
+    setDatayabStatus("")
     const searchStartTime = Date.now()
     const minAnimationTime = 2000 // Corresponds to ChatInput's animation
     const fadeAnimationTime = 300
@@ -180,7 +186,7 @@ export const PortalPage = () => {
 
     let results: DatabaseInfo[] = []
     try {
-      const data = await searchDatayab(query)
+      const data = await searchDatayabStream(query, setDatayabStatus)
       results = data.results
       console.groupCollapsed(`Datayab RAG trace: "${query}"`)
       console.log("LLM raw response:", data.trace.llm_raw)
@@ -211,6 +217,7 @@ export const PortalPage = () => {
 
     // Fade in new results.
     setDataContainerAnimationClass("fade-in")
+    setResultsReady(true)
   }
 
   const handleClearSearch = async () => {
@@ -220,6 +227,8 @@ export const PortalPage = () => {
     await new Promise((resolve) => setTimeout(resolve, fadeAnimationTime))
     setSearchAttempted(false)
     setSearchResults([])
+    setResultsReady(false)
+    setDatayabStatus("")
     setDataContainerAnimationClass("fade-in")
   }
 
@@ -511,7 +520,7 @@ export const PortalPage = () => {
             <div className={`input-refresh-container step-${chatInputStep}`}>
               {(activeMode === "manual" || activeMode === "datayab") && (
                 <AnimatePresence>
-                  {searchAttempted && (
+                  {resultsReady && (
                     <motion.div
                       key="refresh-fab"
                       className="refresh-fab"
@@ -540,6 +549,7 @@ export const PortalPage = () => {
                       ? handleDatayabSearch
                       : undefined
                 }
+                statusText={activeMode === "datayab" ? datayabStatus : undefined}
                 onStepChange={setChatInputStep}
               />
             </div>

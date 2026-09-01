@@ -10,6 +10,7 @@ Flow:
 import logging
 from typing import TypedDict
 
+import httpx
 from django.conf import settings
 from langgraph.graph import END, StateGraph
 
@@ -176,3 +177,84 @@ def run_datayab_search(user_query: str, top_k: int | None = None) -> dict:
     trace["kept_count"] = len(results)
     trace["retries"] = final.get("retries", 0)
     return {"results": results, "trace": trace}
+
+
+def _node_status_event(node: str, update: dict) -> dict | None:
+    """Map a finished graph node to a user-facing progress event."""
+    if node == "analyze":
+        intent = update.get("intent", {})
+        return {
+            "type": "status",
+            "step": "analyze",
+            "search_query": intent.get("search_query"),
+            "in_domain": intent.get("in_domain", True),
+            "data_types": intent.get("data_types", []),
+        }
+    if node == "retrieve":
+        candidates = update.get("candidates", [])
+        return {
+            "type": "status",
+            "step": "retrieve",
+            "candidates": len(candidates),
+            "in_range": sum(1 for c in candidates if c["within_threshold"]),
+        }
+    if node == "verify":
+        return {
+            "type": "status",
+            "step": "verify",
+            "confirmed": len(update.get("results", [])),
+        }
+    if node == "refine":
+        return {
+            "type": "status",
+            "step": "refine",
+            "search_query": update.get("intent", {}).get("search_query"),
+        }
+    return None
+
+
+def stream_datayab_search(user_query: str, top_k: int | None = None):
+    """Yield SSE-ready event dicts as the agent graph progresses."""
+    trace = {
+        "user_query": user_query,
+        "llm_raw": None,
+        "intent": None,
+        "where": None,
+        "verify_raw": None,
+        "candidates": [],
+        "kept_count": 0,
+        "max_distance": settings.DATAYAB_MAX_DISTANCE,
+        "retries": 0,
+    }
+    initial = {
+        "user_query": user_query,
+        "top_k": top_k or settings.DATAYAB_TOP_K,
+        "retries": 0,
+        "results": [],
+        "trace": trace,
+    }
+    results: list[dict] = []
+    try:
+        for chunk in _graph.stream(initial, stream_mode="updates"):
+            for node, update in chunk.items():
+                if "results" in update:
+                    results = update["results"]
+                if "where" in update:
+                    trace["where"] = update["where"]
+                if "retries" in update:
+                    trace["retries"] = update["retries"]
+                event = _node_status_event(node, update)
+                if event:
+                    yield event
+    except httpx.TimeoutException:
+        yield {"type": "error", "detail": "Ollama service timed out."}
+        return
+    except httpx.RequestError:
+        yield {"type": "error", "detail": "Ollama service unreachable."}
+        return
+    except RuntimeError as exc:
+        yield {"type": "error", "detail": str(exc)}
+        return
+
+    trace["kept_count"] = len(results)
+    yield {"type": "result", "results": results, "count": len(results), "trace": trace}

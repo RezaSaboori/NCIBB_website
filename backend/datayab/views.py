@@ -1,37 +1,31 @@
-import httpx
+import json
+
+from django.http import StreamingHttpResponse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from .graph import stream_datayab_search
 from .serializers import DatayabSearchSerializer
-from .services import search_databases
 
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def datayab_search(request):
-    """Semantic (RAG) search over the databases catalog via Ollama + ChromaDB."""
+    """Semantic (RAG) search over the databases catalog; streams agent progress as SSE."""
     serializer = DatayabSearchSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    try:
-        payload = search_databases(
+    def event_stream():
+        for event in stream_datayab_search(
             serializer.validated_data["query"],
             top_k=serializer.validated_data.get("top_k"),
-        )
-    except httpx.TimeoutException:
-        return Response({"detail": "Ollama service timed out."}, status=status.HTTP_504_GATEWAY_TIMEOUT)
-    except httpx.RequestError:
-        return Response({"detail": "Ollama service unreachable."}, status=status.HTTP_502_BAD_GATEWAY)
-    except RuntimeError as exc:
-        return Response({"detail": str(exc)}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+        ):
+            yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
 
-    return Response(
-        {
-            "results": payload["results"],
-            "count": len(payload["results"]),
-            "trace": payload["trace"],
-        }
-    )
+    response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
+    response["Cache-Control"] = "no-cache"
+    response["X-Accel-Buffering"] = "no"
+    return response

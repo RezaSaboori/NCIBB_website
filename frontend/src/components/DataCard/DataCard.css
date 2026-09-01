@@ -6,7 +6,7 @@
 
 .data-container {
   width: 80vw;
-  margin: 0 auto;
+  margin: 0 auto var(--spacing-5xl) auto;
   display: flex;
   gap: var(--spacing-4xl);
   align-items: flex-start;

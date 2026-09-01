@@ -26,6 +26,7 @@ interface ChatInputProps {
   placeholderText?: string
   onSubmit?: (query: string) => Promise<void>
   onStepChange?: (step: number) => void
+  statusText?: string
 }
 
 export const ChatInput = ({
@@ -34,9 +35,11 @@ export const ChatInput = ({
   placeholderText = "داده ای که میخواهید جستجو کنید را وارد کنید",
   onSubmit,
   onStepChange,
+  statusText,
 }: ChatInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const statusRef = useRef<HTMLSpanElement>(null)
 
   const [state, setState] = useState({
     step: 1, // 1: Initial, 2: Search
@@ -80,6 +83,10 @@ export const ChatInput = ({
       handleSearchSubmit()
     }
   }
+
+  useEffect(() => {
+    statusRef.current?.scrollIntoView({ block: "nearest", inline: "end" })
+  }, [statusText])
 
   useEffect(() => {
     if (state.step === 2) {
@@ -141,11 +148,13 @@ export const ChatInput = ({
                     >
                       <div className="search-result-title">
                         <motion.span
+                          ref={statusRef}
+                          key={statusText ?? "default"}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          transition={{ delay: 0.3 }}
+                          transition={{ delay: 0.15 }}
                         >
-                          در حال پردازش ...
+                          {statusText ?? "در حال پردازش ..."}
                         </motion.span>
                       </div>
                     </motion.div>
