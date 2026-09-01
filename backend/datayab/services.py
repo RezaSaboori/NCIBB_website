@@ -86,7 +86,9 @@ def generate_json(prompt: str) -> dict:
     with httpx.Client(timeout=_GENERATE_TIMEOUT) as client:
         resp = client.post(f"{_ollama_base()}/api/generate", json=payload)
         resp.raise_for_status()
-    return json.loads(resp.json()["response"])
+    raw = resp.json()["response"]
+    logger.info("Datayab LLM raw response: %s", raw)
+    return json.loads(raw)
 
 
 def _split_variables(value: str) -> list[str]:
@@ -238,12 +240,14 @@ def rewrite_query(user_query: str) -> dict:
         logger.exception("Datayab query rewrite failed; using raw query")
         return fallback
 
-    return {
+    intent = {
         "search_query": str(parsed.get("search_query") or user_query),
         "data_types": [t for t in parsed.get("data_types") or [] if t in VALID_DATA_TYPES],
         "year_min": parsed.get("year_min") if isinstance(parsed.get("year_min"), int) else None,
         "year_max": parsed.get("year_max") if isinstance(parsed.get("year_max"), int) else None,
     }
+    logger.info("Datayab query intent: %s", intent)
+    return intent
 
 
 def _build_where(intent: dict):
@@ -272,17 +276,32 @@ def search_databases(user_query: str, top_k: int | None = None) -> list[dict]:
         raise RuntimeError("Datayab index is empty. Run: python manage.py embed_databases")
 
     intent = rewrite_query(user_query)
+    where = _build_where(intent)
+    logger.info("Datayab Chroma where filter: %s", where)
     vector = embed_texts([intent["search_query"]])[0]
     res = collection.query(
         query_embeddings=[vector],
         n_results=min(top_k, count),
-        where=_build_where(intent),
+        where=where,
         include=["metadatas", "distances"],
     )
 
     max_distance = settings.DATAYAB_MAX_DISTANCE
     results = []
     for meta, distance in zip(res["metadatas"][0], res["distances"][0]):
-        if distance <= max_distance:
+        kept = distance <= max_distance
+        logger.info(
+            "Datayab candidate: distance=%.4f %s | %s",
+            distance,
+            "KEPT" if kept else "DROPPED",
+            meta.get("name", ""),
+        )
+        if kept:
             results.append(_metadata_to_database(meta))
+    logger.info(
+        "Datayab search: %d/%d candidates kept (threshold %.2f)",
+        len(results),
+        len(res["distances"][0]),
+        max_distance,
+    )
     return results
