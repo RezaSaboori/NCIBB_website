@@ -186,6 +186,10 @@ export const PortalPage = () => {
       console.log("LLM raw response:", data.trace.llm_raw)
       console.log("Parsed intent:", data.trace.intent)
       console.log("Chroma where filter:", data.trace.where)
+      console.log("Verify raw response:", data.trace.verify_raw)
+      if (data.trace.retries > 0) {
+        console.log(`Refined query (retry ${data.trace.retries}):`, data.trace.refined_query)
+      }
       console.table(data.trace.candidates)
       console.log(
         `Kept ${data.trace.kept_count}/${data.trace.candidates.length} candidates (threshold ${data.trace.max_distance})`

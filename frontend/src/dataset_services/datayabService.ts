@@ -6,6 +6,7 @@ export interface DatayabCandidateTrace {
   distance: number
   kept: boolean
   verified: boolean | null
+  reason: string | null
 }
 
 export interface DatayabTrace {
@@ -17,11 +18,14 @@ export interface DatayabTrace {
     year_min: number | null
     year_max: number | null
     in_domain: boolean
-  }
+  } | null
   where: Record<string, unknown> | null
+  verify_raw: string | null
+  refined_query?: string
   candidates: DatayabCandidateTrace[]
   kept_count: number
   max_distance: number
+  retries: number
 }
 
 interface DatayabSearchResponse {

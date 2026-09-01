@@ -23,3 +23,7 @@ httpx==0.27.0
 
 # Datayab RAG vector store
 chromadb==1.5.9
+
+# Datayab multi-agent pipeline
+langchain-ollama==1.1.0
+langgraph==1.2.11

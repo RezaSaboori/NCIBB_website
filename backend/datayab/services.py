@@ -1,19 +1,13 @@
 """
-Datayab RAG service.
+Datayab data layer.
 
-Technique: record-level semantic embedding + self-query retrieval.
-- Ingestion: each row of databases_infos.csv is rendered into an enriched
-  text document, embedded via Ollama, and upserted into a persistent
-  ChromaDB collection. All DataCard fields are stored as metadata so search
-  results are render-ready.
-- Search: the LLM rewrites the (Persian/English) user request into an
-  English semantic query plus structured metadata filters, the query is
-  embedded, and ChromaDB returns the closest records above a distance
-  threshold.
+- CSV parsing and enriched document building for ingestion into ChromaDB.
+- Ollama embedding client and ChromaDB collection access.
+- search_databases() is a thin facade over the multi-agent LangGraph
+  pipeline in datayab.graph (LLM agents live in datayab.agents).
 """
 
 import csv
-import json
 import logging
 
 import chromadb
@@ -28,34 +22,6 @@ VALID_DATA_TYPES = ("image", "text", "sequence", "omics", "table", "signal")
 _COLLECTION_NAME = "databases"
 _EMBED_BATCH_SIZE = 16
 _EMBED_TIMEOUT = 120.0
-_GENERATE_TIMEOUT = 180.0
-
-_QUERY_REWRITE_PROMPT = """You are a query-understanding component for a biomedical dataset catalog search engine.
-
-The catalog contains English metadata describing public biomedical and physiological datasets.
-
-Rewrite the user's request (Persian/Farsi or English) into a concise English semantic search query, and extract optional structured filters.
-
-Rules:
-- "search_query": English only, one or two natural sentences naming the data modality and the clinical/scientific topic. No keyword lists.
-- "data_types": subset of ["image", "text", "sequence", "omics", "table", "signal"], or [] if unspecified. ECG/EEG/PPG/pressure waveforms are "signal"; CT/X-ray/MRI/photos are "image"; video/motion capture are "sequence".
-- "year_min" / "year_max": integer bounds on the dataset release year, or null if unspecified.
-- "in_domain": true only if the user is looking for a biomedical, clinical, physiological, or health-related research dataset; false for unrelated topics (e.g. movies, finance, sports, general web data).
-- Respond with JSON only, no prose.
-
-User request: {query}"""
-
-_VERIFY_PROMPT = """You are a strict relevance filter for a biomedical dataset catalog.
-
-User request: {query}
-
-Candidate datasets:
-{candidates}
-
-Return JSON: {{"relevant": [<candidate numbers>]}} listing only the candidates whose data can directly serve the user's stated need.
-- Judge against the user's original request, not against the rewritten query.
-- If none are relevant, or the request is unrelated to biomedical/physiological research data, return an empty list.
-- Respond with JSON only, no prose."""
 
 
 def _ollama_base() -> str:
@@ -85,22 +51,6 @@ def embed_texts(texts: list[str]) -> list[list[float]]:
             resp.raise_for_status()
             vectors.extend(resp.json()["embeddings"])
     return vectors
-
-
-def generate_json(prompt: str) -> tuple[dict, str]:
-    """Run the LLM in JSON mode; return (parsed JSON, raw response text)."""
-    payload = {
-        "model": settings.OLLAMA_LLM_MODEL,
-        "prompt": prompt,
-        "stream": False,
-        "format": "json",
-        "options": {"temperature": 0},
-    }
-    with httpx.Client(timeout=_GENERATE_TIMEOUT) as client:
-        resp = client.post(f"{_ollama_base()}/api/generate", json=payload)
-        resp.raise_for_status()
-    raw = resp.json()["response"]
-    return json.loads(raw), raw
 
 
 def _split_variables(value: str) -> list[str]:
@@ -243,32 +193,6 @@ def ingest_databases() -> int:
     return len(rows)
 
 
-def rewrite_query(user_query: str) -> tuple[dict, str | None]:
-    """LLM self-query step: English search query + structured filters. Falls back to raw query."""
-    fallback = {
-        "search_query": user_query,
-        "data_types": [],
-        "year_min": None,
-        "year_max": None,
-        "in_domain": True,
-    }
-    try:
-        parsed, raw = generate_json(_QUERY_REWRITE_PROMPT.format(query=user_query))
-    except (httpx.HTTPError, ValueError, KeyError):
-        logger.exception("Datayab query rewrite failed; using raw query")
-        return fallback, None
-
-    intent = {
-        "search_query": str(parsed.get("search_query") or user_query),
-        "data_types": [t for t in parsed.get("data_types") or [] if t in VALID_DATA_TYPES],
-        "year_min": parsed.get("year_min") if isinstance(parsed.get("year_min"), int) else None,
-        "year_max": parsed.get("year_max") if isinstance(parsed.get("year_max"), int) else None,
-        "in_domain": bool(parsed.get("in_domain", True)),
-    }
-    logger.info("Datayab query intent: %s", intent)
-    return intent, raw
-
-
 def _build_where(intent: dict):
     clauses = []
     types = intent["data_types"]
@@ -287,104 +211,8 @@ def _build_where(intent: dict):
     return {"$and": clauses}
 
 
-def verify_candidates(user_query: str, candidates: list[dict]) -> list[dict] | None:
-    """LLM relevance check over retrieved candidates.
-
-    Returns the confirmed subset, an empty list when nothing is relevant,
-    or None when the check itself failed (caller then fails open).
-    """
-    if not candidates:
-        return []
-    numbered = "\n".join(
-        f"{i + 1}. {m.get('name', '')} — {m.get('short_description', '')}"
-        for i, m in enumerate(candidates)
-    )
-    try:
-        parsed, raw = generate_json(
-            _VERIFY_PROMPT.format(query=user_query, candidates=numbered)
-        )
-    except (httpx.HTTPError, ValueError, KeyError):
-        logger.exception("Datayab verification failed; keeping distance-filtered results")
-        return None
-
-    logger.info("Datayab verify raw response: %s", raw)
-    indices = parsed.get("relevant") or []
-    picked = [
-        candidates[idx - 1]
-        for idx in indices
-        if isinstance(idx, int) and 1 <= idx <= len(candidates)
-    ]
-    logger.info("Datayab verify: %d/%d candidates confirmed", len(picked), len(candidates))
-    return picked
-
-
 def search_databases(user_query: str, top_k: int | None = None) -> dict:
-    top_k = top_k or settings.DATAYAB_TOP_K
-    collection = _get_collection()
-    count = collection.count()
-    if count == 0:
-        raise RuntimeError("Datayab index is empty. Run: python manage.py embed_databases")
+    """Run the multi-agent RAG pipeline (see datayab.graph)."""
+    from .graph import run_datayab_search  # deferred: graph imports this module
 
-    intent, llm_raw = rewrite_query(user_query)
-    where = _build_where(intent)
-    max_distance = settings.DATAYAB_MAX_DISTANCE
-    trace = {
-        "user_query": user_query,
-        "llm_raw": llm_raw,
-        "intent": intent,
-        "where": where,
-        "candidates": [],
-        "kept_count": 0,
-        "max_distance": max_distance,
-    }
-
-    if not intent["in_domain"]:
-        logger.info("Datayab: request flagged out-of-domain; returning no results")
-        return {"results": [], "trace": trace}
-
-    logger.info("Datayab Chroma where filter: %s", where)
-    vector = embed_texts([intent["search_query"]])[0]
-    res = collection.query(
-        query_embeddings=[vector],
-        n_results=min(top_k, count),
-        where=where,
-        include=["metadatas", "distances"],
-    )
-
-    kept_metas = []
-    for meta, distance in zip(res["metadatas"][0], res["distances"][0]):
-        within = distance <= max_distance
-        trace["candidates"].append(
-            {
-                "name": meta.get("name", ""),
-                "distance": round(distance, 4),
-                "kept": within,
-                "verified": None,
-            }
-        )
-        logger.info(
-            "Datayab candidate: distance=%.4f %s | %s",
-            distance,
-            "KEPT" if within else "DROPPED",
-            meta.get("name", ""),
-        )
-        if within:
-            kept_metas.append(meta)
-
-    verified_metas = verify_candidates(user_query, kept_metas)
-    if verified_metas is not None:
-        verified_names = {m.get("name") for m in verified_metas}
-        for entry in trace["candidates"]:
-            if entry["kept"]:
-                entry["verified"] = entry["name"] in verified_names
-        kept_metas = verified_metas
-
-    results = [_metadata_to_database(m) for m in kept_metas]
-    trace["kept_count"] = len(results)
-    logger.info(
-        "Datayab search: %d/%d candidates kept (threshold %.2f)",
-        len(results),
-        len(res["distances"][0]),
-        max_distance,
-    )
-    return {"results": results, "trace": trace}
+    return run_datayab_search(user_query, top_k)
