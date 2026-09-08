@@ -20,6 +20,9 @@ import {
 
 import "./styles.css"
 
+// Typewriter speed of the agent-status content, in characters per second.
+const STATUS_TYPING_CHARS_PER_SECOND = 50
+
 interface ChatInputProps {
   className?: string
   buttonText?: string
@@ -93,9 +96,14 @@ export const ChatInput = ({
     if (!statusContent) return
     let interval: ReturnType<typeof setInterval> | undefined
     let index = 0
+    // 50 ticks per second (20 ms interval)
+    const charsPerTick = Math.max(
+      1,
+      Math.round(STATUS_TYPING_CHARS_PER_SECOND / 50)
+    )
     const timeout = setTimeout(() => {
       interval = setInterval(() => {
-        index += 4
+        index += charsPerTick
         setTypedStatusContent(statusContent.slice(0, index))
         if (index >= statusContent.length && interval) clearInterval(interval)
       }, 20)
@@ -172,22 +180,26 @@ export const ChatInput = ({
                       role="status"
                     >
                       <div className="search-result-title">
-                        <motion.span
-                          key={statusText || "default"}
-                          className="datayab-step-title"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          transition={{ delay: 0.15 }}
-                        >
-                          {statusText || "در حال پردازش ..."}
-                        </motion.span>
+                        <AnimatePresence mode="popLayout" initial={false}>
+                          {!typedStatusContent && (
+                            <motion.span
+                              key={statusText || "default"}
+                              className="datayab-step-title"
+                              initial={{ opacity: 0, filter: "blur(6px)" }}
+                              animate={{ opacity: 1, filter: "blur(0px)" }}
+                              exit={{ opacity: 0, filter: "blur(6px)" }}
+                              transition={{ duration: 0.35 }}
+                            >
+                              {statusText || "در حال پردازش ..."}
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
                         {typedStatusContent && (
                           <span
                             ref={statusContentRef}
                             className="datayab-step-content"
                             dir="ltr"
                           >
-                            {" — "}
                             {typedStatusContent}
                           </span>
                         )}
