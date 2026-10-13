@@ -17,14 +17,6 @@ export const DefinitionCounters: React.FC<DefinitionCountersProps> = ({
 }) => {
   return (
     <div className="s2-counters-bar">
-      <button
-        className="blue-glass s2-counter-tab s2-counter-tab--start"
-        onClick={onStartProcessing}
-        aria-label="شروع پردازش"
-      >
-        <span className="s2-counter-tab__label">شروع پردازش</span>
-      </button>
-
       <div className="glass-transparent s2-counter-tab s2-counter-tab--inclusion">
         <span className="s2-counter-tab__value">{toPersianDigits(inclusionCount)}</span>
         <span className="s2-counter-tab__label">معیار ورود</span>
@@ -37,6 +29,13 @@ export const DefinitionCounters: React.FC<DefinitionCountersProps> = ({
         <span className="s2-counter-tab__value">{toPersianDigits(errorCount)}</span>
         <span className="s2-counter-tab__label">خطا</span>
       </div>
+      <button
+        className="blue-glass s2-counter-tab s2-counter-tab--start"
+        onClick={onStartProcessing}
+        aria-label="شروع پردازش"
+      >
+        <span className="s2-counter-tab__label">شروع پردازش</span>
+      </button>
     </div>
   );
 };
