@@ -8,7 +8,7 @@ import { toTypedArray } from "../src/components/landing/CardioBackground/webgl/u
 const directory = dirname(fileURLToPath(import.meta.url));
 const assetDirectory = resolve(directory, "../public/landing/webgl_asset");
 
-const inputPath = resolve(assetDirectory, "mesh_data.json");
+const inputPath = resolve(directory, "../../NCIBB_source_assets/mesh_data.json");
 const outputPath = resolve(assetDirectory, "cardio-particles.bin");
 
 const particleCount = 10000;
