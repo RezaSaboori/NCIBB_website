@@ -60,3 +60,78 @@ export async function particlesExist(url) {
     }
 }
 
+const particleRequests = new Map();
+
+export function loadCardioParticles(url) {
+    if (!particleRequests.has(url)) {
+        const request = fetch(url)
+            .then(async (response) => {
+                if (!response.ok) {
+                    throw new Error(
+                        `Failed to load cardio particles: ${response.status}`
+                    );
+                }
+
+                const buffer = await response.arrayBuffer();
+
+                if (buffer.byteLength % 4 !== 0) {
+                    throw new Error('Invalid particle binary alignment');
+                }
+
+                const values = new Float32Array(buffer);
+
+                if (values.length < 8) {
+                    throw new Error('Invalid particle binary header');
+                }
+
+                const particleCount = values[0];
+
+                if (
+                    !Number.isInteger(particleCount) ||
+                    particleCount <= 0 ||
+                    values.length !== 8 + particleCount * 13
+                ) {
+                    throw new Error('Invalid particle binary length');
+                }
+
+                const particleData = {};
+                let offset = 8;
+
+                for (const [name, dimensions] of [
+                    ['positions', 3],
+                    ['normals', 3],
+                    ['colors', 3],
+                    ['sizes', 1],
+                    ['phases', 1],
+                    ['ao', 1],
+                    ['meshIndices', 1],
+                ]) {
+                    const length = particleCount * dimensions;
+
+                    particleData[name] = values.slice(
+                        offset,
+                        offset + length
+                    );
+
+                    offset += length;
+                }
+
+                return {
+                    particleData,
+                    particleCount,
+                    center: Array.from(values.slice(1, 4)),
+                    maxSize: values[4],
+                    heartBounds: Array.from(values.slice(5, 8)),
+                };
+            })
+            .catch((error) => {
+                particleRequests.delete(url);
+                throw error;
+            });
+
+        particleRequests.set(url, request);
+    }
+
+    return particleRequests.get(url);
+}
+

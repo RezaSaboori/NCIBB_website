@@ -35,6 +35,14 @@ export function createRenderer(gl, canvas, config, particles, PARTICLE_COUNT, ce
     
     // Event listeners storage for cleanup
     const eventListeners = [];
+    const trackedBuffers = [];
+    let disposed = false;
+
+    function createTrackedBuffer() {
+        const buffer = gl.createBuffer();
+        if (buffer) trackedBuffers.push(buffer);
+        return buffer;
+    }
 
     function addEventListener(target, type, handler, options) {
         target.addEventListener(type, handler, options);
@@ -116,43 +124,43 @@ void main() {
         vao = gl.createVertexArray();
         gl.bindVertexArray(vao);
 
-        const posBuffer = gl.createBuffer();
+        const posBuffer = createTrackedBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, particles.positions, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(0);
         gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
 
-        const normalBuffer = gl.createBuffer();
+        const normalBuffer = createTrackedBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, particles.normals, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(1);
         gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0);
 
-        const colorBuffer = gl.createBuffer();
+        const colorBuffer = createTrackedBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, particles.colors, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(2);
         gl.vertexAttribPointer(2, 3, gl.FLOAT, false, 0, 0);
 
-        const sizeBuffer = gl.createBuffer();
+        const sizeBuffer = createTrackedBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, sizeBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, particles.sizes, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(3);
         gl.vertexAttribPointer(3, 1, gl.FLOAT, false, 0, 0);
 
-        const phaseBuffer = gl.createBuffer();
+        const phaseBuffer = createTrackedBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, phaseBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, particles.phases, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(4);
         gl.vertexAttribPointer(4, 1, gl.FLOAT, false, 0, 0);
 
-        const aoBuffer = gl.createBuffer();
+        const aoBuffer = createTrackedBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, aoBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, particles.ao, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(5);
         gl.vertexAttribPointer(5, 1, gl.FLOAT, false, 0, 0);
 
-        const meshIndexBuffer = gl.createBuffer();
+        const meshIndexBuffer = createTrackedBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, meshIndexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, particles.meshIndices, gl.STATIC_DRAW);
         gl.enableVertexAttribArray(6);
@@ -227,7 +235,7 @@ void main() {
 
         // Mouse drag interaction (rotate camera) - only if enabled
         if (config.enableDragRotation !== false) {
-          canvas.addEventListener('mousedown', (e) => {
+          addEventListener(canvas,'mousedown', (e) => {
             e.stopPropagation(); // Prevent event from bubbling
             isDragging = true;
             lastMouseX = e.clientX;
@@ -237,7 +245,7 @@ void main() {
             }
           }, { passive: true });
 
-          canvas.addEventListener('mouseup', () => {
+          addEventListener(canvas,'mouseup', () => {
             isDragging = false;
             if (config.enableDragRotation !== false) {
               canvas.style.cursor = 'grab';
@@ -246,7 +254,7 @@ void main() {
         }
 
         // Mouse move handler - always needed for particle interaction
-        canvas.addEventListener('mousemove', (e) => {
+        addEventListener(canvas,'mousemove', (e) => {
           // Handle camera rotation when dragging (only if drag rotation is enabled)
           if (config.enableDragRotation !== false && isDragging) {
             const deltaX = e.clientX - lastMouseX;
@@ -328,7 +336,7 @@ void main() {
           isMouseActive = true;
         }, { passive: true });
 
-        canvas.addEventListener('mouseleave', () => {
+        addEventListener(canvas,'mouseleave', () => {
           isDragging = false;
           canvas.style.cursor = config.enableDragRotation !== false ? 'grab' : 'default';
           targetMousePos = [0, 0, -100];
@@ -343,7 +351,7 @@ void main() {
 
         // Mouse wheel zoom - only if enabled
         if (config.enableWheelZoom !== false) {
-          canvas.addEventListener('wheel', (e) => {
+          addEventListener(canvas,'wheel', (e) => {
             e.preventDefault();
             distance *= (1 + e.deltaY * 0.001);
             distance = Math.max(maxSize * 0.5, Math.min(maxSize * 10, distance));
@@ -505,14 +513,14 @@ void main() {
             gl.bindVertexArray(portalVao);
             
             // Position buffer
-            portalBuffer = gl.createBuffer();
+            portalBuffer = createTrackedBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, portalBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
             gl.enableVertexAttribArray(0);
             gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
             
             // UV buffer
-            const uvBuffer = gl.createBuffer();
+            const uvBuffer = createTrackedBuffer();
             gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer);
             gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW);
             gl.enableVertexAttribArray(1);
@@ -554,7 +562,7 @@ void main() {
             document.body.appendChild(portalVideo);
             
             const onVideoCanPlay = () => {
-                if (portalVideoTexture) return;
+                if (disposed || portalVideoTexture) return;
                 
                 portalVideoTexture = gl.createTexture();
                 gl.bindTexture(gl.TEXTURE_2D, portalVideoTexture);
@@ -568,6 +576,7 @@ void main() {
                 const img = new Image();
                 img.crossOrigin = 'anonymous';
                 img.onload = () => {
+                    if (disposed) return;
                     portalNoiseTexture = gl.createTexture();
                     gl.bindTexture(gl.TEXTURE_2D, portalNoiseTexture);
                     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
@@ -578,6 +587,7 @@ void main() {
                     portalInitialized = true;
                 };
                 img.onerror = () => {
+                    if (disposed) return;
                     console.warn('Failed to load portal noise texture, using fallback');
                     // Create a simple noise texture as fallback
                     portalNoiseTexture = gl.createTexture();
@@ -598,7 +608,7 @@ void main() {
                 img.src = noiseUrl;
             };
             
-            portalVideo.addEventListener('canplay', onVideoCanPlay);
+            addEventListener(portalVideo, 'canplay', onVideoCanPlay);
             portalVideo.load();
             portalVideo.play().catch(e => console.warn('Portal video play error:', e));
             
@@ -1168,10 +1178,47 @@ void main() {
           }
     }
 
+    function dispose() {
+        if (disposed) return;
+        disposed = true;
+
+        for (const { target, type, handler, options } of eventListeners) {
+            target.removeEventListener(type, handler, options);
+        }
+
+        eventListeners.length = 0;
+
+        if (portalVideo) {
+            portalVideo.pause();
+            portalVideo.removeAttribute('src');
+            portalVideo.load();
+            portalVideo.remove();
+            portalVideo = null;
+        }
+
+        if (gl.isContextLost()) return;
+
+        for (const buffer of trackedBuffers) {
+            gl.deleteBuffer(buffer);
+        }
+
+        trackedBuffers.length = 0;
+
+        if (vao) gl.deleteVertexArray(vao);
+        if (portalVao) gl.deleteVertexArray(portalVao);
+
+        if (program) gl.deleteProgram(program);
+        if (portalProgram) gl.deleteProgram(portalProgram);
+
+        if (portalVideoTexture) gl.deleteTexture(portalVideoTexture);
+        if (portalNoiseTexture) gl.deleteTexture(portalNoiseTexture);
+    }
+
     return {
         init,
         render,
         setCameraPreset,
         updateConfig,
+        dispose,
     };
 }
