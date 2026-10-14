@@ -12,6 +12,14 @@
   padding: var(--spacing-md) 0;
 }
 
+.project-card{
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--border-radius-container-sm);
+  padding: var(--spacing-md);
+  gap: var(--spacing-md);
+}
+
 /* Card title */
 .project-card__title {
   flex: 1;
@@ -79,7 +87,25 @@
   flex: 1;
   font-family: var(--font-family-persian);
   text-align: center !important;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-pill);
+  cursor: pointer;
 }
+
+.s2-criteria-window__btn.blue-glass {
+  color: var(--color-gray1) !important
+}
+
+.dark .s2-criteria-window__btn.blue-glass {
+  color: var(--color-gray12) !important
+}
+
+.s2-criteria-window__btn.glass {
+  color: var(--color-red) !important
+}
+
 
 /* Loading / empty / error states */
 .project-grid__loading,

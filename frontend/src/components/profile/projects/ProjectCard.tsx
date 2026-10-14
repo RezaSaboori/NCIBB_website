@@ -53,7 +53,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
       {/* Footer */}
       <div className="project-card__footer">
         <button
-          className="red-glass s2-criteria-window__btn project-card__action-btn"
+          className="glass s2-criteria-window__btn project-card__action-btn"
           type="button"
           onClick={() => onDelete(project)}
         >
