@@ -67,4 +67,5 @@
   line-height: var(--line-height-relaxed);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  direction: ltr !important
 }

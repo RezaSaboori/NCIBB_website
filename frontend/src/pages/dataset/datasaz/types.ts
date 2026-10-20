@@ -39,7 +39,7 @@ export interface CriteriaItem {
   value_type?: "numeric" | "enum" | string;
   value_min?: number;
   value_max?: number;
-  values?: string[];
+  values?: EnumValues | null;
   /** Owned by CriteriaPanel; only relevant when in advanced mode */
   groupName?: string;
   isGroupRequired?: boolean;
@@ -80,7 +80,7 @@ export interface SerializedAdvancedEntry {
   value_type?: "numeric" | "enum" | string;
   value_min?: number;
   value_max?: number;
-  values?: string[];
+  values?: EnumValues | null;
   rows: SerializedRow[];
 }
 
@@ -93,7 +93,7 @@ export interface SerializedCriteriaItem {
   value_type?: "numeric" | "enum" | string;
   value_min?: number;
   value_max?: number;
-  values?: string[];
+  values?: EnumValues | null;
   mode: "simple" | "advanced";
   rows: SerializedRow[];
   groupName?: string;
