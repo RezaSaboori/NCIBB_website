@@ -1,8 +1,8 @@
 /* Reuse glass.css: --glass-backdrop-filter already supplies blur,
    saturation and brightness (the requested exposure effect). */
-/* Pass the available height from HeroUI's positioned portal to its content. */
+/* Cap the panel height; its description body scrolls when needed. */
 .s2-criteria-description-frame {
-  max-height: inherit;
+  max-height: min(18rem, calc(100dvh - (2 * var(--spacing-md))));
 }
 
 .glass-transparent.s2-criteria-description {
@@ -11,7 +11,7 @@
   flex-direction: column;
   align-items: stretch;
   gap: var(--spacing-md);
-  width: min(32rem, calc(100vw - (2 * var(--spacing-md))));
+  width: min(22rem, calc(100vw - (2 * var(--spacing-md))));
   max-width: none;
   max-height: inherit;
   padding: var(--spacing-lg);
@@ -21,6 +21,8 @@
   background: transparent;
   color: var(--color-gray11);
   font-family: var(--font-family-base);
+  direction: ltr;
+  text-align: left;
   overflow: hidden;
   isolation: isolate;
 

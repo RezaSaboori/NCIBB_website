@@ -53,14 +53,14 @@ export const CriteriaDescriptionHelp: React.FC<CriteriaDescriptionHelpProps> = (
         </button>
       </PopoverTrigger>
 
-      <PopoverContent aria-describedby={descriptionId}>
+      <PopoverContent dir="ltr" aria-describedby={descriptionId}>
         {(titleProps) => (
           <>
             <div className="s2-criteria-description__header">
               <h3
                 {...titleProps}
                 className="s2-criteria-description__title"
-                dir="auto"
+                dir="ltr"
               >
                 {label}
               </h3>
@@ -79,7 +79,7 @@ export const CriteriaDescriptionHelp: React.FC<CriteriaDescriptionHelpProps> = (
               <p
                 id={descriptionId}
                 className="s2-criteria-description__text"
-                dir="auto"
+                dir="ltr"
               >
                 {description?.trim() || "No description is available for this field."}
               </p>

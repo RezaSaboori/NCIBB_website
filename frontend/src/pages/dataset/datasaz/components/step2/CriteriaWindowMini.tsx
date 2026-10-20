@@ -9,6 +9,8 @@ import React, { useState } from "react";
 import { TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
 import { CriteriaDescriptionHelp } from "./CriteriaDescriptionHelp";
 import { CriteriaWindowRow, RowState } from "./CriteriaWindowRow";
+import type { EnumValues } from "../../types";
+import { getEnumOptions } from "../../utils/enumOptions";
 
 interface CriteriaWindowMiniProps {
   label: string;
@@ -17,7 +19,7 @@ interface CriteriaWindowMiniProps {
   value_type?: "numeric" | "enum" | string;
   value_min?: number;
   value_max?: number;
-  values?: string[];
+  values?: EnumValues | null;
   onClose: () => void;
   onDelete: () => void;
   onHelp?: () => void;
@@ -57,7 +59,9 @@ export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
     return init;
   });
 
-  const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;
+  const enumOptions = getEnumOptions(values);
+  // Enum fields always use a dropdown, even when no choices are available.
+  const isEnum = value_type === "enum";
   const isNumeric = value_type === "numeric";
 
   const handleRowChange = (id: number, patch: Partial<RowState>) => {
@@ -71,7 +75,7 @@ export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
   const showAddMoreRule = (() => {
     if (!isEnum) return true;
     if (rows.some((r) => r.isRequired)) return false;
-    if (values && rows.length >= values.length) return false;
+    if (rows.length >= enumOptions.length) return false;
     return true;
   })();
 
@@ -116,7 +120,7 @@ export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
             row={row}
             isEnum={isEnum}
             isNumeric={isNumeric}
-            values={values}
+            values={enumOptions}
             value_min={value_min}
             value_max={value_max}
             onChange={handleRowChange}

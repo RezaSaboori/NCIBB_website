@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
 import { CriteriaDescriptionHelp } from "./CriteriaDescriptionHelp";
 import { CriteriaWindowRow, RowState } from "./CriteriaWindowRow";
+import type { EnumValues } from "../../types";
+import { getEnumOptions } from "../../utils/enumOptions";
 import { useScrollText } from "../../hooks/useScrollText";
 
 interface CriteriaWindowProps {
@@ -12,7 +14,7 @@ interface CriteriaWindowProps {
   value_type?: "numeric" | "enum" | string;
   value_min?: number;
   value_max?: number;
-  values?: string[];
+  values?: EnumValues | null;
   isAdvanced?: boolean;
   onToggleAdvanced?: () => void;
   onMinimize: () => void;
@@ -57,7 +59,9 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
     return init;
   });
 
-  const isEnum = value_type === "enum" && Array.isArray(values) && values.length > 0;
+  const enumOptions = getEnumOptions(values);
+  // Enum fields always use a dropdown, even when no choices are available.
+  const isEnum = value_type === "enum";
   const isNumeric = value_type === "numeric";
 
   const handleRowChange = (id: number, patch: Partial<RowState>) => {
@@ -131,7 +135,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
             row={row}
             isEnum={isEnum}
             isNumeric={isNumeric}
-            values={values}
+            values={enumOptions}
             value_min={value_min}
             value_max={value_max}
             onChange={handleRowChange}

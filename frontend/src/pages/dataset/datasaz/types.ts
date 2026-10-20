@@ -1,5 +1,8 @@
 export type DatasazStep = 1 | 2 | 3 | 4;
 
+/** Enum labels map to OMOP concept IDs; arrays support older saved criteria. */
+export type EnumValues = Record<string, number> | string[];
+
 export interface DatasazStepConfig {
   id: DatasazStep;
   label: string;
@@ -14,7 +17,7 @@ export interface SuggestionItem {
   unit?: string;
   min?: number;
   max?: number;
-  values?: string[];
+  values?: EnumValues | null;
   is_leaf: boolean;
   path: string[];
 }
