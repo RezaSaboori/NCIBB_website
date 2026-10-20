@@ -8,6 +8,8 @@ export interface DatasazStepConfig {
 export interface SuggestionItem {
   code: string;
   name: string;
+  /** Graph description retained for the field's help dialog. */
+  description?: string | null;
   value_type: "numeric" | "enum";
   unit?: string;
   min?: number;
@@ -28,6 +30,8 @@ export interface AutocompleteResponse {
 export interface CriteriaItem {
   id: number;
   label: string;
+  /** Graph description retained for the field's help dialog. */
+  description?: string | null;
   unit?: string;
   value_type?: "numeric" | "enum" | string;
   value_min?: number;
@@ -67,6 +71,8 @@ export interface SerializedAdvancedEntry {
   entryId: number;
   id: number;
   label: string;
+  /** Graph description retained for the field's help dialog. */
+  description?: string | null;
   unit?: string;
   value_type?: "numeric" | "enum" | string;
   value_min?: number;
@@ -78,6 +84,8 @@ export interface SerializedAdvancedEntry {
 export interface SerializedCriteriaItem {
   id: number;
   label: string;
+  /** Graph description retained for the field's help dialog. */
+  description?: string | null;
   unit?: string;
   value_type?: "numeric" | "enum" | string;
   value_min?: number;

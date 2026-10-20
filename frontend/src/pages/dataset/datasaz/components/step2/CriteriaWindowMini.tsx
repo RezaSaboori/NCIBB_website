@@ -6,11 +6,13 @@
  *   - header shows field label + unit + action icons
  */
 import React, { useState } from "react";
-import { QuestionIcon, TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
+import { TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
+import { CriteriaDescriptionHelp } from "./CriteriaDescriptionHelp";
 import { CriteriaWindowRow, RowState } from "./CriteriaWindowRow";
 
 interface CriteriaWindowMiniProps {
   label: string;
+  description?: string | null;
   unit?: string;
   value_type?: "numeric" | "enum" | string;
   value_min?: number;
@@ -35,6 +37,7 @@ const makeMiniRow = (): RowState => ({
 
 export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
   label,
+  description,
   unit,
   value_type,
   value_min,
@@ -81,14 +84,11 @@ export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
           {unit && <span className="s2-criteria-window__unit">{unit}</span>}
         </span>
         <div className="s2-criteria-window__header-actions">
-          <button
-            className="teal-glass dz-icon-btn s2-icon-btn"
-            aria-label="Help"
-            onClick={onHelp}
-            type="button"
-          >
-            <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
-          </button>
+          <CriteriaDescriptionHelp
+            label={label}
+            description={description}
+            onOpen={onHelp}
+          />
           <button
             className="orange-glass dz-icon-btn s2-icon-btn"
             aria-label="Close"

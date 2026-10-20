@@ -1,7 +1,8 @@
 /* CriteriaWindowAdvanced.tsx */
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import "./criteriaAdvanced.css";
-import { QuestionIcon, TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
+import { TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
+import { CriteriaDescriptionHelp } from "./CriteriaDescriptionHelp";
 import { CriteriaButton } from "./CriteriaButton";
 import { AddCriteriaTab } from "./AddCriteriaTab";
 import { CriteriaWindowMini } from "./CriteriaWindowMini";
@@ -164,6 +165,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
             entryId: newEntryId,
             id: newEntryId,
             label,
+            description: item.description ?? null,
             unit: item.unit,
             value_type: item.value_type,
             value_min: item.min,
@@ -208,6 +210,8 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   }, []);
 
   const activeEntry = entries.find((e) => e.entryId === activeEntryId) ?? null;
+  // Group help describes the selected field, or the first field when none is selected.
+  const helpEntry = activeEntry ?? entries[0];
 
   return (
     <div className={`opal-glass dz-glass-container dz-glass-container--sm s2-criteria-window s2-criteria-window--advanced s2-adv-group${spotlightOpen ? " s2-adv-group--spotlight-open" : ""}`}>
@@ -225,14 +229,11 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
           label="Required ?"
         />
         <div className="s2-criteria-window__header-actions">
-          <button
-            className="teal-glass dz-icon-btn s2-icon-btn"
-            aria-label="Help"
-            onClick={onHelp}
-            type="button"
-          >
-            <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
-          </button>
+          <CriteriaDescriptionHelp
+            label={helpEntry.label}
+            description={helpEntry.description}
+            onOpen={onHelp}
+          />
           <button
             className="orange-glass dz-icon-btn s2-icon-btn"
             aria-label="Minimize"
@@ -309,6 +310,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
             <div key={entry.entryId} data-criteria-id={entry.entryId}>
             <CriteriaWindowMini
               label={entry.label}
+              description={entry.description}
               unit={entry.unit}
               value_type={entry.value_type}
               value_min={entry.value_min}

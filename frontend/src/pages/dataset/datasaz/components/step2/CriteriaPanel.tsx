@@ -213,6 +213,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
           {
             id: newId,
             label,
+            description: item.description ?? null,
             unit: item.unit,
             value_type: item.value_type,
             value_min: item.min,
@@ -406,6 +407,7 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
                     <div key={c.id} data-criteria-id={c.id}>
                       <CriteriaWindow
                         label={c.label}
+                        description={c.description}
                         unit={c.unit}
                         value_type={c.value_type}
                         value_min={c.value_min}
