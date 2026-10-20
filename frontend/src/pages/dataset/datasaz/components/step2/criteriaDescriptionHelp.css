@@ -1,12 +1,19 @@
 /* Reuse glass.css: --glass-backdrop-filter already supplies blur,
    saturation and brightness (the requested exposure effect). */
+/* Pass the available height from HeroUI's positioned portal to its content. */
+.s2-criteria-description-frame {
+  max-height: inherit;
+}
+
 .glass-transparent.s2-criteria-description {
-  position: fixed;
-  inset: 0;
-  margin: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
   width: min(32rem, calc(100vw - (2 * var(--spacing-md))));
   max-width: none;
-  max-height: calc(100dvh - (2 * var(--spacing-md)));
+  max-height: inherit;
   padding: var(--spacing-lg);
   border: none;
   border-radius: var(--border-radius-container-sm);
@@ -16,17 +23,9 @@
   font-family: var(--font-family-base);
   overflow: hidden;
   isolation: isolate;
-}
 
-.s2-criteria-description[open] {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-/* Keep the page visible; frosting belongs to the description surface. */
-.s2-criteria-description::backdrop {
-  background: transparent;
+  /* Soft ambient shadow plus a closer contact shadow; glass remains transparent. */
+  box-shadow: var(--elevation-4), var(--elevation-2);
 }
 
 .s2-criteria-description__header {
