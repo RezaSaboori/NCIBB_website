@@ -27,7 +27,7 @@
 .account-workspace__toolbar { justify-content: space-between; width: 100%; }
 .account-workspace__submit { align-self: flex-start; }
 
-.account-workspace__metrics, .account-workspace__fields, .account-workspace__definitions {
+.account-workspace__metrics, .account-workspace__fields {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
   gap: var(--spacing-md);
@@ -40,14 +40,19 @@
 }
 
 .account-workspace__balance bdi { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); }
-.account-workspace__definitions dt { color: var(--color-gray9); }
-.account-workspace__definitions dd { margin: 0; overflow-wrap: anywhere; }
-.account-workspace__wallet-split { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.account-workspace__wallet-split dd { font-weight: var(--font-weight-semibold); }
 .account-workspace__identity-body { gap: var(--spacing-md); }
+.account-workspace__avatar-trigger {
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
 .account-workspace__picture { max-block-size: min(56vh, 22rem); object-fit: contain; }
 
-.account-workspace__form label {
+.account-workspace__form label:not(:where(.ui-glass-choice, .ui-glass-switch)) {
   display: flex;
   flex-direction: column;
   min-inline-size: 0;
@@ -61,12 +66,15 @@
   padding: var(--spacing-sm) 0;
 }
 
-.account-workspace__form .account-workspace__check, .account-workspace__options label {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--spacing-xs);
+.account-workspace__scope {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-inline-size: 0;
+  align-self: start;
+  gap: var(--spacing-sm);
 }
+
+.account-workspace__scope legend { margin-block-end: var(--spacing-xs); }
 
 .account-workspace :focus-visible {
   outline: var(--border-width-thin) solid var(--color-blue);

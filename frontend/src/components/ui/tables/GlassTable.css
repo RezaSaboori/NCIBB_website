@@ -27,9 +27,9 @@
 .audit-table tr:hover td { background: var(--color-gray2); }
 .audit-table tr > :first-child { border-start-start-radius: var(--audit-row-radius); border-end-start-radius: var(--audit-row-radius); }
 .audit-table tr > :last-child { border-start-end-radius: var(--audit-row-radius); border-end-end-radius: var(--audit-row-radius); }
-.audit-table tr > :is(th, td) { border-block: var(--border-width-thin) solid var(--color-gray3); }
-.audit-table tr > :first-child { border-inline-start: var(--border-width-thin) solid var(--color-gray3); }
-.audit-table tr > :last-child { border-inline-end: var(--border-width-thin) solid var(--color-gray3); }
+.audit-table tr > :is(th, td) { border-block: var(--ui-stroke); }
+.audit-table tr > :first-child { border-inline-start: var(--ui-stroke); }
+.audit-table tr > :last-child { border-inline-end: var(--ui-stroke); }
 
 @media (max-width: 760px) {
   .audit-panel.u-container { --p: var(--spacing-sm); --gap: var(--spacing-sm); --radius: var(--border-radius-container-sm); }

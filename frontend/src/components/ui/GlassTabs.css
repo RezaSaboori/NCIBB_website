@@ -141,6 +141,7 @@
 }
 .ui-glass-tabs::-webkit-scrollbar { height: 6px; }
 .ui-glass-tabs::-webkit-scrollbar-thumb { border: 0; }
+.ui-glass-tabs__placeholder { display: none; }
 .datasaz-step-tabs.ui-glass-tabs__list {
   --ui-glass-tabs-inset: var(--spacing-xs);
   background: transparent;

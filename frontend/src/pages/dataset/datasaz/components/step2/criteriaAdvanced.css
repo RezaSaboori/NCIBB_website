@@ -6,18 +6,12 @@
   gap: var(--spacing-sm) !important;
 }
 
-/* Adapt ui-input-shell inside the group header to be transparent/compact */
+/* Keep the shared input compact inside the group header. */
 .s2-adv-group__name-input.ui-input-shell {
   flex: 1;
   min-width: 0;
-  border-color: var(--color-gray1);
   height: 2rem;
   min-height: 2rem;
-}
-
-.s2-adv-group__name-input.ui-input-shell:focus-within {
-  border-color: var(--color-blue);
-  box-shadow: none;
 }
 
 /* ── Tabs inside advanced group ─────────────────────────────────── */

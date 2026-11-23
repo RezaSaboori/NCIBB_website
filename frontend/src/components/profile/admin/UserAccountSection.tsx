@@ -1,9 +1,10 @@
-import { Switch } from "@heroui/react"
 import type { FormEvent, ReactNode } from "react"
 import { GlassButton } from "@/components/ui/GlassButton"
 import { GlassCard } from "@/components/ui/GlassCard"
+import { GlassSwitch } from "@/components/ui/inputs"
 import type { Role, UserDetail } from "@/types/account"
 import { formatAccountDate } from "../shared/accountFormat"
+import { ProfileDetailCards } from "../shared/ProfileDetailCards"
 import { RoleChoices } from "./RoleChoices"
 import "./UserAccountSection.css"
 
@@ -25,22 +26,22 @@ export function UserAccountSection({
 }: UserAccountSectionProps) {
   return (
     <div className="profile-user-account">
-      <GlassCard size="sm">
-        <dl className="profile-user-account__details">
-          <div className="profile-user-account__email"><dt>ایمیل</dt><dd><bdi>{user.email}</bdi></dd></div>
-          <div><dt>تأیید ایمیل</dt><dd>{user.is_email_verified ? "تأیید شده" : "تأیید نشده"}</dd></div>
-          <div><dt>آخرین ورود</dt><dd>{formatAccountDate(user.last_login)}</dd></div>
-          <div><dt>تاریخ ثبت نام</dt><dd>{formatAccountDate(user.created_at)}</dd></div>
-          {user.profile.job_title && <div><dt>عنوان شغلی</dt><dd>{user.profile.job_title}</dd></div>}
-          {user.profile.company && <div><dt>سازمان</dt><dd>{user.profile.company}</dd></div>}
-          {user.profile.department && <div><dt>واحد</dt><dd>{user.profile.department}</dd></div>}
-          <div><dt>گروه‌ها</dt><dd>{user.groups.map((group) => group.name).join("، ") || "—"}</dd></div>
-        </dl>
+      <GlassCard>
+        <ProfileDetailCards items={[
+          { label: "ایمیل", value: <bdi>{user.email}</bdi>, fullWidthOnMobile: true },
+          { label: "تأیید ایمیل", value: user.is_email_verified ? "تأیید شده" : "تأیید نشده" },
+          { label: "آخرین ورود", value: formatAccountDate(user.last_login) },
+          { label: "تاریخ ثبت نام", value: formatAccountDate(user.created_at) },
+          ...(user.profile.job_title ? [{ label: "عنوان شغلی", value: user.profile.job_title }] : []),
+          ...(user.profile.company ? [{ label: "سازمان", value: user.profile.company }] : []),
+          ...(user.profile.department ? [{ label: "واحد", value: user.profile.department }] : []),
+          { label: "گروه‌ها", value: user.groups.map((group) => group.name).join("، ") || "—" },
+        ]} />
       </GlassCard>
       <form className="profile-user-account__form" onSubmit={onSave}>
-        <GlassCard size="sm" heading={<h3>دسترسی حساب</h3>} footer={(
+        <GlassCard heading={<h3>دسترسی حساب</h3>} footer={(
           <div className="profile-user-account__actions">
-            <Switch size="sm" isSelected={active} onValueChange={onActiveChange}>حساب فعال</Switch>
+            <GlassSwitch label="حساب فعال" checked={active} onChange={(event) => onActiveChange(event.target.checked)} />
             <GlassButton color="primary" type="submit" isLoading={saving} isDisabled={!roles}>ذخیره دسترسی حساب</GlassButton>
           </div>
         )}>

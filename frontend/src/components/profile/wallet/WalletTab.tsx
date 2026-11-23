@@ -6,11 +6,12 @@ import { GlassCard } from "@/components/ui/GlassCard"
 import { accountApi } from "@/dataset_services/accountApi"
 import type { AppDispatch, RootState } from "@/store/store"
 import { fetchWallet } from "@/store/walletSlice"
-import { formatAccountDate, formatCoins } from "../shared/accountFormat"
+import { formatCoins } from "../shared/accountFormat"
 import { AccountStatus } from "../shared/AccountStatus"
 import { PageControls } from "../shared/PageControls"
 import { useAccountQuery } from "../shared/useAccountQuery"
 import { CreditLedger } from "./CreditLedger"
+import { WalletBalanceCards } from "./WalletBalanceCards"
 
 export function WalletTab() {
   const [page, setPage] = useState(1)
@@ -21,19 +22,10 @@ export function WalletTab() {
   return (
     <div className="account-workspace__stack">
       <GlassCard size="lg"
-        heading={<div className="account-workspace__heading"><Icon icon={coinIcon} width={24} aria-hidden /><h2>موجودی قابل استفاده</h2></div>}
-        footer={wallet && <p className="account-workspace__muted">تمدید اعتبار ماهانه در {formatAccountDate(wallet.reset_at)}</p>}>
+        heading={<div className="account-workspace__heading"><Icon icon={coinIcon} width={24} aria-hidden /><h2>اعتبار شخصی</h2></div>}>
         <AccountStatus loading={!wallet && !error} error={error ? "موجودی کیف پول دریافت نشد." : ""}
           retry={() => void dispatch(fetchWallet())} />
-        {wallet && (
-          <>
-            <strong className="account-workspace__balance">{formatCoins(wallet.balance)} <bdi>Beat Coin</bdi></strong>
-            <dl className="account-workspace__definitions account-workspace__wallet-split">
-              <div><dt>اعتبار ماهانه</dt><dd>{formatCoins(wallet.monthly_balance)}</dd></div>
-              <div><dt>اعتبار دائمی</dt><dd>{formatCoins(wallet.permanent_balance)}</dd></div>
-            </dl>
-          </>
-        )}
+        {wallet && <WalletBalanceCards wallet={wallet} showRenewal />}
       </GlassCard>
       {!!wallet?.groups?.length && (
         <section className="account-workspace__section">

@@ -21,6 +21,9 @@ function GroupWalletPanel({ group, admin }: { group: Group; admin: boolean }) {
   const wallet = useAccountQuery(useCallback(() => accountApi.groupWallet(group.id, page), [group.id, page]))
   return (
     <div className="account-workspace__stack">
+      {wallet.data && <GlassCard size="sm" heading={<h3>موجودی اشتراکی</h3>}>
+        <strong className="account-workspace__balance">{formatCoins(wallet.data.balance)} <bdi>Beat Coin</bdi></strong>
+      </GlassCard>}
       {admin && <GlassCard size="sm" heading={<h3>تنظیم موجودی گروه</h3>}>
         <AdjustmentForm shared save={(data) => accountApi.adjustGroup(group.id, data)} onSaved={() => {
           if (page === 1) void wallet.refresh()
@@ -28,10 +31,7 @@ function GroupWalletPanel({ group, admin }: { group: Group; admin: boolean }) {
         }} />
       </GlassCard>}
       <CreditLedger entries={wallet.data?.results ?? []}
-        controls={<>
-          <AccountStatus loading={wallet.loading} error={wallet.error} retry={wallet.refresh} />
-          {wallet.data && <p>موجودی {formatCoins(wallet.data.balance)} Beat Coin</p>}
-        </>}
+        controls={<AccountStatus loading={wallet.loading} error={wallet.error} retry={wallet.refresh} />}
         footer={<PageControls data={wallet.data} page={page} onPage={setPage} />}
         showEmpty={!!wallet.data} />
     </div>

@@ -1,0 +1,95 @@
+.ui-glass-choice {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  min-inline-size: 0;
+  min-block-size: 2.75rem;
+  padding: var(--spacing-sm) var(--spacing-md);
+  gap: var(--spacing-sm);
+  border-radius: var(--border-radius-pill);
+  color: var(--color-gray12);
+  font-family: var(--font-family-persian);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.ui-glass-choice__input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.ui-glass-choice > .ui-glass-choice__surface {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ui-glass-choice__surface.blue-glass,
+.ui-glass-choice__input:checked ~ .ui-glass-choice__surface.glass { display: none; }
+.ui-glass-choice__input:checked ~ .ui-glass-choice__surface.blue-glass { display: block; }
+
+.ui-glass-choice__mark {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: 1rem;
+  block-size: 1rem;
+  border: var(--border-width-thin) solid var(--color-gray7);
+  border-radius: 50%;
+  background: var(--color-gray2);
+}
+
+.ui-glass-choice__label { overflow-wrap: anywhere; text-align: start; }
+
+.ui-glass-choice:has(> .ui-glass-choice__input:checked) { color: var(--color-gray1); }
+.dark .ui-glass-choice:has(> .ui-glass-choice__input:checked) { color: var(--color-gray12); }
+.ui-glass-choice__input:checked ~ .ui-glass-choice__mark {
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.ui-glass-choice__input[type="checkbox"]:checked ~ .ui-glass-choice__mark::after {
+  content: "";
+  inline-size: .3rem;
+  block-size: .55rem;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-1px) rotate(45deg);
+}
+
+.ui-glass-choice__input[type="radio"]:checked ~ .ui-glass-choice__mark::after {
+  content: "";
+  inline-size: .5rem;
+  block-size: .5rem;
+  border-radius: inherit;
+  background: currentColor;
+}
+
+.ui-glass-choice:has(> .ui-glass-choice__input:focus-visible) {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+.ui-glass-choice:has(> .ui-glass-choice__input:disabled) {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+@media (forced-colors: active) {
+  .ui-glass-choice { border: 1px solid ButtonText; }
+  .ui-glass-choice:has(> .ui-glass-choice__input:focus-visible) { outline-color: Highlight; }
+  .ui-glass-choice__input[type="radio"]:checked ~ .ui-glass-choice__mark::after {
+    background: ButtonText;
+    forced-color-adjust: none;
+  }
+}

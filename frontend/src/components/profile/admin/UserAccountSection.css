@@ -1,48 +1,20 @@
 .profile-user-account {
   display: grid;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
-.profile-user-account__details,
 .account-workspace__options.profile-user-account__roles {
   display: grid;
-  gap: var(--spacing-sm) var(--spacing-md);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-md);
   padding: 0;
 }
 
-.profile-user-account__details { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.profile-user-account__details div { min-inline-size: 0; }
-.profile-user-account__details dt, .profile-user-account__roles legend { color: var(--color-gray9); font-size: var(--font-size-sm); }
-.profile-user-account__details dd {
-  margin-block-start: var(--spacing-xs);
-  overflow-wrap: anywhere;
-}
-
-.account-workspace__options.profile-user-account__roles {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
-  gap: var(--spacing-sm);
-}
-
-.profile-user-account__roles legend { padding: 0; margin-block-end: var(--spacing-sm); }
-
-.account-workspace__options.profile-user-account__roles label {
-  min-inline-size: 0;
-  min-block-size: 2.25rem;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  gap: var(--spacing-sm);
-  border: var(--border-width-thin) solid var(--color-gray3);
-  border-radius: var(--border-radius-item-lg);
-  background: color-mix(in srgb, var(--color-gray1) 72%, transparent);
+.profile-user-account__roles legend {
+  padding: 0;
+  margin-block-end: var(--spacing-md);
+  color: var(--color-gray9);
   font-size: var(--font-size-sm);
-  overflow-wrap: anywhere;
-  cursor: pointer;
-}
-
-.profile-user-account__roles input {
-  flex: none;
-  inline-size: 1rem;
-  block-size: 1rem;
-  accent-color: var(--color-blue);
 }
 
 .profile-user-account__actions {
@@ -50,11 +22,14 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   inline-size: 100%;
+  border-block-start: var(--ui-stroke);
+  padding-block-start: var(--spacing-md);
 }
 
 @media (max-width: 620px) {
-  .profile-user-account__details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .profile-user-account__email { grid-column: 1 / -1; }
+  .account-workspace__options.profile-user-account__roles {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr));
+  }
 }

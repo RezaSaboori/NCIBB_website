@@ -6,10 +6,11 @@ import { useDispatch } from "react-redux"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
 import type { AppDispatch } from "@/store/store"
 import { fetchWallet } from "@/store/walletSlice"
-import { accountName, formatCoins } from "../shared/accountFormat"
+import { accountName } from "../shared/accountFormat"
 import { AccountStatus } from "../shared/AccountStatus"
 import { useAccountQuery } from "../shared/useAccountQuery"
 import { AdjustmentForm } from "../wallet/AdjustmentForm"
+import { WalletBalanceCards } from "../wallet/WalletBalanceCards"
 import { ProfileModal } from "../shared/ProfileModal"
 import { UserAccountSection } from "./UserAccountSection"
 import { UserAuditSection, UserLedgerSection, UserMessagesSection, UserProjectsSection } from "./UserDetailSections"
@@ -29,7 +30,7 @@ export function UserDetailDialog({ id, viewerId, onClose, onUpdated }: {
   const [error, setError] = useState("")
   const [status, setStatus] = useState("")
   const [ledgerRevision, setLedgerRevision] = useState(0)
-  const [section, setSection] = useState("account")
+  const [tabRail, setTabRail] = useState<HTMLDivElement | null>(null)
   const user = detail.data
 
   useEffect(() => {
@@ -56,10 +57,11 @@ export function UserDetailDialog({ id, viewerId, onClose, onUpdated }: {
     }
   }
   return (
-    <ProfileModal isOpen size="4xl" animateSize title={user ? accountName(user) : "جزئیات کاربر"} onClose={onClose}>
+    <ProfileModal isOpen size="4xl" animateSize title={user ? accountName(user) : "جزئیات کاربر"}
+      headerNavigationRef={user ? setTabRail : undefined} onClose={onClose}>
       <AccountStatus loading={detail.loading} error={detail.error} retry={detail.refresh} />
-      {user && (
-        <GlassTabs aria-label="جزئیات کاربر" selectedKey={section} onSelectionChange={(key) => setSection(String(key))}>
+      {user && tabRail && (
+        <GlassTabs aria-label="جزئیات کاربر" railTarget={tabRail}>
           <Tab key="account" title="حساب">
             <UserAccountSection user={user} roles={roles.data?.filter((role) => role.scope === "platform" && role.code !== "user")}
               active={active} selectedRoles={roleIds} saving={saving} onActiveChange={setActive}
@@ -74,13 +76,15 @@ export function UserDetailDialog({ id, viewerId, onClose, onUpdated }: {
           <Tab key="messages" title="پیام‌ها"><GlassCard size="sm"><UserMessagesSection id={id} /></GlassCard></Tab>
           <Tab key="wallet" title="اعتبار">
             <div className="account-workspace__stack">
-              <GlassCard size="sm"><p>موجودی {formatCoins(user.wallet.balance)} Beat Coin · ماهانه {formatCoins(user.wallet.monthly_balance)} · دائمی {formatCoins(user.wallet.permanent_balance)}</p>
-              <AdjustmentForm save={(data) => accountApi.adjustUser(id, data)} onSaved={() => {
-                setLedgerRevision((value) => value + 1)
-                void detail.refresh()
-                onUpdated()
-                if (viewerId === id) void dispatch(fetchWallet())
-              }} /></GlassCard>
+              <WalletBalanceCards wallet={user.wallet} />
+              <GlassCard size="sm" heading={<h3>تنظیم موجودی حساب</h3>}>
+                <AdjustmentForm save={(data) => accountApi.adjustUser(id, data)} onSaved={() => {
+                  setLedgerRevision((value) => value + 1)
+                  void detail.refresh()
+                  onUpdated()
+                  if (viewerId === id) void dispatch(fetchWallet())
+                }} />
+              </GlassCard>
               <UserLedgerSection id={id} revision={ledgerRevision} />
             </div>
           </Tab>

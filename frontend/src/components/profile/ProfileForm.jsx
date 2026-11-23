@@ -163,6 +163,13 @@ const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
   }
 
   const profile = profileData?.profile
+  const portrait = (
+    <UserAvatar
+      name={profile?.full_name || "کاربر ناشناس"}
+      size="lg"
+      src={profile?.profile_picture_url}
+    />
+  )
 
   return (
     <div className="account-workspace__stack">
@@ -172,8 +179,11 @@ const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
           {profile?.profile_picture_url && <GlassButton onPress={onDeleteOpen}>حذف عکس</GlassButton>}
         </>}>
         <div className="account-workspace__identity-body">
-          <UserAvatar src={profile?.profile_picture_url} name={profile?.full_name || "کاربر ناشناس"}
-            seed={profileData?.id ?? profileData?.email ?? profile?.full_name} size="lg" />
+          {profile?.profile_picture_url ? portrait : (
+            <button aria-label="تعامل با آواتار شیشه‌ای" className="account-workspace__avatar-trigger" type="button">
+              {portrait}
+            </button>
+          )}
           <div>
             <strong>{profile?.full_name || "کاربر ناشناس"}</strong>
             {profile?.job_title && <p className="account-workspace__muted">{profile.job_title}{profile.company ? ` در ${profile.company}` : ""}</p>}

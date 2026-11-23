@@ -1,41 +1,45 @@
 import { useEffect, useState } from "react"
 
-export const useBlinkingEyes = (enabled = true) => {
-  const [isBlinking, setIsBlinking] = useState(false)
+type Blink = "single" | "double"
+
+export function useBlinkingEyes() {
+  const [blink, setBlink] = useState<Blink | null>(null)
 
   useEffect(() => {
-    if (!enabled) {
-      setIsBlinking(false)
-      return
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
+    let timer: number | undefined
+
+    const scheduleBlink = () => {
+      setBlink(null)
+      timer = window.setTimeout(closeEyes, 2000 + Math.random() * 4500)
     }
 
-    const timeoutIds: number[] = []
+    const closeEyes = () => {
+      const doubleBlink = Math.random() < 0.15
 
-    const scheduleTimeout = (callback: () => void, delay: number) => {
-      const timeoutId = window.setTimeout(callback, delay)
-      timeoutIds.push(timeoutId)
+      setBlink(doubleBlink ? "double" : "single")
+      timer = window.setTimeout(scheduleBlink, doubleBlink ? 450 : 230)
     }
 
-    const triggerBlink = () => {
-      setIsBlinking(true)
-      scheduleTimeout(() => setIsBlinking(false), 220)
-
-      if (Math.random() < 0.15) {
-        scheduleTimeout(() => {
-          setIsBlinking(true)
-          scheduleTimeout(() => setIsBlinking(false), 220)
-        }, 260 + Math.random() * 120)
+    const syncBlinking = () => {
+      window.clearTimeout(timer)
+      if (document.hidden || reducedMotion.matches) {
+        setBlink(null)
+      } else {
+        scheduleBlink()
       }
-
-      scheduleTimeout(triggerBlink, 2000 + Math.random() * 4500)
     }
 
-    scheduleTimeout(triggerBlink, 2000 + Math.random() * 4500)
+    document.addEventListener("visibilitychange", syncBlinking)
+    reducedMotion.addEventListener("change", syncBlinking)
+    syncBlinking()
 
     return () => {
-      timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId))
+      window.clearTimeout(timer)
+      document.removeEventListener("visibilitychange", syncBlinking)
+      reducedMotion.removeEventListener("change", syncBlinking)
     }
-  }, [enabled])
+  }, [])
 
-  return isBlinking
+  return blink
 }

@@ -60,6 +60,8 @@
 }
 
 #home-icon-nav {
+  -webkit-backdrop-filter: var(--glass-backdrop-filter);
+  backdrop-filter: var(--glass-backdrop-filter);
   background-image: linear-gradient(45deg, #f8a4c76c, #faa6de5b);
   box-shadow:
     inset 0 0 0 1px color-mix(in srgb, #ff80aab6 20%, transparent),
@@ -238,6 +240,11 @@
 .header-nav--icon.is-authenticated .header-nav__avatar {
   width: calc(var(--header-icon-size));
   height: calc(var(--header-icon-size));
+}
+
+.header-nav--icon.is-authenticated .header-nav__control:focus-visible {
+  outline: var(--border-width-thin) solid var(--color-blue);
+  outline-offset: 2px;
 }
 
 .header-nav__menu:not(:has(input:checked))::after {

@@ -1,0 +1,94 @@
+.ui-glass-switch {
+  --switch-inset: var(--spacing-xs);
+  --switch-thumb-size: 1.25rem;
+  --switch-thumb-light: var(--color-gray1);
+  --switch-thumb-shade: var(--color-gray3);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-block-size: 2.75rem;
+  min-inline-size: 0;
+  border-radius: var(--border-radius-pill);
+  color: var(--color-gray12);
+  font-family: var(--font-family-persian);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+}
+
+.dark .ui-glass-switch {
+  --switch-thumb-light: var(--color-gray12);
+  --switch-thumb-shade: var(--color-gray9);
+}
+
+.ui-glass-switch__input {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  inline-size: 100%;
+  block-size: 100%;
+  opacity: 0;
+  margin: 0;
+  cursor: inherit;
+}
+
+.ui-glass-switch__track {
+  position: relative;
+  flex: none;
+  inline-size: 3rem;
+  block-size: calc(var(--switch-thumb-size) + 2 * var(--switch-inset));
+  border-radius: var(--border-radius-pill);
+}
+
+.ui-glass-switch .ui-glass-switch__surface {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.ui-glass-switch__track > .blue-glass,
+.ui-glass-switch__thumb > .glass,
+.ui-glass-switch__input:checked + .ui-glass-switch__track > .glass,
+.ui-glass-switch__input:checked + .ui-glass-switch__track .ui-glass-switch__thumb > .blue-glass { display: none; }
+
+.ui-glass-switch__input:checked + .ui-glass-switch__track > .blue-glass,
+.ui-glass-switch__input:checked + .ui-glass-switch__track .ui-glass-switch__thumb > .glass { display: block; }
+
+.ui-glass-switch__track > .ui-glass-switch__thumb {
+  position: absolute;
+  inset-block-start: var(--switch-inset);
+  inset-inline-start: var(--switch-inset);
+  inline-size: var(--switch-thumb-size);
+  block-size: var(--switch-thumb-size);
+  border-radius: 50%;
+  transition: inset-inline-start var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+.ui-glass-switch__thumb > .glass {
+  background-image: linear-gradient(135deg, var(--switch-thumb-light), var(--switch-thumb-shade));
+}
+
+.ui-glass-switch__input:checked + .ui-glass-switch__track > .ui-glass-switch__thumb {
+  inset-inline-start: calc(100% - var(--switch-thumb-size) - var(--switch-inset));
+}
+
+.ui-glass-switch__input:focus-visible + .ui-glass-switch__track {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+.ui-glass-switch:has(> .ui-glass-switch__input:disabled) {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-glass-switch__track > .ui-glass-switch__thumb { transition: none; }
+}
+
+@media (forced-colors: active) {
+  .ui-glass-switch__track,
+  .ui-glass-switch__thumb { border: 1px solid ButtonText; }
+  .ui-glass-switch__input:focus-visible + .ui-glass-switch__track { outline-color: Highlight; }
+}

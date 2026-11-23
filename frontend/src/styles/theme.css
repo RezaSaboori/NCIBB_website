@@ -100,6 +100,7 @@
   --border-width-thin: 1px;
   --border-width-normal: 2px;
   --border-width-thick: 4px;
+  --ui-stroke: var(--border-width-thin) solid var(--color-gray3);
 
   /* * ========================================
     * Elevation (Box Shadow)

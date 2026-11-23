@@ -26,21 +26,13 @@
   width: 100%;
   min-width: 0;
   gap: var(--spacing-xs);
-  border: var(--border-width-thin) solid var(--color-gray2);
+  border: var(--ui-stroke);
   border-radius: var(--border-radius-container-xs);
   padding: 0 var(--spacing-xs);
   height: var(--ui-input-height);
   min-height: var(--ui-input-height);
   background-color: var(--color-gray1);
   box-sizing: border-box;
-  transition:
-    border-color var(--motion-duration-normal) var(--motion-easing-easeInOut),
-    box-shadow var(--motion-duration-normal) var(--motion-easing-easeInOut);
-}
-
-.ui-input-shell:focus-within {
-  border-color: var(--color-gray3);
-  box-shadow: var(--elevation-2);
 }
 
 /* ── Growable shell: TextInput/SearchInput with multiline prop ── */
@@ -121,7 +113,6 @@
 .ui-dropdown { inline-size: 100%; min-inline-size: 0; }
 
 .ui-dropdown__trigger {
-  box-shadow: var(--elevation-2);
   color: var(--color-gray11);
   cursor: pointer;
   text-align: start;
@@ -169,7 +160,7 @@
   box-sizing: border-box;
   padding: var(--spacing-sm);
   gap: var(--spacing-xs);
-  border: var(--border-width-thin) solid var(--color-gray3);
+  border: var(--ui-stroke);
   border-radius: var(--border-radius-container-xs);
   background: var(--color-gray1);
   box-shadow: var(--elevation-4);
@@ -288,7 +279,8 @@
   -moz-appearance: textfield;
 }
 
-.ui-input-shell:has(.ui-input-field:focus-visible) {
+.ui-input-shell:has(.ui-input-field:focus-visible),
+.ui-dropdown__trigger:focus-visible {
   outline: var(--border-width-thin) solid var(--color-blue);
   outline-offset: 2px;
 }

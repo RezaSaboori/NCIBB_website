@@ -1,8 +1,21 @@
 import { Tabs, type TabsProps } from "@heroui/react"
-import { useLayoutEffect, useRef } from "react"
+import { createContext, forwardRef, useContext, useLayoutEffect, useRef, type ComponentPropsWithoutRef } from "react"
+import { createPortal } from "react-dom"
 import "./GlassTabs.css"
 
-export function GlassTabs(props: TabsProps) {
+const TabRailTarget = createContext<HTMLElement | undefined>(undefined)
+
+const PortaledTabRail = forwardRef<HTMLDivElement, ComponentPropsWithoutRef<"div">>(
+  function PortaledTabRail(props, ref) {
+    const target = useContext(TabRailTarget)
+    return target ? createPortal(
+      <div className="ui-glass-tabs"><div {...props} ref={ref} /></div>,
+      target,
+    ) : null
+  },
+)
+
+export function GlassTabs({ railTarget, ...props }: TabsProps & { railTarget?: HTMLElement }) {
   const railRef = useRef<HTMLElement>(null)
 
   useLayoutEffect(() => {
@@ -29,22 +42,25 @@ export function GlassTabs(props: TabsProps) {
       selection.disconnect()
       resize.disconnect()
     }
-  }, [])
+  }, [railTarget])
 
   return (
-    <Tabs
-      {...props}
-      ref={railRef}
-      radius="full"
-      classNames={{
-        base: "ui-glass-tabs",
-        tabList: "datasaz-step-tabs ui-glass-tabs__list",
-        tab: "datasaz-step-tab ui-glass-tabs__tab",
-        cursor: "ui-glass-tabs__cursor",
-        tabContent: "ui-glass-tabs__label",
-        panel: "ui-glass-tabs__panel",
-      }}
-      disableCursorAnimation
-    />
+    <TabRailTarget.Provider value={railTarget}>
+      <Tabs
+        {...props}
+        as={railTarget ? PortaledTabRail : props.as}
+        ref={railRef}
+        radius="full"
+        classNames={{
+          base: railTarget ? "ui-glass-tabs__placeholder" : "ui-glass-tabs",
+          tabList: "datasaz-step-tabs ui-glass-tabs__list",
+          tab: "datasaz-step-tab ui-glass-tabs__tab",
+          cursor: "ui-glass-tabs__cursor",
+          tabContent: "ui-glass-tabs__label",
+          panel: "ui-glass-tabs__panel",
+        }}
+        disableCursorAnimation
+      />
+    </TabRailTarget.Provider>
   )
 }

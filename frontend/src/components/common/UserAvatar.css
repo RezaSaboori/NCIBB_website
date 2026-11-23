@@ -31,50 +31,6 @@
   object-fit: cover;
 }
 
-.user-avatar__eyes {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 100%;
-  height: 100%;
-  gap: 20%;
-  padding-bottom: 10%;
-}
-
-.user-avatar__eye {
-  width: 12%;
-  height: 25%;
-  background: var(--color-gray12);
-  border-radius: var(--border-radius-pill);
-  transform-origin: center;
-  will-change: transform;
-}
-
-.user-avatar__eyes--blink .user-avatar__eye {
-  animation: user-avatar-blink 220ms var(--motion-easing-easeInOut);
-}
-
-@keyframes user-avatar-blink {
-  0% {
-    transform: scaleY(1);
-  }
-
-  35% {
-    transform: scaleY(0.05);
-  }
-
-  55% {
-    transform: scaleY(0.05);
-  }
-
-  100% {
-    transform: scaleY(1);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .user-avatar__eyes--blink .user-avatar__eye {
-    animation: none;
-  }
+.user-avatar--glass {
+  overflow: visible;
 }

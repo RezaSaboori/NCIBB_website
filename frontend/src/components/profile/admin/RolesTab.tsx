@@ -1,6 +1,6 @@
 import { GlassCard } from "@/components/ui/GlassCard"
 import { GlassTable, type GlassTableColumn } from "@/components/ui/tables/GlassTable"
-import { SingleLineInput, SelectInput } from "@/components/ui/inputs"
+import { GlassChoice, SingleLineInput } from "@/components/ui/inputs"
 import { GlassButton } from "@/components/ui/GlassButton"
 import { useCallback, useState, type FormEvent } from "react"
 import { accountApi, accountError, type ScopedCatalog } from "@/dataset_services/accountApi"
@@ -8,6 +8,11 @@ import type { Role } from "@/types/account"
 import { AccountStatus } from "../shared/AccountStatus"
 import { PageControls } from "../shared/PageControls"
 import { useAccountQuery } from "../shared/useAccountQuery"
+
+const roleScopes = [
+  { value: "platform", label: "سامانه" },
+  { value: "group", label: "گروه" },
+] as const
 
 function RoleForm({ role, catalog, close, onSave }: {
   role: Role | null; catalog: ScopedCatalog; close: () => void; onSave: () => void
@@ -38,16 +43,19 @@ function RoleForm({ role, catalog, close, onSave }: {
       <div className="account-workspace__fields">
         <label>نام نقش<SingleLineInput required maxLength={100} value={label} onChange={(event) => setLabel(event.target.value)} /></label>
         <label>شناسه نقش<SingleLineInput required dir="ltr" maxLength={48} pattern="[a-zA-Z0-9_\-]+" disabled={!!role} value={code} onChange={(event) => setCode(event.target.value)} /></label>
-        <label>دامنه<SelectInput disabled={!!role} value={scope} onChange={(value) => {
-          setScope(value as Role["scope"])
-          setCapabilities([])
-        }} options={[{ value: "platform", label: "سامانه" }, { value: "group", label: "گروه" }]} /></label>
+        <fieldset className="account-workspace__scope" disabled={!!role}>
+          <legend>دامنه</legend>
+          {roleScopes.map(({ value, label }) => (
+            <GlassChoice key={value} type="radio" name="role-scope" value={value} label={label} checked={scope === value}
+              onChange={() => { setScope(value); setCapabilities([]) }} />
+          ))}
+        </fieldset>
       </div>
       <fieldset className="account-workspace__options">
         <legend>مجوزها</legend>
         {Object.entries(catalog[scope]).map(([permission, name]) => (
-          <label key={permission}><input type="checkbox" checked={capabilities.includes(permission)}
-            onChange={(event) => setCapabilities(event.target.checked ? [...capabilities, permission] : capabilities.filter((item) => item !== permission))} />{name}</label>
+          <GlassChoice key={permission} label={name} checked={capabilities.includes(permission)}
+            onChange={(event) => setCapabilities(event.target.checked ? [...capabilities, permission] : capabilities.filter((item) => item !== permission))} />
         ))}
       </fieldset>
       <AccountStatus error={error} />

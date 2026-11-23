@@ -1,4 +1,4 @@
-import { SingleLineInput, SelectInput } from "@/components/ui/inputs"
+import { GlassSwitch, SingleLineInput, SelectInput } from "@/components/ui/inputs"
 import { GlassButton } from "@/components/ui/GlassButton"
 import { useCallback, useState, type FormEvent } from "react"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
@@ -47,7 +47,8 @@ export function GroupMemberForm({ group, member, roles, close, onSaved }: {
         </div>
       )}
       <RoleChoices label="نقش‌های گروه" roles={roles} selected={rolesSelected} onChange={setRolesSelected} />
-      <label className="account-workspace__check"><input type="checkbox" checked={active} onChange={(event) => setActive(event.target.checked)} />عضویت فعال</label>
+      <GlassSwitch className="account-workspace__submit" label="عضویت فعال" checked={active}
+        onChange={(event) => setActive(event.target.checked)} />
       <AccountStatus error={error} />
       <div className="account-workspace__actions">
         <GlassButton color="primary" type="submit" isLoading={saving} isDisabled={!user}>ذخیره عضویت</GlassButton>

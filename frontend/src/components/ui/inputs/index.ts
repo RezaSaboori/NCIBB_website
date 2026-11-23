@@ -5,4 +5,6 @@ export { MessageInput } from "./MessageInput";
 export { NumberInput } from "./NumberInput";
 export { SearchInput } from "./SearchInput";
 export { DropdownInput } from "./DropdownInput";
+export { GlassChoice } from "./GlassChoice";
+export { GlassSwitch } from "./GlassSwitch";
 export { RadioToggle } from "./RadioToggle";

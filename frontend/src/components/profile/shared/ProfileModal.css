@@ -23,9 +23,11 @@ html:has(.profile-modal) { scrollbar-gutter: auto !important; }
 
 .profile-modal.glass-transparent::before { pointer-events: none; }
 
-.profile-modal :is(.profile-modal__header, .profile-modal__body, .profile-modal__footer) { padding: 0; min-inline-size: 0; }
+.profile-modal :is(.profile-modal__title, .profile-modal__body, .profile-modal__footer) { padding: 0; min-inline-size: 0; }
 
 .profile-modal .profile-modal__header {
+  display: flex;
+  flex: none;
   align-items: center;
   justify-content: space-between;
   gap: var(--spacing-md);
@@ -37,7 +39,19 @@ html:has(.profile-modal) { scrollbar-gutter: auto !important; }
   overflow-wrap: anywhere;
 }
 
-.profile-modal .profile-modal__close { flex: none; color: var(--color-gray12); }
+.profile-modal .profile-modal__close { flex: none; }
+
+.profile-modal--with-navigation .profile-modal__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  grid-template-areas: "title navigation close";
+}
+
+.profile-modal--with-navigation .profile-modal__title { grid-area: title; }
+.profile-modal--with-navigation .profile-modal__close { grid-area: close; justify-self: end; }
+.profile-modal__navigation { grid-area: navigation; justify-self: center; min-inline-size: 0; max-inline-size: 100%; }
+.profile-modal__navigation .ui-glass-tabs { margin: 0; }
+.profile-modal--with-navigation .ui-glass-tabs__panel { padding-block-start: 0; }
 
 .profile-modal .profile-modal__body {
   flex: 0 1 auto;
@@ -69,12 +83,21 @@ html:has(.profile-modal) { scrollbar-gutter: auto !important; }
 .profile-modal h3 { font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); }
 .profile-modal blockquote { white-space: pre-wrap; overflow-wrap: anywhere; }
 
+@media (min-width: 761px) {
+  .profile-modal--with-navigation.glass-transparent { gap: var(--spacing-lg); }
+}
+
 @media (max-width: 760px) {
   .profile-modal.glass-transparent {
     --profile-modal-padding: var(--spacing-md);
     border-radius: var(--border-radius-container-sm);
     margin: var(--spacing-sm);
     max-block-size: calc(var(--visual-viewport-height, 100dvh) - 2 * var(--spacing-sm));
+  }
+
+  .profile-modal--with-navigation .profile-modal__header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "title close" "navigation navigation";
   }
 }
 
