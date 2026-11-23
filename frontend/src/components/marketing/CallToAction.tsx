@@ -12,8 +12,6 @@ interface CallToActionProps {
 }
 
 export const CallToAction: React.FC<CallToActionProps> = ({
-  title,
-  description,
   action,
 }) => {
   return (

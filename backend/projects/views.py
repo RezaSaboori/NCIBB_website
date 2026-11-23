@@ -15,7 +15,16 @@ from .serializers import (
     ProjectCommentCreateUpdateSerializer,
     ProjectFileSerializer
 )
-from authentication.permissions import IsOwnerOrAdmin, IsOwnerOrReadOnly
+from authentication.permissions import IsOwnerOrReadOnly
+from apps.user_management.access import is_admin
+from django.shortcuts import get_object_or_404
+
+
+def accessible_project(user, project_id):
+    projects = Project.objects.all()
+    if not is_admin(user):
+        projects = projects.filter(Q(owner=user) | Q(collaborators=user)).distinct()
+    return get_object_or_404(projects, pk=project_id)
 
 
 class ProjectListView(generics.ListCreateAPIView):
@@ -29,7 +38,7 @@ class ProjectListView(generics.ListCreateAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        if user.role == 'admin':
+        if is_admin(user):
             return Project.objects.all()
         return Project.objects.filter(
             Q(owner=user) | Q(collaborators=user)
@@ -55,7 +64,7 @@ class ProjectDetailView(generics.RetrieveUpdateDestroyAPIView):
     
     def get_queryset(self):
         user = self.request.user
-        if user.role == 'admin':
+        if is_admin(user):
             return Project.objects.all()
         return Project.objects.filter(
             Q(owner=user) | Q(collaborators=user)
@@ -78,7 +87,7 @@ class ProjectTaskListView(generics.ListCreateAPIView):
         # Check if user has access to the project
         try:
             project = Project.objects.get(id=project_id)
-            if user.role != 'admin' and project.owner != user and user not in project.collaborators.all():
+            if not is_admin(user) and project.owner != user and user not in project.collaborators.all():
                 return ProjectTask.objects.none()
             return ProjectTask.objects.filter(project=project)
         except Project.DoesNotExist:
@@ -91,7 +100,7 @@ class ProjectTaskListView(generics.ListCreateAPIView):
     
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['project'] = Project.objects.get(id=self.kwargs['project_id'])
+        context['project'] = accessible_project(self.request.user, self.kwargs['project_id'])
         return context
 
 
@@ -106,7 +115,7 @@ class ProjectTaskDetailView(generics.RetrieveUpdateDestroyAPIView):
         # Check if user has access to the project
         try:
             project = Project.objects.get(id=project_id)
-            if user.role != 'admin' and project.owner != user and user not in project.collaborators.all():
+            if not is_admin(user) and project.owner != user and user not in project.collaborators.all():
                 return ProjectTask.objects.none()
             return ProjectTask.objects.filter(project=project)
         except Project.DoesNotExist:
@@ -126,7 +135,7 @@ class ProjectCommentListView(generics.ListCreateAPIView):
         # Check if user has access to the project
         try:
             project = Project.objects.get(id=project_id)
-            if user.role != 'admin' and project.owner != user and user not in project.collaborators.all():
+            if not is_admin(user) and project.owner != user and user not in project.collaborators.all():
                 return ProjectComment.objects.none()
             return ProjectComment.objects.filter(project=project)
         except Project.DoesNotExist:
@@ -139,7 +148,7 @@ class ProjectCommentListView(generics.ListCreateAPIView):
     
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['project'] = Project.objects.get(id=self.kwargs['project_id'])
+        context['project'] = accessible_project(self.request.user, self.kwargs['project_id'])
         return context
 
 
@@ -157,7 +166,7 @@ class ProjectFileListView(generics.ListCreateAPIView):
         # Check if user has access to the project
         try:
             project = Project.objects.get(id=project_id)
-            if user.role != 'admin' and project.owner != user and user not in project.collaborators.all():
+            if not is_admin(user) and project.owner != user and user not in project.collaborators.all():
                 return ProjectFile.objects.none()
             return ProjectFile.objects.filter(project=project)
         except Project.DoesNotExist:
@@ -174,7 +183,7 @@ def project_stats_view(request):
     """Get project statistics for dashboard"""
     user = request.user
     
-    if user.role == 'admin':
+    if is_admin(user):
         projects = Project.objects.all()
     else:
         projects = Project.objects.filter(
@@ -200,7 +209,7 @@ def add_collaborator_view(request, project_id):
         project = Project.objects.get(id=project_id)
         
         # Check if user is owner or admin
-        if project.owner != request.user and request.user.role != 'admin':
+        if project.owner != request.user and not is_admin(request.user):
             return Response(
                 {"error": "Only project owner or admin can add collaborators"}, 
                 status=status.HTTP_403_FORBIDDEN

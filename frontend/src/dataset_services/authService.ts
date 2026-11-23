@@ -1,56 +1,45 @@
-import api from "./api"
+import api, { refreshSession } from "./api"
 
-const login = async (credentials) => {
-  const response = await api.post("/auth/login/", credentials)
-  return response.data
+interface Credentials { email: string; password: string }
+interface Registration extends Credentials {
+  username: string
+  first_name: string
+  last_name: string
+  password_confirm: string
+}
+export interface AuthResponse {
+  access: string
+  refresh: string
+  user: {
+    id: number
+    email: string
+    username: string
+    first_name: string
+    role: string
+    profile: { full_name?: string; profile_picture_url?: string | null } | null
+  }
 }
 
-const register = async (userData) => {
-  const response = await api.post("/auth/register/", userData)
-  return response.data
-}
+const login = async (credentials: Credentials) => (await api.post<AuthResponse>("/auth/login/", credentials)).data
+
+const register = async (userData: Registration) => (await api.post<AuthResponse>("/auth/register/", userData)).data
 
 const logout = async () => {
-  const refreshToken = localStorage.getItem("refresh_token")
-  if (refreshToken) {
+  const refresh = localStorage.getItem("refresh_token")
+  if (refresh) {
     try {
-      await api.post("/auth/logout/", { refresh: refreshToken })
+      await api.post("/auth/logout/", { refresh })
     } catch (error) {
       console.error("Failed to logout on server", error)
     }
   }
-  // Even if server logout fails, clear local tokens
   localStorage.removeItem("access_token")
   localStorage.removeItem("refresh_token")
 }
 
-const refreshToken = async () => {
-  const refreshToken = localStorage.getItem("refresh_token")
-  if (!refreshToken) {
-    throw new Error("No refresh token found")
-  }
-  const response = await api.post("/auth/token/refresh/", {
-    refresh: refreshToken,
-  })
-  localStorage.setItem("access_token", response.data.access)
-  return response.data
-}
+const refreshToken = async () => ({ access: await refreshSession() })
+const forgotPassword = async (email: string) => (await api.post("/auth/password/reset/", { email })).data
+const resetPassword = async (resetData: Record<string, string>) =>
+  (await api.post("/auth/password/reset/confirm/", resetData)).data
 
-const forgotPassword = async (email) => {
-  const response = await api.post("/auth/password/reset/", { email })
-  return response.data
-}
-
-const resetPassword = async (resetData) => {
-  const response = await api.post("/auth/password/reset/confirm/", resetData)
-  return response.data
-}
-
-export const authService = {
-  login,
-  register,
-  logout,
-  refreshToken,
-  forgotPassword,
-  resetPassword,
-}
+export const authService = { login, register, logout, refreshToken, forgotPassword, resetPassword }

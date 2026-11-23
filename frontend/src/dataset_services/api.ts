@@ -1,58 +1,62 @@
-import axios from "axios"
-import { store } from "../store/store" // Import the store
-import { logoutSuccess } from "../store/authSlice" // Import the logout action
+import axios, { type InternalAxiosRequestConfig } from "axios"
+import { store } from "../store/store"
+import { logoutSuccess } from "../store/authSlice"
+import { getUserIdFromAccessToken } from "../utils/authToken"
 
-const api = axios.create({
-  baseURL: "/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
+const api = axios.create({ baseURL: "/api", headers: { "Content-Type": "application/json" } })
+const unauthenticated = new Set(["/auth/login/", "/auth/register/", "/auth/email-verification/confirm/"])
+
+api.interceptors.request.use((config) => {
+  const access = localStorage.getItem("access_token")
+  if (access && !unauthenticated.has(config.url || "")) {
+    config.headers.set("Authorization", `Bearer ${access}`)
+  }
+  return config
 })
 
-// Request interceptor to add the auth token header to requests
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("access_token")
-    if (token) {
-      config.headers["Authorization"] = "Bearer " + token
-    }
-    return config
-  },
-  (error) => {
-    Promise.reject(error)
-  }
-)
+let pendingRefresh: Promise<string> | undefined
 
-// Response interceptor to handle token refresh
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-      const refreshToken = localStorage.getItem("refresh_token")
-      if (refreshToken) {
-        try {
-          const response = await axios.post("/api/auth/token/refresh/", {
-            refresh: refreshToken,
-          })
-          const { access } = response.data
-          localStorage.setItem("access_token", access)
-          axios.defaults.headers.common["Authorization"] = "Bearer " + access
-          return api(originalRequest)
-        } catch (refreshError) {
-          // If refresh token is invalid, logout the user
-          store.dispatch(logoutSuccess())
-          return Promise.reject(refreshError)
-        }
-      }
-    }
-    return Promise.reject(error)
-  }
-)
+export function refreshSession() {
+  if (pendingRefresh) return pendingRefresh
+  const refresh = localStorage.getItem("refresh_token")
+  if (!refresh) return Promise.reject(new Error("Missing refresh token"))
 
-export const getPageData = (pageName: string) => {
-  return api.get(`/core/pages/${pageName}/`)
+  pendingRefresh = axios.post<{ access: string; refresh?: string }>("/api/auth/token/refresh/", { refresh })
+    .then(({ data }) => {
+      if (localStorage.getItem("refresh_token") !== refresh) throw new Error("Session changed")
+      localStorage.setItem("access_token", data.access)
+      if (data.refresh) localStorage.setItem("refresh_token", data.refresh)
+      return data.access
+    })
+    .finally(() => { pendingRefresh = undefined })
+  return pendingRefresh
 }
+
+api.interceptors.response.use((response) => response, async (error: unknown) => {
+  if (!axios.isAxiosError(error)) throw error
+  const request: (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined = error.config
+  if (!request || error.response?.status !== 401 || request._retry || unauthenticated.has(request.url || "")) {
+    throw error
+  }
+
+  const refreshAtFailure = localStorage.getItem("refresh_token")
+  const access = localStorage.getItem("access_token")
+  if (!access && !refreshAtFailure) throw error
+  const sent = request.headers.get("Authorization")
+  if (typeof sent === "string" && access && sent !== `Bearer ${access}`
+      && getUserIdFromAccessToken(sent.slice(7)) !== getUserIdFromAccessToken(access)) {
+    throw error
+  }
+  request._retry = true
+  try {
+    if (!access || sent === `Bearer ${access}` || !sent) await refreshSession()
+  } catch {
+    if (localStorage.getItem("refresh_token") === refreshAtFailure) store.dispatch(logoutSuccess())
+    throw error
+  }
+  return api(request)
+})
+
+export const getPageData = async (slug: string) => (await api.get(`/core/pages/${slug}/`)).data
 
 export default api

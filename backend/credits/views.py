@@ -1,159 +1,96 @@
-from rest_framework import generics, status, permissions
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
+from django.utils.cache import add_never_cache_headers
+from rest_framework import generics, permissions, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
-from .models import UserCredit, CreditTransaction, CreditPackage
-from .serializers import (
-    UserCreditSerializer, 
-    CreditTransactionSerializer, 
-    CreditPackageSerializer,
-    AddCreditsSerializer,
-    SpendCreditsSerializer
-)
-from authentication.permissions import IsOwnerOrAdmin, CanManageUsers
+
+from apps.user_management.access import IsPlatformAdmin
+from apps.user_management.models import GroupMembership
+from .models import CreditPackage, CreditTransaction, GroupWallet
+from .serializers import AddCreditsSerializer, CreditPackageSerializer, CreditTransactionSerializer
+from .services import CreditError, adjust_balance, job_price, personal_wallet
 
 
-class UserCreditView(generics.RetrieveAPIView):
-    serializer_class = UserCreditSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrAdmin]
-    
-    def get_object(self):
-        credit, created = UserCredit.objects.get_or_create(user=self.request.user)
-        return credit
+def wallet_summary(user, *, include_groups=True):
+    wallet, reset = personal_wallet(user)
+    result = {
+        "id": wallet.pk, "user": user.pk, "balance": str(wallet.balance + wallet.monthly_balance),
+        "monthly_balance": str(wallet.monthly_balance), "permanent_balance": str(wallet.balance),
+        "total_earned": str(wallet.total_earned), "total_spent": str(wallet.total_spent),
+        "period": wallet.period, "reset_at": reset.isoformat(), "job_price": str(job_price()),
+    }
+    if include_groups:
+        memberships = GroupMembership.objects.filter(user=user, active=True, can_spend=True).select_related("group")
+        balances = {wallet.group_id: wallet.balance for wallet in GroupWallet.objects.filter(
+            group_id__in=memberships.values_list("group_id", flat=True)
+        )}
+        result["groups"] = [
+            {"id": member.group_id, "name": member.group.name,
+             "balance": str(balances.get(member.group_id, "0.00"))}
+            for member in memberships
+        ]
+    return result
+
+
+class UserCreditView(generics.GenericAPIView):
+    def get(self, request):
+        response = Response(wallet_summary(request.user))
+        add_never_cache_headers(response)
+        return response
 
 
 class CreditTransactionListView(generics.ListAPIView):
     serializer_class = CreditTransactionSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['transaction_type']
-    search_fields = ['description']
-    ordering_fields = ['created_at', 'amount']
-    ordering = ['-created_at']
-    
+    filterset_fields = ["transaction_type", "bucket"]
+    search_fields = ["description"]
+    ordering_fields = ["created_at", "amount"]
+
     def get_queryset(self):
-        if self.request.user.role == 'admin':
-            return CreditTransaction.objects.all()
         return CreditTransaction.objects.filter(user=self.request.user)
 
 
 class CreditPackageListView(generics.ListAPIView):
     queryset = CreditPackage.objects.filter(is_active=True)
     serializer_class = CreditPackageSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
 
 class CreditPackageDetailView(generics.RetrieveAPIView):
     queryset = CreditPackage.objects.filter(is_active=True)
     serializer_class = CreditPackageSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
 
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
+def credit_error(error):
+    return Response({"code": error.code, "detail": str(error)}, status=status.HTTP_409_CONFLICT)
+
+
+@api_view(["POST"])
+@permission_classes([IsPlatformAdmin])
 def add_credits_view(request):
-    """Add credits to user's account (admin only)"""
-    if request.user.role != 'admin':
-        return Response(
-            {"error": "Only administrators can add credits"}, 
-            status=status.HTTP_403_FORBIDDEN
-        )
-    
     serializer = AddCreditsSerializer(data=request.data)
-    if serializer.is_valid():
-        user_id = request.data.get('user_id')
-        if not user_id:
-            return Response(
-                {"error": "user_id is required"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        try:
-            from authentication.models import User
-            user = User.objects.get(id=user_id)
-            credit, created = UserCredit.objects.get_or_create(user=user)
-            
-            amount = serializer.validated_data['amount']
-            description = serializer.validated_data.get('description', 'Credits added by admin')
-            
-            credit.add_credits(amount, description)
-            
-            return Response({
-                "message": f"Successfully added {amount} credits to {user.get_full_name()}",
-                "new_balance": str(credit.balance)
-            }, status=status.HTTP_200_OK)
-            
-        except User.DoesNotExist:
-            return Response(
-                {"error": "User not found"}, 
-                status=status.HTTP_404_NOT_FOUND
-            )
-    
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer.is_valid(raise_exception=True)
+    values = serializer.validated_data
+    user = get_object_or_404(get_user_model(), pk=values.pop("user_id"))
+    try:
+        entry = adjust_balance(request.user, user=user, **values)
+    except CreditError as error:
+        return credit_error(error)
+    return Response({"new_balance": str(entry.balance_after), "transaction": CreditTransactionSerializer(entry).data})
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
 def spend_credits_view(request):
-    """Spend credits from user's account"""
-    serializer = SpendCreditsSerializer(data=request.data)
-    if serializer.is_valid():
-        credit, created = UserCredit.objects.get_or_create(user=request.user)
-        
-        amount = serializer.validated_data['amount']
-        description = serializer.validated_data.get('description', 'Credits spent')
-        
-        if credit.spend_credits(amount, description):
-            return Response({
-                "message": f"Successfully spent {amount} credits",
-                "new_balance": str(credit.balance)
-            }, status=status.HTTP_200_OK)
-        else:
-            return Response({
-                "error": "Insufficient credits",
-                "current_balance": str(credit.balance),
-                "requested_amount": str(amount)
-            }, status=status.HTTP_400_BAD_REQUEST)
-    
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return Response(
+        {"code": "job_required", "detail": "Credits are spent through a managed job."},
+        status=status.HTTP_403_FORBIDDEN,
+    )
 
 
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
+@api_view(["GET"])
 def credit_stats_view(request):
-    """Get credit statistics for dashboard"""
-    credit, created = UserCredit.objects.get_or_create(user=request.user)
-    
-    # Get recent transactions
-    recent_transactions = CreditTransaction.objects.filter(
-        user=request.user
-    ).order_by('-created_at')[:10]
-    
-    # Get monthly stats
-    from django.utils import timezone
-    from datetime import timedelta
-    
-    now = timezone.now()
-    last_month = now - timedelta(days=30)
-    
-    monthly_earned = CreditTransaction.objects.filter(
-        user=request.user,
-        transaction_type='earned',
-        created_at__gte=last_month
-    ).aggregate(total=models.Sum('amount'))['total'] or 0
-    
-    monthly_spent = CreditTransaction.objects.filter(
-        user=request.user,
-        transaction_type='spent',
-        created_at__gte=last_month
-    ).aggregate(total=models.Sum('amount'))['total'] or 0
-    
-    return Response({
-        'balance': str(credit.balance),
-        'total_earned': str(credit.total_earned),
-        'total_spent': str(credit.total_spent),
-        'monthly_earned': str(monthly_earned),
-        'monthly_spent': str(monthly_spent),
-        'recent_transactions': CreditTransactionSerializer(recent_transactions, many=True).data
-    })
+    data = wallet_summary(request.user)
+    data["recent_transactions"] = CreditTransactionSerializer(
+        CreditTransaction.objects.filter(user=request.user)[:10], many=True
+    ).data
+    return Response(data)

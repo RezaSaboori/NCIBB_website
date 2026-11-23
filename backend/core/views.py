@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
+from apps.user_management.access import is_admin
 from .models import Page
 from .serializers import PageSerializer
 
@@ -29,7 +30,7 @@ User = get_user_model()
 @permission_classes([IsAuthenticated])
 def admin_dashboard_stats(request):
     """Get admin dashboard statistics"""
-    if request.user.role != 'admin':
+    if not is_admin(request.user):
         return Response(
             {"error": "Only administrators can access this endpoint"}, 
             status=403
@@ -38,23 +39,24 @@ def admin_dashboard_stats(request):
     # Get user statistics
     total_users = User.objects.count()
     active_users = User.objects.filter(is_active=True).count()
-    verified_users = User.objects.filter(is_verified=True).count()
+    verified_users = User.objects.filter(is_email_verified=True).count()
     
     # Get project statistics
-    from apps.projects.models import Project
-    total_projects = Project.objects.count()
+    from datasaz.models import DatasazProject
+    from projects.models import Project
+    total_projects = Project.objects.count() + DatasazProject.objects.count()
     active_projects = Project.objects.filter(status='active').count()
     completed_projects = Project.objects.filter(status='completed').count()
     
     # Get credit statistics
-    from apps.credits.models import UserCredit
+    from credits.models import UserCredit
     total_credits = UserCredit.objects.aggregate(
-        total=models.Sum('balance')
+        total=models.Sum(models.F('balance') + models.F('monthly_balance'))
     )['total'] or 0
     
     # Get message statistics
-    from apps.messaging.models import Message
-    total_messages = Message.objects.count()
+    from messaging.models import ThreadMessage
+    total_messages = ThreadMessage.objects.count()
     
     stats = {
         'total_users': total_users,

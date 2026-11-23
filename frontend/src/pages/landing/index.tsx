@@ -40,7 +40,6 @@ const LandingPage = () => {
     isLoading, 
     totalProgress, 
     updateProgress, 
-    finishLoading, 
     handleError 
   } = useLoadingState()
   

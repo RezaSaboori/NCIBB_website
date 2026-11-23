@@ -1,5 +1,7 @@
 from rest_framework import permissions
 
+from apps.user_management.access import IsPlatformAdmin, is_admin
+
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
@@ -20,15 +22,10 @@ class IsAdminOrManagerOnly(permissions.BasePermission):
     Custom permission to only allow admin or manager users.
     """
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role in ['admin', 'manager']
+        return is_admin(request.user)
 
 
-class CanManageUsers(permissions.BasePermission):
-    """
-    Custom permission to only allow admin users to manage users.
-    """
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == 'admin'
+CanManageUsers = IsPlatformAdmin
 
 
 class IsOwnerOrAdmin(permissions.BasePermission):
@@ -37,7 +34,7 @@ class IsOwnerOrAdmin(permissions.BasePermission):
     """
     def has_object_permission(self, request, view, obj):
         # Admin users can access any object
-        if request.user.role == 'admin':
+        if is_admin(request.user):
             return True
         
         # Users can only access their own objects
@@ -59,7 +56,7 @@ class IsAdminOrSelf(permissions.BasePermission):
     """
     def has_object_permission(self, request, view, obj):
         # Admin users can access any profile
-        if request.user.role == 'admin':
+        if is_admin(request.user):
             return True
         
         # Users can only access their own profile

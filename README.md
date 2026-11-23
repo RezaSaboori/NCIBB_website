@@ -73,7 +73,7 @@ NCIBB/
 
 ### Prerequisites
 - Python 3.10+
-- Node.js 18+
+- Node.js 20.19+ or 22.12+. The repository pins Node 22.19.0 in `.nvmrc`.
 - PostgreSQL (for production)
 - Redis (for background tasks)
 
@@ -87,8 +87,10 @@ NCIBB/
 
 2. **Backend Setup**
    ```bash
-   # Install Python dependencies
-   pip install -r requirements.txt
+   cd backend
+   python -m venv .venv
+   source .venv/bin/activate
+   python -m pip install -r requirements.txt
    
    # Run migrations
    python manage.py migrate
@@ -97,15 +99,17 @@ NCIBB/
    python manage.py createsuperuser
    
    # Start development server
-   python manage.py runserver
+   python manage.py runserver 127.0.0.1:8000
    ```
 
-3. **Frontend Setup**
+3. **Frontend Setup** (in a second terminal, from the repository root)
    ```bash
+   # Select the version in .nvmrc with your Node version manager.
+   nvm use
    cd frontend
    
    # Install dependencies
-   npm install
+   npm ci
    
    # Start development server
    npm run dev
@@ -113,7 +117,7 @@ NCIBB/
 
 4. **Access the application**
    - Backend API: http://localhost:8000/api/
-   - Frontend: http://localhost:3000
+   - Frontend: http://localhost:5173
    - Admin Panel: http://localhost:8000/admin/
 
 ### Docker Setup
@@ -150,113 +154,80 @@ NCIBB/
 
 ## 📚 API Endpoints
 
-### Authentication
-- `POST /api/auth/login/` - User login
-- `POST /api/auth/register/` - User registration
-- `POST /api/auth/logout/` - User logout
-- `GET /api/auth/dashboard/` - User dashboard data
-- `GET /api/auth/profile/` - User profile
-- `PATCH /api/auth/profile/` - Update profile
+### Accounts and access
 
-### Credits
-- `GET /api/credits/` - User credit balance
-- `GET /api/credits/transactions/` - Credit transactions
-- `POST /api/credits/add/` - Add credits (admin only)
-- `POST /api/credits/spend/` - Spend credits
+Use a Bearer access token for these endpoints unless marked public. List endpoints with pagination return `count`, `results`, `next`, and `previous`. A missing or expired session returns `401`. A disallowed operation returns `403`, and a conversation outside the caller’s audience returns `404`.
 
-### Projects
-- `GET /api/projects/` - List projects
-- `POST /api/projects/` - Create project
-- `GET /api/projects/{id}/` - Project details
-- `PATCH /api/projects/{id}/` - Update project
-- `DELETE /api/projects/{id}/` - Delete project
+| Method and path | Request and result |
+| --- | --- |
+| `POST /api/auth/register/`, `POST /api/auth/login/` | Public. Existing registration or login credentials return the user and access and refresh tokens. Registration always gives base-user access. |
+| `GET/PATCH /api/auth/profile/me/` | Get the signed-in user and their roles, effective capabilities, and active group memberships. PATCH accepts editable account and profile fields and returns the complete profile. |
+| `POST /api/auth/email-verification/` | Request a link for the current address. Returns `204`; repeat requests can return `429`. |
+| `POST /api/auth/email-verification/confirm/` | Public. Accepts `token` and returns `204` on confirmation. Invalid or expired links return `400`. |
+| `GET /api/auth/users/`, `GET /api/auth/users/{id}/` | Platform admin. Search by name, username, or email and filter by `role` and `is_active`. Detail includes a wallet summary. |
+| `PATCH /api/auth/users/{id}/access/` | Platform admin. Send `roles` as an array of platform role IDs, `is_active` as a boolean, or both. Returns the updated account. |
+| `GET /api/auth/users/{id}/{projects,conversations,credits,audit}/` | Platform admin. Paginated related data. `GET /api/auth/users/{id}/conversations/{thread_id}/` returns messages and records the review. |
+| `GET/POST /api/auth/roles/`, `PATCH /api/auth/roles/{id}/` | Platform admin. Create with `code`, `label`, `scope`, and `capabilities`. Only custom role labels and capabilities can be edited. Get assignable codes from `GET /api/auth/role-capabilities/`. |
+| `GET/POST /api/auth/groups/`, `PATCH /api/auth/groups/{id}/` | List the caller’s active groups or all groups for a platform admin. Only platform admins write `name` and optional `parent`. |
+| `GET /api/auth/groups/{id}/members/`, `PUT /api/auth/groups/{id}/members/{user_id}/` | Platform and group admins can list members in scope. Platform admins set group role IDs and `active`. |
+| `PATCH /api/auth/groups/{id}/spending/{membership_id}/` | Platform or group admin in scope. Set `can_spend`; returns the updated membership. |
+| `GET/POST /api/auth/groups/{id}/mentors/`, `DELETE /api/auth/groups/{id}/mentors/{link_id}/` | Platform admin. POST connects `professor` and `student` membership IDs in the same group. DELETE returns `204`. |
+| `GET /api/auth/research-groups/` | Requires the registered research-groups capability. Returns the caller’s memberships and assigned contacts. |
+
+### Beat Coin
+
+| Method and path | Request and result |
+| --- | --- |
+| `GET /api/credits/` | Personal wallet with decimal-string balances, next Persian calendar reset, job price, and approved shared wallets. |
+| `GET /api/credits/transactions/` | Paginated personal ledger. |
+| `POST /api/auth/users/{id}/credits/` | Platform admin. A signed decimal-string `amount`, `reason`, and UUID `request_id` adjust permanent credits. Returns the ledger entry. Reuse a request ID when retrying the same adjustment. |
+| `GET/POST /api/auth/groups/{id}/wallet/` | Platform and group admins in scope can read the shared balance and ledger. Platform admins can post adjustments with the same format. |
+| `POST /api/credits/add/` | Legacy positive adjustment. Accepts the same reason and request ID plus `user_id`. |
+| `POST /api/credits/spend/` | Returns `403` with `job_required`. Managed jobs spend through the server ledger. |
+
+Insufficient funds, conflicting adjustment retries, and balance limits return `409`. The Datasaz worker integration uses `credits.services.reserve_job(job_id, user, group=...)` before queueing work and `finish_job(job_id, succeeded=..., reason=...)` at terminal state. Use a stable job ID across retries and wrap reservation and the persisted job transition in the same database transaction. Once the runner exists, dispatch after the reservation commits, then record a failed enqueue through the same release path.
 
 ### Messaging
-- `GET /api/messaging/messages/` - List messages
-- `POST /api/messaging/send/` - Send message
-- `GET /api/messaging/inbox/` - Inbox summary
-- `GET /api/messaging/notifications/` - Notifications
 
-## 🎨 Frontend Components
+| Method and path | Request and result |
+| --- | --- |
+| `GET /api/messaging/destinations/` | Returns permitted destinations and optional recipient and group IDs. Filter with `search`. |
+| `GET/POST /api/messaging/threads/` | List the caller’s inbox, optionally filtered by `route`. Compose with `kind`, `subject`, `content`, and the required `recipient` and `group` for the selected destination. |
+| `GET /api/messaging/threads/{id}/`, `GET/POST /api/messaging/threads/{id}/messages/` | Thread metadata or paginated messages, newest first. POST accepts `content` and returns the new message. |
+| `POST /api/messaging/threads/{id}/read/` | Mark through the supplied message ID in `through`. Returns `204`. |
+| `POST /api/messaging/threads/{id}/forward/` | Compose fields plus `message_ids`. Copies between one and ten selected messages into a new permitted conversation. |
+| `POST /api/messaging/send/` or `POST /api/messaging/messages/` | Legacy recipient-ID send using the same routing rules. Returns the new thread. |
 
-### Dashboard Components
-- **UserDashboard**: Main user dashboard with stats and quick actions
-- **AdminDashboard**: Admin panel with user management and system stats
+### Projects
 
-### Authentication Components
-- **LoginForm**: User login with validation
-- **RegisterForm**: User registration with validation
+The `/api/projects/` collection supports GET and POST. Use GET, PATCH, and DELETE on `/api/projects/{id}/`. The profile uses the owner-scoped `/api/datasaz/projects/` list for Datasaz projects.
 
-### Common Components
-- **ProtectedRoute**: Route protection based on authentication and roles
+## Production configuration and rollout
 
-## 🔧 Configuration
+Set `NCIBB_ENV=production`, a private `SECRET_KEY`, comma-separated `ALLOWED_HOSTS`, `PUBLIC_SITE_URL`, and `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, and `DB_PORT` in the service environment. Use a dedicated PostgreSQL database and database user. The Compose database uses PostgreSQL 16 for new development databases. For an existing older PostgreSQL volume, restore a backup into the upgraded instance. Set `TRUST_HTTPS_PROXY=1` only behind a proxy that strips and sets `X-Forwarded-Proto`. Serve the Vite build and media through that proxy, and route `/api/` and `/admin/` to Django. Configure SMTP using `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, and `DEFAULT_FROM_EMAIL`. Set `CACHE_URL` to a shared Redis instance in multi-worker deployments so rate limits have shared state.
 
-### Environment Variables
+| Server setting | Example value |
+| --- | --- |
+| `BEAT_COIN_PLATFORM_ALLOWANCES` | `{"user":{"starter":"5","monthly":"10"},"student":{"monthly":"20"}}` |
+| `BEAT_COIN_GROUP_ALLOWANCES` | `{"42":{"student":{"starter":"3","monthly":"5"}}}` |
+| `BEAT_COIN_EMAIL_REWARD` | `2.00` |
+| `BEAT_COIN_JOB_PRICE` | `0` while Datasaz processing is a placeholder. Configure one positive fixed price when connecting the real worker. |
 
-#### Backend (.env)
-```env
-SECRET_KEY=your-secret-key
-DEBUG=True
-DB_NAME=ncibb_db
-DB_USER=postgres
-DB_PASSWORD=password
-DB_HOST=localhost
-DB_PORT=5432
-```
+Back up the source database and rehearse the migration with a staging copy. Run `python manage.py migrate` and `python manage.py check --deploy` before serving production traffic. Verify the administrator roster and reconcile account, balance, project, and conversation counts. Active Django superusers provide initial administrator access. Use `python manage.py bootstrap_platform_admin --email <verified-account>` for each confirmed administrator who needs access. If the deployment previously used the default signing secret, provision a new secret and have users sign in again.
 
-#### Frontend (.env)
-```env
-VITE_API_BASE_URL=http://localhost:8000/api
-```
-
-## 🚀 Deployment
-
-### Production Setup
-
-1. **Update settings for production**
-   ```python
-   # Use production settings
-   ENVIRONMENT=production
-   ```
-
-2. **Configure database**
-   ```bash
-   # Use PostgreSQL in production
-   DATABASES = {
-       'default': {
-           'ENGINE': 'django.db.backends.postgresql',
-           'NAME': 'ncibb_db',
-           'USER': 'postgres',
-           'PASSWORD': 'your-password',
-           'HOST': 'your-host',
-           'PORT': '5432',
-       }
-   }
-   ```
-
-3. **Build and deploy**
-   ```bash
-   # Build frontend
-   cd frontend
-   npm run build
-   
-   # Deploy backend
-   python manage.py collectstatic
-   gunicorn ncibb.wsgi:application
-   ```
+Schedule `python manage.py rollover_beat_coin` hourly. Wallet reads and new job reservations also reconcile overdue credits. Purchases require a future checkout integration.
 
 ## 🧪 Testing
 
 ### Backend Tests
 ```bash
-python manage.py test
+python manage.py test authentication.tests.test_profile apps.user_management.tests credits
 ```
 
-### Frontend Tests
+### Frontend production build
 ```bash
 cd frontend
-npm test
+npm run build
 ```
 
 ## 📝 License

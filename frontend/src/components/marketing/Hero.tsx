@@ -17,8 +17,6 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({
-  title,
-  subtitle,
   imageUrl,
   primaryAction,
   secondaryAction,

@@ -1,6 +1,5 @@
 export interface HeaderProps {
   className?: string
-  sidebarOffset?: string
 }
 
 export interface NavigationItem {

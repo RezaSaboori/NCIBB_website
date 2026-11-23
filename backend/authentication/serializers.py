@@ -1,7 +1,16 @@
 from rest_framework import serializers
-from django.contrib.auth import authenticate
 from django.contrib.auth.password_validation import validate_password
+from apps.user_management.access import current_access, is_admin, is_support
+from apps.user_management.models import EmailVerification
 from .models import User, UserProfile, ProfilePrivacySettings, UserPreferences
+
+
+def legacy_role(user):
+    if is_admin(user):
+        return "admin"
+    if is_support(user):
+        return "support"
+    return "user"
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -12,13 +21,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'id', 'username', 'email', 'first_name', 'last_name', 
-            'password', 'password_confirm', 'phone', 'role'
+            'password', 'password_confirm', 'phone'
         )
         extra_kwargs = {
             'password': {'write_only': True},
             'password_confirm': {'write_only': True},
             'phone': {'required': False},
-            'role': {'required': False},
         }
     
     def validate(self, attrs):
@@ -28,8 +36,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         validated_data.pop('password_confirm')
-        # Set default role if not provided
-        validated_data.setdefault('role', 'user')
         password = validated_data.pop('password')
         user = User.objects.create_user(password=password, **validated_data)
         return user
@@ -74,6 +80,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    role = serializers.SerializerMethodField()
+
+    def get_role(self, obj):
+        return legacy_role(obj)
+
     profile = UserProfileSerializer(read_only=True)
     get_full_name = serializers.ReadOnlyField()
     
@@ -87,34 +98,12 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'created_at', 'updated_at', 'is_email_verified')
 
 
-class CustomTokenObtainPairSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField()
-    
-    def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
-        
-        if email and password:
-            user = authenticate(
-                request=self.context.get('request'),
-                username=email,
-                password=password
-            )
-            
-            if not user:
-                raise serializers.ValidationError('Invalid credentials')
-            
-            if not user.is_active:
-                raise serializers.ValidationError('User account is disabled')
-            
-            attrs['user'] = user
-            return attrs
-        else:
-            raise serializers.ValidationError('Must include email and password')
-
-
 class UserDashboardSerializer(serializers.ModelSerializer):
+    role = serializers.SerializerMethodField()
+
+    def get_role(self, obj):
+        return legacy_role(obj)
+
     profile = UserProfileSerializer(read_only=True)
     get_full_name = serializers.ReadOnlyField()
     
@@ -136,7 +125,7 @@ class UserDashboardSerializer(serializers.ModelSerializer):
         try:
             credits = obj.credits
             return {
-                'balance': str(credits.balance),
+                'balance': str(credits.balance + credits.monthly_balance),
                 'total_earned': str(credits.total_earned),
                 'total_spent': str(credits.total_spent),
             }
@@ -163,21 +152,12 @@ class UserDashboardSerializer(serializers.ModelSerializer):
             }
     
     def get_recent_messages(self, obj):
-        try:
-            from messaging.models import Message
-            messages = Message.objects.filter(recipient=obj).order_by('-created_at')[:5]
-            return [
-                {
-                    'id': msg.id,
-                    'subject': msg.subject,
-                    'sender_name': msg.sender.get_full_name(),
-                    'created_at': msg.created_at,
-                    'is_read': msg.is_read,
-                }
-                for msg in messages
-            ]
-        except:
-            return []
+        from messaging.routing import thread_list
+
+        return [
+            {"id": item.pk, "subject": item.subject, "created_at": item.updated_at, "is_read": not item.unread}
+            for item in thread_list(obj)[:5]
+        ]
 
 
 class PrivacySettingsSerializer(serializers.ModelSerializer):
@@ -228,6 +208,11 @@ class CompleteUserProfileSerializer(serializers.ModelSerializer):
         )
         read_only_fields = ('id', 'is_email_verified', 'is_phone_verified', 'last_activity', 'profile_completion_score')
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data.update(current_access(instance))
+        return data
+
     def update(self, instance, validated_data):
         # Pop the nested profile data that DRF creates because of the 'source' attribute
         profile_data = validated_data.pop('profile', {})
@@ -236,9 +221,15 @@ class CompleteUserProfileSerializer(serializers.ModelSerializer):
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.username = validated_data.get('username', instance.username)
-        instance.email = validated_data.get('email', instance.email)
-        instance.phone = validated_data.get('phone', instance.phone)
-        instance.save()
+        email = validated_data.get("email", instance.email)
+        if email != instance.email:
+            instance.is_email_verified = False
+            EmailVerification.objects.filter(user=instance).delete()
+        instance.email = email
+        instance.phone = validated_data.get("phone", instance.phone)
+        instance.save(update_fields=[
+            "first_name", "last_name", "username", "email", "phone", "is_email_verified", "updated_at",
+        ])
 
         # Update the related UserProfile model instance
         profile = instance.profile

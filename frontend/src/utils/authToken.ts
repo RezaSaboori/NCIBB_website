@@ -1,10 +1,6 @@
-export const getUserIdFromAccessToken = (): string | null => {
-  if (typeof window === "undefined") {
-    return null
-  }
-
-  const token = window.localStorage.getItem("access_token")
-
+export const getUserIdFromAccessToken = (
+  token = typeof window === "undefined" ? null : window.localStorage.getItem("access_token"),
+): string | null => {
   if (!token) {
     return null
   }

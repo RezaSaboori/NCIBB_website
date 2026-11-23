@@ -62,10 +62,10 @@ export const CriteriaDescriptionHelp: React.FC<CriteriaDescriptionHelpProps> = (
                 className="s2-criteria-description__title"
                 dir="ltr"
               >
-                {label}
+                Description
               </h3>
               <button
-                className="glass-transparent dz-icon-btn s2-criteria-description__close"
+                className="red-glass dz-icon-btn s2-criteria-description__close"
                 aria-label="Close description"
                 onClick={() => setIsOpen(false)}
                 type="button"

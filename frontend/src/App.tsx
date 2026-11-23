@@ -4,6 +4,8 @@ import MainLayout from "./layouts/default"
 import AuthLayout from "./layouts/auth"
 import LandingPage from "./pages/landing"
 
+const VerifyEmailPage = lazy(() => import("./pages/auth/VerifyEmailPage"))
+
 const Page = lazy(() => import("./pages/Page"))
 
 const ProfileManager = lazy(
@@ -37,6 +39,7 @@ function App() {
         <Route path="/dataset" element={<DatasetPage />} />
         <Route path="/portal" element={<PortalPage />} />
         <Route path="/profile" element={<ProfileManager />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
       </Route>
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<LoginPage />} />

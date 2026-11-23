@@ -31,6 +31,18 @@ class Message(models.Model):
 
 
 class MessageThread(models.Model):
+    class Route(models.TextChoices):
+        LEGACY = "legacy", "Legacy conversation"
+        SUPPORT_QUEUE = "support_queue", "Support queue"
+        ADMIN_QUEUE = "admin_queue", "Administration queue"
+        SUPPORT_DIRECT = "support_direct", "Support conversation"
+        ADMIN_DIRECT = "admin_direct", "Administrator conversation"
+        MENTOR = "mentor", "Mentorship conversation"
+
+    route = models.CharField(max_length=20, choices=Route.choices, default=Route.LEGACY)
+    created_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="+")
+    recipient = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="+")
+    group = models.ForeignKey("user_management.UserGroup", null=True, on_delete=models.PROTECT)
     participants = models.ManyToManyField(User, related_name='message_threads')
     subject = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -40,7 +52,8 @@ class MessageThread(models.Model):
         db_table = 'message_threads'
         verbose_name = 'Message Thread'
         verbose_name_plural = 'Message Threads'
-        ordering = ['-updated_at']
+        ordering = ["-updated_at", "-pk"]
+        indexes = [models.Index(fields=["route", "-updated_at"])]
     
     def __str__(self):
         return self.subject
@@ -49,14 +62,10 @@ class MessageThread(models.Model):
     def last_message(self):
         return self.thread_messages.order_by('-created_at').first()
     
-    @property
-    def unread_count(self, user):
-        return self.thread_messages.filter(
-            recipient=user, is_read=False
-        ).count()
 
 
 class ThreadMessage(models.Model):
+    forwarded = models.BooleanField(default=False)
     thread = models.ForeignKey(MessageThread, on_delete=models.CASCADE, related_name='thread_messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='thread_messages')
     content = models.TextField()
@@ -112,3 +121,14 @@ class Notification(models.Model):
             self.is_read = True
             self.read_at = timezone.now()
             self.save()
+
+
+class ThreadReadReceipt(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.ForeignKey(ThreadMessage, on_delete=models.CASCADE, related_name="receipts")
+    read_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=["user", "message"], name="unique_thread_read_receipt")
+        ]

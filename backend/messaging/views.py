@@ -1,218 +1,204 @@
-from rest_framework import generics, status, permissions
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import SearchFilter, OrderingFilter
+from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .models import Message, MessageThread, ThreadMessage, Notification
-from .serializers import (
-    MessageSerializer, 
-    MessageCreateSerializer,
-    MessageThreadSerializer,
-    MessageThreadCreateSerializer,
-    ThreadMessageSerializer,
-    ThreadMessageCreateSerializer,
-    NotificationSerializer,
-    InboxSerializer
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from rest_framework import generics, serializers, status
+from rest_framework.decorators import api_view, throttle_classes
+from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.response import Response
+from rest_framework.throttling import UserRateThrottle
+
+from apps.user_management.access import is_admin, is_support
+from .models import Message, MessageThread, Notification, ThreadMessage
+from .routing import (
+    available_destinations, compose, mark_read, readable_threads, reply, thread_list, unread_messages,
 )
-from authentication.permissions import IsOwnerOrAdmin
+from .serializers import (
+    ComposeSerializer, ForwardSerializer, LegacySendSerializer, MessageSerializer,
+    MessageThreadSerializer, NotificationSerializer, ReplySerializer, ThreadMessageSerializer,
+)
 
 
-class MessageListView(generics.ListCreateAPIView):
+class MessageWriteThrottle(UserRateThrottle):
+    rate = "120/hour"
+    scope = "message_write"
+
+    def allow_request(self, request, view):
+        return request.method in ("GET", "HEAD", "OPTIONS") or super().allow_request(request, view)
+
+
+def own_legacy_messages(user):
+    return Message.objects.filter(Q(sender=user) | Q(recipient=user)).select_related("sender", "recipient")
+
+
+class MessageListView(generics.ListAPIView):
     serializer_class = MessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['is_read', 'sender', 'recipient']
-    search_fields = ['subject', 'content']
-    ordering_fields = ['created_at']
-    ordering = ['-created_at']
-    
+    throttle_classes = [MessageWriteThrottle]
+    filterset_fields = ["is_read", "sender", "recipient"]
+    search_fields = ["subject", "content"]
+
     def get_queryset(self):
-        user = self.request.user
-        return Message.objects.filter(
-            Q(sender=user) | Q(recipient=user)
-        ).distinct()
-    
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return MessageCreateSerializer
-        return MessageSerializer
+        return own_legacy_messages(self.request.user)
+
+    def post(self, request, *args, **kwargs):
+        return send_legacy(request)
 
 
-class MessageDetailView(generics.RetrieveUpdateDestroyAPIView):
+class MessageDetailView(generics.RetrieveAPIView):
     serializer_class = MessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
-        user = self.request.user
-        return Message.objects.filter(
-            Q(sender=user) | Q(recipient=user)
-        ).distinct()
-    
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        # Mark as read if recipient is viewing
-        if instance.recipient == request.user:
-            instance.mark_as_read()
-        return super().retrieve(request, *args, **kwargs)
+        return own_legacy_messages(self.request.user)
 
 
-class MessageThreadListView(generics.ListCreateAPIView):
+class MessageThreadListView(generics.ListAPIView):
     serializer_class = MessageThreadSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [SearchFilter, OrderingFilter]
-    search_fields = ['subject']
-    ordering_fields = ['created_at', 'updated_at']
-    ordering = ['-updated_at']
-    
+    throttle_classes = [MessageWriteThrottle]
+    filterset_fields = ["route"]
+    search_fields = ["subject"]
+    ordering_fields = ["updated_at", "created_at"]
+
     def get_queryset(self):
-        user = self.request.user
-        return MessageThread.objects.filter(participants=user)
-    
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return MessageThreadCreateSerializer
-        return MessageThreadSerializer
+        return thread_list(self.request.user)
+
+    def post(self, request):
+        serializer = ComposeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        thread = compose(request.user, **serializer.validated_data)
+        return Response(self.get_serializer(thread).data, status=status.HTTP_201_CREATED)
 
 
-class MessageThreadDetailView(generics.RetrieveUpdateDestroyAPIView):
+class MessageThreadDetailView(generics.RetrieveAPIView):
     serializer_class = MessageThreadSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
-        user = self.request.user
-        return MessageThread.objects.filter(participants=user)
+        return thread_list(self.request.user)
 
 
-class ThreadMessageListView(generics.ListCreateAPIView):
+class ThreadMessageListView(generics.ListAPIView):
     serializer_class = ThreadMessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [OrderingFilter]
-    ordering = ['created_at']
-    
+    throttle_classes = [MessageWriteThrottle]
+    ordering_fields = ["id"]
+
     def get_queryset(self):
-        thread_id = self.kwargs['thread_id']
-        user = self.request.user
-        
-        # Check if user is participant in the thread
-        try:
-            thread = MessageThread.objects.get(id=thread_id, participants=user)
-            return ThreadMessage.objects.filter(thread=thread)
-        except MessageThread.DoesNotExist:
-            return ThreadMessage.objects.none()
-    
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return ThreadMessageCreateSerializer
-        return ThreadMessageSerializer
-    
-    def get_serializer_context(self):
-        context = super().get_serializer_context()
-        context['thread'] = MessageThread.objects.get(id=self.kwargs['thread_id'])
-        return context
+        thread = get_object_or_404(readable_threads(self.request.user), pk=self.kwargs["thread_id"])
+        return ThreadMessage.objects.filter(thread=thread).select_related("sender").order_by("-pk")
+
+    def post(self, request, thread_id):
+        serializer = ReplySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        entry = reply(request.user, thread_id, serializer.validated_data["content"])
+        return Response(self.get_serializer(entry).data, status=status.HTTP_201_CREATED)
 
 
 class NotificationListView(generics.ListAPIView):
     serializer_class = NotificationSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['notification_type', 'is_read']
-    ordering_fields = ['created_at']
-    ordering = ['-created_at']
-    
+    filterset_fields = ["notification_type", "is_read"]
+
     def get_queryset(self):
         return Notification.objects.filter(user=self.request.user)
 
 
-class NotificationDetailView(generics.RetrieveUpdateAPIView):
+class NotificationDetailView(generics.RetrieveAPIView):
     serializer_class = NotificationSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
         return Notification.objects.filter(user=self.request.user)
-    
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.mark_as_read()
-        return super().retrieve(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        item = self.get_object()
+        item.mark_as_read()
+        return Response(self.get_serializer(item).data)
 
 
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
+@api_view(["GET"])
+def destinations_view(request):
+    return Response(available_destinations(request.user, request.query_params.get("search", "").strip()[:120]))
+
+
+@api_view(["POST"])
+@throttle_classes([MessageWriteThrottle])
+def forward_view(request, thread_id):
+    source = get_object_or_404(readable_threads(request.user), pk=thread_id)
+    serializer = ForwardSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    ids = serializer.validated_data.pop("message_ids")
+    messages = list(source.thread_messages.filter(pk__in=ids).order_by("pk"))
+    if len(messages) != len(ids):
+        raise NotFound("A selected message is unavailable.")
+    thread = compose(request.user, **serializer.validated_data, forwarded=messages)
+    return Response(MessageThreadSerializer(thread, context={"request": request}).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["POST"])
+def mark_thread_read_view(request, thread_id):
+    thread = get_object_or_404(readable_threads(request.user), pk=thread_id)
+    marker = serializers.IntegerField(min_value=1).run_validation(request.data.get("through"))
+    get_object_or_404(thread.thread_messages, pk=marker)
+    mark_read(request.user, thread.thread_messages.filter(pk__lte=marker))
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["GET"])
 def inbox_view(request):
-    """Get inbox summary with unread counts and recent messages"""
-    user = request.user
-    
-    # Get unread counts
-    unread_messages = Message.objects.filter(recipient=user, is_read=False).count()
-    unread_notifications = Notification.objects.filter(user=user, is_read=False).count()
-    
-    # Get recent messages
-    recent_messages = Message.objects.filter(recipient=user).order_by('-created_at')[:5]
-    
-    # Get recent notifications
-    recent_notifications = Notification.objects.filter(user=user).order_by('-created_at')[:5]
-    
-    data = {
-        'unread_messages': unread_messages,
-        'unread_notifications': unread_notifications,
-        'recent_messages': MessageSerializer(recent_messages, many=True).data,
-        'recent_notifications': NotificationSerializer(recent_notifications, many=True).data,
-    }
-    
+    data = message_stats(request.user)
+    data["recent_messages"] = MessageThreadSerializer(
+        thread_list(request.user)[:5], context={"request": request}, many=True,
+    ).data
+    data["recent_notifications"] = NotificationSerializer(
+        Notification.objects.filter(user=request.user)[:5], many=True,
+    ).data
     return Response(data)
 
 
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
+@api_view(["POST"])
 def mark_all_read_view(request):
-    """Mark all messages and notifications as read"""
-    user = request.user
-    
-    # Mark all messages as read
-    Message.objects.filter(recipient=user, is_read=False).update(is_read=True)
-    
-    # Mark all notifications as read
-    Notification.objects.filter(user=user, is_read=False).update(is_read=True)
-    
-    return Response({"message": "All messages and notifications marked as read"})
+    mark_read(request.user, unread_messages(request.user))
+    Notification.objects.filter(user=request.user, is_read=False).update(is_read=True, read_at=timezone.now())
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
+def send_legacy(request):
+    serializer = LegacySendSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    values = serializer.validated_data
+    recipient = get_user_model().objects.filter(pk=values["recipient"], is_active=True).first()
+    if not recipient or recipient.pk == request.user.pk:
+        raise PermissionDenied()
+    if is_admin(request.user):
+        kind = MessageThread.Route.ADMIN_DIRECT
+    elif is_support(request.user):
+        if is_admin(recipient):
+            kind = MessageThread.Route.ADMIN_QUEUE
+            values.pop("recipient")
+        else:
+            kind = MessageThread.Route.SUPPORT_DIRECT
+    elif is_support(recipient):
+        kind = MessageThread.Route.SUPPORT_QUEUE
+        values.pop("recipient")
+    else:
+        raise PermissionDenied()
+    thread = compose(request.user, kind=kind, **values)
+    return Response(MessageThreadSerializer(thread, context={"request": request}).data, status=status.HTTP_201_CREATED)
+
+
+@api_view(["POST"])
+@throttle_classes([MessageWriteThrottle])
 def send_message_view(request):
-    """Send a message to another user"""
-    serializer = MessageCreateSerializer(data=request.data, context={'request': request})
-    if serializer.is_valid():
-        message = serializer.save()
-        
-        # Create notification for recipient
-        Notification.objects.create(
-            user=message.recipient,
-            notification_type='message',
-            title='New Message',
-            message=f"You received a new message from {message.sender.get_full_name()}: {message.subject}"
-        )
-        
-        return Response(
-            MessageSerializer(message).data, 
-            status=status.HTTP_201_CREATED
-        )
-    
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    return send_legacy(request)
 
 
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
-def message_stats_view(request):
-    """Get message statistics for dashboard"""
-    user = request.user
-    
-    stats = {
-        'total_sent': Message.objects.filter(sender=user).count(),
-        'total_received': Message.objects.filter(recipient=user).count(),
-        'unread_count': Message.objects.filter(recipient=user, is_read=False).count(),
-        'unread_notifications': Notification.objects.filter(user=user, is_read=False).count(),
+def message_stats(user):
+    threads = readable_threads(user)
+    unread = unread_messages(user).count()
+    return {
+        "total_sent": ThreadMessage.objects.filter(sender=user, thread__in=threads).count(),
+        "total_received": ThreadMessage.objects.filter(thread__in=threads).exclude(sender=user).count(),
+        "unread_messages": unread, "unread_count": unread,
+        "unread_notifications": Notification.objects.filter(user=user, is_read=False).count(),
     }
-    
-    return Response(stats)
+
+
+@api_view(["GET"])
+def message_stats_view(request):
+    return Response(message_stats(request.user))

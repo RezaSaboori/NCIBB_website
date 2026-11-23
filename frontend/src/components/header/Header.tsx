@@ -1,5 +1,6 @@
 import { HeaderProps, NavigationItem } from "./types"
 import { useActiveIndicator } from "./hooks/useActiveIndicator"
+import { BeatCoinButton } from "./components/BeatCoinButton"
 import { HomeButton } from "./components/HomeButton"
 import { ProfileButton } from "./components/ProfileButton"
 import { ThemeToggle } from "./components/ThemeToggle"
@@ -16,14 +17,13 @@ const navigationItems: NavigationItem[] = [
   { value: "contact", label: "تماس با ما" },
 ]
 
-export const Header = ({ className, sidebarOffset }: HeaderProps) => {
+export const Header = ({ className }: HeaderProps) => {
   const { theme } = useTheme()
   useActiveIndicator()
 
   return (
     <div
       className={`header-container ${className || ""} ${theme === "dark" ? "theme-dark" : "theme-light"}`}
-      style={sidebarOffset ? { transform: `translateX(calc(-50% - ${sidebarOffset} / 2))` } : undefined}
     >
       <HomeButton ariaLabel="خانه" title="خانه" />
 
@@ -31,6 +31,7 @@ export const Header = ({ className, sidebarOffset }: HeaderProps) => {
 
       <ProfileButton ariaLabel="پروفایل" title="پروفایل کاربر" />
 
+      <BeatCoinButton />
       <ThemeToggle />
     </div>
   )

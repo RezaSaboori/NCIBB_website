@@ -1,75 +1,45 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import { profileService } from "../dataset_services/profileService"
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
+import { accountApi, accountError } from "../dataset_services/accountApi"
+import type { AccountProfile } from "../types/account"
 
-export const fetchUserProfile = createAsyncThunk(
-  "profile/fetchUserProfile",
-  async (_, { rejectWithValue }) => {
-    try {
-      const data = await profileService.getCurrentProfile()
-      return data
-    } catch (error) {
-      return rejectWithValue(error.response.data)
-    }
+export const fetchUserProfile = createAsyncThunk("profile/fetchUserProfile", async (_, { rejectWithValue }) => {
+  try {
+    return await accountApi.profile()
+  } catch (error) {
+    return rejectWithValue(accountError(error))
   }
-)
+})
 
 export const updateUserProfile = createAsyncThunk(
   "profile/updateUserProfile",
-  async (profileData, { rejectWithValue }) => {
+  async (data: Record<string, unknown>, { rejectWithValue }) => {
     try {
-      const data = await profileService.updateProfile(profileData)
-      return data
+      return await accountApi.updateProfile(data)
     } catch (error) {
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(accountError(error))
     }
-  }
+  },
 )
 
-const initialState = {
-  profile: null,
-  loading: false,
-  error: null,
-}
+interface ProfileState { profile: AccountProfile | null; loading: boolean; error: string | null }
+const initialState: ProfileState = { profile: null, loading: false, error: null }
 
 const profileSlice = createSlice({
   name: "profile",
   initialState,
-  reducers: {
-    clearProfile: (state) => {
-      state.profile = null
-      state.loading = false
-      state.error = null
-    },
-  },
+  reducers: { clearProfile: () => initialState },
   extraReducers: (builder) => {
-    builder
-      .addCase(fetchUserProfile.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(fetchUserProfile.fulfilled, (state, action) => {
-        state.loading = false
-        state.profile = action.payload
-      })
-      .addCase(fetchUserProfile.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload
-      })
-      .addCase(updateUserProfile.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(updateUserProfile.fulfilled, (state, action) => {
-        state.loading = false
-        state.profile = { ...state.profile, ...action.payload }
-      })
-      .addCase(updateUserProfile.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload
-      })
+    for (const action of [fetchUserProfile, updateUserProfile]) {
+      builder
+        .addCase(action.pending, (state) => { state.loading = true; state.error = null })
+        .addCase(action.fulfilled, (state, event) => { state.loading = false; state.profile = event.payload })
+        .addCase(action.rejected, (state, event) => {
+          state.loading = false
+          state.error = typeof event.payload === "string" ? event.payload : null
+        })
+    }
   },
 })
 
 export const { clearProfile } = profileSlice.actions
-
 export default profileSlice.reducer

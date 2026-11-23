@@ -1,6 +1,14 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit"
 
-const initialState = {
+import type { AuthResponse } from "../dataset_services/authService"
+
+interface AuthState {
+  isAuthenticated: boolean
+  user: AuthResponse["user"] | null
+  loading: boolean
+}
+
+const initialState: AuthState = {
   isAuthenticated: localStorage.getItem("access_token") ? true : false,
   user: null,
   loading: true,
@@ -10,7 +18,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    loginSuccess(state, action) {
+    loginSuccess(state, action: PayloadAction<AuthResponse>) {
       state.isAuthenticated = true
       state.user = action.payload.user
       localStorage.setItem("access_token", action.payload.access)
@@ -22,7 +30,7 @@ const authSlice = createSlice({
       localStorage.removeItem("access_token")
       localStorage.removeItem("refresh_token")
     },
-    setLoading(state, action) {
+    setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload
     },
   },

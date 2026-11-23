@@ -177,6 +177,7 @@ logs/
 tmp/
 temp/
 *.tmp
+/.codex/
 
 # Large data files (specifically exclude large JSON files)
 frontend/public/landing/cardio_particles/webgl_asset/mesh_data.json

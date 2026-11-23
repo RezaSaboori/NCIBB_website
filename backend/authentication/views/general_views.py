@@ -1,15 +1,17 @@
 from rest_framework import status, generics, permissions
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes, throttle_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.exceptions import ValidationError
+from rest_framework.throttling import AnonRateThrottle
+from rest_framework_simplejwt.exceptions import TokenError
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import update_last_login
+from django.db import transaction
 from authentication.models import User, UserProfile
-from ..permissions import CanManageUsers
 from ..serializers import (
     UserRegistrationSerializer, 
     UserProfileSerializer,
-    CustomTokenObtainPairSerializer,
     UserDashboardSerializer,
     UserSerializer
 )
@@ -22,81 +24,58 @@ def test_api(request):
     return Response({"message": "API is working!", "status": "success"})
 
 
+class LoginThrottle(AnonRateThrottle):
+    scope = "account_login"
+    rate = "60/hour"
+
+
+class RegistrationThrottle(AnonRateThrottle):
+    scope = "account_registration"
+    rate = "15/hour"
+
+
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
+@authentication_classes([])
+@throttle_classes([LoginThrottle])
 def simple_login(request):
-    """Simple login endpoint for testing"""
-    try:
-        email = request.data.get('email')
-        password = request.data.get('password')
-        
-        if not email or not password:
-            return Response(
-                {"error": "Email and password are required"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # Authenticate user
-        user = authenticate(username=email, password=password)
-        
-        if user is None:
-            return Response(
-                {"error": "Invalid credentials"}, 
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-        
-        if not user.is_active:
-            return Response(
-                {"error": "User account is disabled"}, 
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-        
-        # Generate tokens
-        refresh = RefreshToken.for_user(user)
-        
-        return Response({
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email,
-                'first_name': user.first_name,
-                'last_name': user.last_name,
-                'role': user.role,
-                'is_active': user.is_active,
-            },
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }, status=status.HTTP_200_OK)
-        
-    except Exception as e:
-        return Response(
-            {"error": str(e)}, 
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+    email = request.data.get("email")
+    password = request.data.get("password")
+    if not isinstance(email, str) or not isinstance(password, str) or not email or not password:
+        return Response({"error": "Email and password are required"}, status=status.HTTP_400_BAD_REQUEST)
+    user = authenticate(username=email, password=password)
+    if user is None:
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+    update_last_login(None, user)
+    refresh = RefreshToken.for_user(user)
+    return Response({
+        "user": UserSerializer(user, context={"request": request}).data,
+        "refresh": str(refresh),
+        "access": str(refresh.access_token),
+    })
 
 
 class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
     permission_classes = [permissions.AllowAny]
-    
+    authentication_classes = []
+    throttle_classes = [RegistrationThrottle]
+
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         
-        # Create user profile
-        UserProfile.objects.create(user=user)
-        
-        # Generate tokens
+        from credits.services import personal_wallet
+
+        personal_wallet(user)
         refresh = RefreshToken.for_user(user)
         
         return Response({
-            'user': UserSerializer(user).data,
+            'user': UserSerializer(user, context={'request': request}).data,
             'refresh': str(refresh),
             'access': str(refresh.access_token),
         }, status=status.HTTP_201_CREATED)
@@ -119,39 +98,17 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
         return profile
 
 
-class UserListView(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filterset_fields = ['role', 'is_active', 'is_verified']
-    search_fields = ['username', 'email', 'first_name', 'last_name']
-    ordering_fields = ['created_at', 'last_login', 'username']
-    ordering = ['-created_at']
-
-
-class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get_permissions(self):
-        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-            return [permissions.IsAuthenticated(), CanManageUsers()]
-        return [permissions.IsAuthenticated()]
-
-
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def logout_view(request):
     try:
-        refresh_token = request.data["refresh"]
-        token = RefreshToken(refresh_token)
+        token = RefreshToken(request.data.get("refresh", ""))
+        if str(token.get("user_id")) != str(request.user.pk):
+            raise ValidationError({"refresh": "Invalid session token."})
         token.blacklist()
-        return Response({"message": "Successfully logged out"}, 
-                       status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response({"error": str(e)}, 
-                       status=status.HTTP_400_BAD_REQUEST)
+    except TokenError as error:
+        raise ValidationError({"refresh": "Invalid session token."}) from error
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])
@@ -181,7 +138,7 @@ def user_stats_view(request):
     try:
         credits = user.credits
         credit_stats = {
-            'balance': str(credits.balance),
+            'balance': str(credits.balance + credits.monthly_balance),
             'total_earned': str(credits.total_earned),
             'total_spent': str(credits.total_spent),
         }
@@ -192,21 +149,12 @@ def user_stats_view(request):
             'total_spent': '0.00',
         }
     
-    # Get recent activity
-    try:
-        from messaging.models import Message
-        recent_messages = Message.objects.filter(recipient=user).order_by('-created_at')[:5]
-        recent_activity = [
-            {
-                'type': 'message',
-                'title': msg.subject,
-                'description': f"From {msg.sender.get_full_name()}",
-                'created_at': msg.created_at,
-            }
-            for msg in recent_messages
-        ]
-    except:
-        recent_activity = []
+    from messaging.routing import thread_list
+
+    recent_activity = [
+        {"type": "message", "title": entry.subject, "description": "", "created_at": entry.updated_at}
+        for entry in thread_list(user)[:5]
+    ]
     
     return Response({
         'project_stats': project_stats,

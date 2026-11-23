@@ -1,5 +1,4 @@
 import React from "react"
-// @ts-expect-error JS module without types
 import ProfileForm from "../ProfileForm"
 
 interface AccountTabProps {

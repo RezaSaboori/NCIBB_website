@@ -2,6 +2,7 @@
 Django settings for NCIBB project.
 """
 
+import json
 import os
 from pathlib import Path
 from datetime import timedelta
@@ -10,12 +11,23 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '*']
+PRODUCTION = os.getenv("NCIBB_ENV") == "production"
+SECRET_KEY = os.environ["SECRET_KEY"] if PRODUCTION else os.getenv(
+    "SECRET_KEY", "django-insecure-ncibb-local-development-only"
+)
+DEBUG = not PRODUCTION and os.getenv("DEBUG", "1").lower() in {"1", "true", "yes"}
+ALLOWED_HOSTS = os.environ["ALLOWED_HOSTS"].split(",") if PRODUCTION else [
+    "localhost", "127.0.0.1", "0.0.0.0", "testserver"
+]
+SECURE_SSL_REDIRECT = PRODUCTION
+if PRODUCTION and os.getenv("TRUST_HTTPS_PROXY") == "1":
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SESSION_COOKIE_SECURE = PRODUCTION
+CSRF_COOKIE_SECURE = PRODUCTION
+SECURE_HSTS_SECONDS = 31536000 if PRODUCTION else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = PRODUCTION
+SECURE_HSTS_PRELOAD = PRODUCTION
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split()
 
 # Application definition
 DJANGO_APPS = [
@@ -38,6 +50,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'main',
     'authentication',
+    'apps.user_management.apps.UserManagementConfig',
     'credits',
     'projects',
     'messaging',
@@ -84,12 +97,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ncibb.wsgi.application'
 
 # Database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+if PRODUCTION or os.getenv("DB_HOST"):
+    DATABASES = {"default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ["DB_NAME"],
+        "USER": os.environ["DB_USER"],
+        "PASSWORD": os.environ["DB_PASSWORD"],
+        "HOST": os.environ["DB_HOST"],
+        "PORT": os.getenv("DB_PORT", "5432"),
+        "CONN_MAX_AGE": 60,
+        "OPTIONS": {"sslmode": os.getenv("DB_SSLMODE", "require" if PRODUCTION else "prefer")},
+    }}
+else:
+    DATABASES = {"default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.getenv("SQLITE_PATH", str(BASE_DIR / "db.sqlite3")),
+    }}
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -185,7 +208,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 # For development, allow all origins (remove in production)
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = not PRODUCTION
+if PRODUCTION:
+    CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split()
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -261,3 +286,29 @@ LOGGING = {
         },
     },
 }
+
+# Account verification and Beat Coin policy
+PUBLIC_SITE_URL = os.environ["PUBLIC_SITE_URL"] if PRODUCTION else os.getenv(
+    "PUBLIC_SITE_URL", "http://localhost:5173"
+)
+EMAIL_BACKEND = (
+    "django.core.mail.backends.smtp.EmailBackend" if PRODUCTION
+    else "django.core.mail.backends.console.EmailBackend"
+)
+EMAIL_HOST = os.getenv("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = PRODUCTION
+EMAIL_TIMEOUT = 10
+DEFAULT_FROM_EMAIL = os.environ["DEFAULT_FROM_EMAIL"] if PRODUCTION else "ncibb@localhost"
+BEAT_COIN_JOB_PRICE = os.getenv("BEAT_COIN_JOB_PRICE", "0")
+BEAT_COIN_EMAIL_REWARD = os.getenv("BEAT_COIN_EMAIL_REWARD", "0")
+BEAT_COIN_PLATFORM_ALLOWANCES = json.loads(os.getenv("BEAT_COIN_PLATFORM_ALLOWANCES", "{}"))
+BEAT_COIN_GROUP_ALLOWANCES = json.loads(os.getenv("BEAT_COIN_GROUP_ALLOWANCES", "{}"))
+
+if os.getenv("CACHE_URL"):
+    CACHES = {"default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.environ["CACHE_URL"],
+    }}

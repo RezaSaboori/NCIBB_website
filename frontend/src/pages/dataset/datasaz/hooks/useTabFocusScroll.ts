@@ -14,7 +14,6 @@ interface UseTabFocusScrollOptions {
 }
 
 export function useTabFocusScroll({
-  selectedId,
   setSelectedId,
   expandedIds,
   windowsContainerRef,

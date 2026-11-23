@@ -31,10 +31,7 @@ const features_fa: Feature[] = [
   },
 ]
 
-export const FeatureGrid: React.FC<FeatureGridProps> = ({
-  title,
-  features,
-}) => {
+export const FeatureGrid: React.FC<FeatureGridProps> = () => {
   return (
     <div className="bg-gray-50 dark:bg-gray-900 py-20">
       <div className="container mx-auto px-6">

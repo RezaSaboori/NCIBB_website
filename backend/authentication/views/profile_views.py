@@ -3,6 +3,10 @@ from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.exceptions import MethodNotAllowed
+from django.utils.cache import add_never_cache_headers
+
+from apps.user_management.access import is_admin
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
@@ -27,7 +31,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         if self.action == 'list':
             # For admin users, return all profiles
-            if self.request.user.role == 'admin':
+            if is_admin(self.request.user):
                 return UserProfile.objects.select_related('user').all()
             # For regular users, return only their profile
             return UserProfile.objects.filter(user=self.request.user)
@@ -49,56 +53,30 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         # Recalculate completion percentage
         instance.calculate_completion()
     
-    @action(detail=False, methods=['get', 'put', 'patch'], url_path='me')
+    def create(self, request, *args, **kwargs):
+        raise MethodNotAllowed(request.method)
+
+    def destroy(self, request, *args, **kwargs):
+        raise MethodNotAllowed(request.method)
+
+    @action(detail=False, methods=["get", "put", "patch"], url_path="me")
     def me(self, request):
-        """Get or update current user's complete profile"""
-        if request.method == 'GET':
-            try:
-                user_instance = User.objects.select_related(
-                    'profile', 'privacy_settings', 'preferences'
-                ).get(pk=request.user.pk)
-                
-                serializer = CompleteUserProfileSerializer(
-                    user_instance, 
-                    context={'request': request}
-                )
-                return Response(serializer.data)
-            except User.DoesNotExist:
-                return Response(
-                    {'error': 'User not found'}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            except Exception as e:
-                logger.error(f"Error fetching profile for user {request.user.id}: {str(e)}")
-                return Response(
-                    {'error': 'Failed to fetch profile'}, 
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-        
-        elif request.method in ['PUT', 'PATCH']:
-            try:
-                user_instance = User.objects.get(pk=request.user.pk)
-                serializer = CompleteUserProfileSerializer(
-                    user_instance, 
-                    data=request.data, 
-                    partial=request.method == 'PATCH',
-                    context={'request': request}
-                )
-                serializer.is_valid(raise_exception=True)
-                serializer.save()
-                return Response(serializer.data)
-            except User.DoesNotExist:
-                return Response(
-                    {'error': 'User not found'}, 
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            except Exception as e:
-                logger.error(f"Error updating profile for user {request.user.id}: {str(e)}")
-                return Response(
-                    {'error': 'Failed to update profile'}, 
-                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                )
-    
+        if request.method == "GET":
+            user = User.objects.select_related("profile", "privacy_settings", "preferences").get(pk=request.user.pk)
+            serializer = CompleteUserProfileSerializer(user, context={"request": request})
+            response = Response(serializer.data)
+            add_never_cache_headers(response)
+            return response
+
+        with transaction.atomic():
+            user = User.objects.select_for_update().get(pk=request.user.pk)
+            serializer = CompleteUserProfileSerializer(
+                user, data=request.data, partial=request.method == "PATCH", context={"request": request},
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
+
     @action(detail=True, methods=['post'], url_path='upload-picture')
     def upload_picture(self, request, pk=None):
         """Handle profile picture upload"""

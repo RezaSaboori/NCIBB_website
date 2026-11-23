@@ -1,4 +1,3 @@
-import React from "react";
 import { DatasazMode } from "./datasaz";
 
 export const DatasetPage = () => {

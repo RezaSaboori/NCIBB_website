@@ -307,3 +307,64 @@
   font-size: 1.3rem;
   margin-left: 0.1rem;
 }
+
+.header-nav--beat-coin {
+  flex-shrink: 0;
+}
+
+.header-nav__beat-coin {
+  height: 100%;
+  gap: var(--spacing-xs);
+  padding-inline: .625rem;
+  border-radius: inherit;
+  white-space: nowrap;
+  color: var(--color-gray12);
+}
+
+.header-nav__beat-coin-icon {
+  color: var(--color-red);
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.header-nav__beat-coin:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+@media (max-width: 860px) {
+  .header-nav__beat-coin-name {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .header-container {
+    flex-wrap: wrap;
+    width: min(100%, 28rem);
+    gap: .25rem;
+  }
+
+  .header-nav--main {
+    order: 5;
+    max-width: 100%;
+  }
+
+  .header-nav__menu {
+    gap: 0;
+  }
+
+  .header-nav__item {
+    padding-inline: .4rem;
+    white-space: nowrap;
+  }
+
+  .ncibb-main {
+    padding-block-start: 6rem;
+  }
+}
+
+.header-nav__beat-coin.header-nav__control--active {
+  color: var(--color-blue);
+  background: color-mix(in srgb, var(--color-blue) 12%, transparent);
+}

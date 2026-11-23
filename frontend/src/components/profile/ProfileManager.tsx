@@ -1,173 +1,111 @@
-// frontend/src/components/profile/ProfileManager.tsx
-import React, { useState, useEffect, useCallback } from "react"
-import { Spinner } from "@heroui/react"
-import { useSelector, useDispatch } from "react-redux"
-// @ts-expect-error JS module without types
-import { profileService } from "../../dataset_services/profileService"
-import { logoutSuccess } from "../../store/authSlice"
-import { authService } from "../../dataset_services/authService"
-import { useNavigate, useOutletContext } from "react-router-dom"
-import { RootState } from "../../store/store"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom"
 
-import ProfileSidebar from "./sidebar/ProfileSidebar"
-import SessionExpiredBanner from "./shared/SessionExpiredBanner"
-import DashboardTab from "./dashboard/DashboardTab"
+import { accountApi } from "@/dataset_services/accountApi"
+import { authService } from "@/dataset_services/authService"
+import type { LayoutContext } from "@/layouts/default"
+import { logoutSuccess } from "@/store/authSlice"
+import type { AppDispatch, RootState } from "@/store/store"
+
 import AccountTab from "./account/AccountTab"
-import MessagesTab from "./messages/MessagesTab"
-import { UserProjectsList } from "./UserProjectsList"
+import { EmailVerificationCard } from "./account/EmailVerificationCard"
+import { RolesTab } from "./admin/RolesTab"
+import { UsersTab } from "./admin/UsersTab"
+import DashboardTab from "./dashboard/DashboardTab"
+import { GroupsTab } from "./groups/GroupsTab"
+import { ResearchGroupsTab } from "./groups/ResearchGroupsTab"
 import LearningTab from "./learning/LearningTab"
-import SecurityTab from "./security/SecurityTab"
+import MessagesTab from "./messages/MessagesTab"
+import { AccountStatus } from "./shared/AccountStatus"
+import SessionExpiredBanner from "./shared/SessionExpiredBanner"
+import { useAccountQuery } from "./shared/useAccountQuery"
+import { profileNavigation } from "./sidebar/navItems"
+import ProfileSidebar from "./sidebar/ProfileSidebar"
+import { WalletTab } from "./wallet/WalletTab"
+import { UserProjectsList } from "./UserProjectsList"
+import "./accountWorkspace.css"
 
-interface ProfileData {
-  preferences: any
-  completion?: any
-  [key: string]: any
-}
-
-type ProfileTab = "dashboard" | "account" | "messages" | "projects" | "learning"
-
-const ProfileManager: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<ProfileTab>("dashboard")
-  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false)
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth)
-  const [profileData, setProfileData] = useState<ProfileData | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-  const [saving, setSaving] = useState<boolean>(false)
-  const dispatch = useDispatch()
+export default function ProfileManager() {
+  const [params] = useSearchParams()
+  const activeTab = params.get("tab") ?? "dashboard"
+  const [collapsed, setCollapsed] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
+  const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
-  const { setSidebar, setSidebarWidth } = useOutletContext<any>()
+  const { setSidebar, setSidebarWidth } = useOutletContext<LayoutContext>()
+  const query = useAccountQuery(useCallback(() => isAuthenticated ? accountApi.profile() : null, [isAuthenticated]))
+  const profile = query.data
+  const refresh = query.refresh
+  const navigation = useMemo(() => profile ? profileNavigation(profile) : null, [profile])
+  const canOpen = navigation && [...navigation.primary, ...navigation.bottom].some((item) => item.id === activeTab)
 
-  const handleLogout = async () => {
-    try {
-      await authService.logout()
-      dispatch(logoutSuccess())
-      navigate("/")
-    } catch (err) {
-      console.error("Logout failed:", err)
-    }
-  }
-
-  const SIDEBAR_EXPANDED_WIDTH = 260
-  const SIDEBAR_COLLAPSED_WIDTH = 72
+  const logout = useCallback(async () => {
+    await authService.logout()
+    dispatch(logoutSuccess())
+    navigate("/")
+  }, [dispatch, navigate])
 
   useEffect(() => {
+    if (!isAuthenticated || !navigation) return
     setSidebar(
-      <ProfileSidebar
-        activeTab={activeTab}
-        onTabChange={(tab) => setActiveTab(tab as ProfileTab)}
-        onLogout={handleLogout}
-        isCollapsed={sidebarCollapsed}
-        onToggleCollapse={() => setSidebarCollapsed((prev) => !prev)}
-      />
+      <ProfileSidebar {...navigation} activeTab={activeTab} isCollapsed={collapsed}
+        onLogout={() => void logout()} onToggleCollapse={() => setCollapsed((value) => !value)} />,
     )
-    setSidebarWidth(sidebarCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH)
-    return () => {
-      setSidebar(null)
-      setSidebarWidth(260)
-    }
-  }, [activeTab, setSidebar, setSidebarWidth, sidebarCollapsed])
-
-  const loadProfile = useCallback(async () => {
-    if (!isAuthenticated) {
-      setLoading(false)
-      return
-    }
-    try {
-      setLoading(true)
-      const data = await profileService.getCurrentProfile()
-      setProfileData(data)
-      setError(null)
-    } catch (err: any) {
-      setError("خطا در بارگذاری اطلاعات پروفایل")
-      console.error("Profile load error:", err)
-      if (err?.response?.status === 401) {
-        dispatch(logoutSuccess())
-      }
-    } finally {
-      setLoading(false)
-    }
-  }, [isAuthenticated, dispatch])
+    setSidebarWidth(collapsed ? 72 : 260)
+    return () => { setSidebar(null) }
+  }, [activeTab, collapsed, isAuthenticated, logout, navigation, setSidebar, setSidebarWidth])
 
   useEffect(() => {
-    loadProfile()
-  }, [loadProfile])
+    if (!isAuthenticated) return
+    const refreshAccess = () => { if (document.visibilityState === "visible") void refresh() }
+    window.addEventListener("focus", refreshAccess)
+    return () => window.removeEventListener("focus", refreshAccess)
+  }, [isAuthenticated, refresh])
 
-  const handleProfileUpdate = async (updatedData: any) => {
+  const update = async (data: Record<string, unknown>) => {
+    setSaving(true)
     try {
-      setSaving(true)
-      const response = await profileService.updateProfile(updatedData)
-      setProfileData((prev) => ({ ...prev, profile: response }) as ProfileData)
+      const response = await accountApi.updateProfile(data)
+      query.setData(response)
       return response
     } finally {
       setSaving(false)
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <Spinner size="lg" label="در حال بارگذاری..." />
-      </div>
-    )
-  }
+  if (!isAuthenticated) return <SessionExpiredBanner message="برای مشاهده پروفایل وارد شوید." />
 
-  // Session expired or unauthenticated — show in-page modal trigger, no redirect
-  if (!isAuthenticated) {
-    return (
-      <SessionExpiredBanner message={error ?? "برای مشاهده پروفایل وارد شوید."} />
-    )
-  }
+  if (!profile) return (
+    <div className="page-content account-workspace">
+      <AccountStatus loading={query.loading} error={query.error} retry={refresh} />
+    </div>
+  )
 
-  if (!profileData) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <p>اطلاعات پروفایل یافت نشد.</p>
-      </div>
-    )
-  }
-
+  const admin = profile.capabilities.includes("platform.admin")
   const renderTab = () => {
+    if (!canOpen) return <section className="account-workspace__panel glass">
+      <h1>دسترسی به این بخش در دسترس نیست</h1><Link to="/profile">بازگشت به داشبورد</Link>
+    </section>
     switch (activeTab) {
-      case "dashboard":
-        return (
-          <DashboardTab
-            completion={(profileData as any)?.completion}
-            userId={(user as any)?.id ?? ""}
-            onRefresh={loadProfile}
-          />
-        )
-      case "account":
-        return (
-          <AccountTab
-            profileData={profileData}
-            onUpdate={handleProfileUpdate}
-            saving={saving}
-            onRefresh={loadProfile}
-          />
-        )
-      case "messages":
-        return <MessagesTab />
-      case "projects":
-        return <UserProjectsList />
-      case "learning":
-        return (
-          <LearningTab
-            preferencesData={profileData?.preferences}
-            onUpdate={handleProfileUpdate}
-            saving={saving}
-          />
-        )
-      default:
-        return null
+      case "dashboard": return <DashboardTab profile={profile} />
+      case "account": return <div className="account-workspace__stack">
+        <EmailVerificationCard key={profile.email} email={profile.email} verified={profile.is_email_verified} />
+        <AccountTab profileData={profile} onUpdate={update} saving={saving} onRefresh={refresh} />
+      </div>
+      case "wallet": return <WalletTab />
+      case "messages": return <MessagesTab key="messages" userId={profile.id} />
+      case "support": return <MessagesTab key="support" userId={profile.id} queue />
+      case "projects": return <UserProjectsList />
+      case "learning": return <LearningTab />
+      case "users": return <UsersTab viewerId={profile.id} initialStatus={params.get("status") ?? ""} onAccessChanged={() => void refresh()} />
+      case "roles": return <RolesTab />
+      case "groups": return <GroupsTab admin={admin} memberships={profile.groups} />
+      case "research": return <ResearchGroupsTab />
+      default: return null
     }
   }
 
-  return (
-    <div className="page-content">
-      {renderTab()}
-    </div>
-  )
+  return <div className="page-content account-workspace" dir="rtl">{renderTab()}</div>
 }
-
-export default ProfileManager

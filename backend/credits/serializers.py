@@ -1,56 +1,51 @@
+from decimal import Decimal
+
 from rest_framework import serializers
-from .models import UserCredit, CreditTransaction, CreditPackage
 
-
-class UserCreditSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.get_full_name', read_only=True)
-    
-    class Meta:
-        model = UserCredit
-        fields = (
-            'id', 'user', 'user_name', 'balance', 'total_earned', 
-            'total_spent', 'created_at', 'updated_at'
-        )
-        read_only_fields = ('id', 'created_at', 'updated_at')
+from .models import CreditPackage, CreditTransaction
 
 
 class CreditTransactionSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.get_full_name', read_only=True)
-    
+    actor = serializers.IntegerField(source="actor_id", read_only=True)
+    user = serializers.IntegerField(source="user_id", read_only=True)
+    group = serializers.IntegerField(source="group_id", read_only=True)
+
     class Meta:
         model = CreditTransaction
         fields = (
-            'id', 'user', 'user_name', 'amount', 'transaction_type',
-            'description', 'reference_id', 'created_at'
+            "id", "user", "group", "actor", "amount", "bucket", "balance_after",
+            "transaction_type", "description", "reference_id", "created_at",
         )
-        read_only_fields = ('id', 'created_at')
+        read_only_fields = fields
 
 
 class CreditPackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditPackage
-        fields = (
-            'id', 'name', 'description', 'credits', 'price',
-            'is_active', 'created_at', 'updated_at'
-        )
-        read_only_fields = ('id', 'created_at', 'updated_at')
+        fields = ("id", "name", "description", "credits", "price", "is_active", "created_at", "updated_at")
+        read_only_fields = fields
 
 
-class AddCreditsSerializer(serializers.Serializer):
-    amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0.01)
-    description = serializers.CharField(max_length=500, required=False)
-    
+class AdjustmentSerializer(serializers.Serializer):
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    reason = serializers.CharField(max_length=500)
+    request_id = serializers.UUIDField()
+
     def validate_amount(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("Amount must be greater than 0")
+        if not value:
+            raise serializers.ValidationError("The adjustment must be nonzero.")
         return value
 
 
-class SpendCreditsSerializer(serializers.Serializer):
-    amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=0.01)
+class AddCreditsSerializer(AdjustmentSerializer):
+    user_id = serializers.IntegerField(min_value=1)
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2, min_value=Decimal("0.01"))
+    reason = serializers.CharField(max_length=500, required=False)
     description = serializers.CharField(max_length=500, required=False)
-    
-    def validate_amount(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("Amount must be greater than 0")
-        return value
+
+    def validate(self, attrs):
+        attrs["reason"] = attrs.get("reason") or attrs.pop("description", "")
+        attrs.pop("description", None)
+        if not attrs["reason"]:
+            raise serializers.ValidationError({"reason": "An adjustment reason is required."})
+        return attrs

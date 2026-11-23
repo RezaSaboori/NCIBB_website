@@ -9,6 +9,10 @@ urlpatterns = [
     path('messages/<int:pk>/', views.MessageDetailView.as_view(), name='message_detail'),
     path('send/', views.send_message_view, name='send_message'),
     
+    path('destinations/', views.destinations_view, name='destinations'),
+    path('threads/<int:thread_id>/read/', views.mark_thread_read_view, name='thread_read'),
+    path('threads/<int:thread_id>/forward/', views.forward_view, name='thread_forward'),
+
     # Thread endpoints
     path('threads/', views.MessageThreadListView.as_view(), name='thread_list'),
     path('threads/<int:pk>/', views.MessageThreadDetailView.as_view(), name='thread_detail'),

@@ -63,7 +63,7 @@ class User(AbstractUser):
         super().save(*args, **kwargs)
         # Create profile if doesn't exist
         if not hasattr(self, 'profile'):
-            UserProfile.objects.create(user=self)
+            UserProfile.objects.get_or_create(user=self)
 
 
 class UserProfile(models.Model):
