@@ -1,0 +1,83 @@
+/* The scroll lock's inline scrollbar gutter offsets fixed overlays in Chromium RTL. */
+html:has(.profile-modal) { scrollbar-gutter: auto !important; }
+
+.profile-modal__backdrop,
+.profile-modal__viewport { z-index: 1000000; }
+.profile-modal__viewport { overflow-x: clip; }
+
+.profile-modal.glass-transparent {
+  --profile-modal-padding: var(--spacing-lg);
+  --profile-modal-scrollbar: 6px;
+  isolation: isolate;
+  box-sizing: border-box;
+  min-inline-size: 0;
+  margin: var(--spacing-md);
+  max-block-size: calc(var(--visual-viewport-height, 100dvh) - 2 * var(--spacing-md));
+  padding: var(--profile-modal-padding);
+  gap: var(--spacing-md);
+  border-radius: var(--border-radius-container-lg);
+  background: transparent;
+  box-shadow: none;
+  color: var(--color-gray12);
+}
+
+.profile-modal.glass-transparent::before { pointer-events: none; }
+
+.profile-modal :is(.profile-modal__header, .profile-modal__body, .profile-modal__footer) { padding: 0; min-inline-size: 0; }
+
+.profile-modal .profile-modal__header {
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.profile-modal__header h2 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.profile-modal .profile-modal__close { flex: none; color: var(--color-gray12); }
+
+.profile-modal .profile-modal__body {
+  flex: 0 1 auto;
+  min-block-size: 0;
+  gap: 0;
+  margin-inline: calc(-1 * var(--profile-modal-padding));
+  margin-block: calc(-1 * var(--spacing-sm)) calc(-1 * var(--spacing-md));
+  padding-inline: var(--profile-modal-padding);
+  padding-block: var(--spacing-sm) var(--spacing-md);
+  scrollbar-gutter: stable both-edges;
+}
+
+@supports selector(::-webkit-scrollbar) {
+  .profile-modal .profile-modal__body { padding-inline: calc(var(--profile-modal-padding) - var(--profile-modal-scrollbar)); }
+  .profile-modal__body::-webkit-scrollbar { width: var(--profile-modal-scrollbar); }
+  .profile-modal__body::-webkit-scrollbar-thumb { border: 0; }
+}
+
+.profile-modal__content { display: flow-root; }
+.profile-modal__size { transition: block-size var(--motion-duration-slow) var(--motion-easing-easeInOut); }
+
+.profile-modal :focus-visible {
+  outline: var(--border-width-thin) solid var(--color-blue);
+  outline-offset: 2px;
+}
+
+.profile-modal .ui-input-field:focus-visible { outline: none; }
+.profile-modal .ui-glass-tabs__tab:focus-visible { outline-offset: -2px; }
+.profile-modal h3 { font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); }
+.profile-modal blockquote { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+@media (max-width: 760px) {
+  .profile-modal.glass-transparent {
+    --profile-modal-padding: var(--spacing-md);
+    border-radius: var(--border-radius-container-sm);
+    margin: var(--spacing-sm);
+    max-block-size: calc(var(--visual-viewport-height, 100dvh) - 2 * var(--spacing-sm));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-modal__size { transition: none; }
+}

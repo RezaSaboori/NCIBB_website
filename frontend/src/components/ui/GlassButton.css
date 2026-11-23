@@ -1,0 +1,25 @@
+.ui-glass-button {
+  display: inline-flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-pill);
+  padding-inline: var(--spacing-md);
+  min-block-size: 2.25rem;
+  font-family: var(--font-family-persian);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  color: var(--color-gray12);
+  text-decoration: none;
+}
+
+.ui-glass-button[data-size="sm"] { min-block-size: 2rem; padding-inline: var(--spacing-sm); }
+.ui-glass-button.blue-glass { color: var(--color-gray1); }
+.dark .ui-glass-button.blue-glass { color: var(--color-gray12); }
+.ui-glass-button.red-glass { color: var(--color-gray1); }
+.dark .ui-glass-button.red-glass { color: var(--color-gray12); }
+
+.ui-glass-button:focus-visible {
+  outline: var(--border-width-thin) solid var(--color-blue);
+  outline-offset: var(--spacing-xs);
+}

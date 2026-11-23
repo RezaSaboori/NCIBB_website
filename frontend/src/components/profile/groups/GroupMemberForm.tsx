@@ -1,5 +1,6 @@
+import { SingleLineInput, SelectInput } from "@/components/ui/inputs"
+import { GlassButton } from "@/components/ui/GlassButton"
 import { useCallback, useState, type FormEvent } from "react"
-import { Button } from "@heroui/react"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
 import type { GroupMember, Role } from "@/types/account"
 import { RoleChoices } from "../admin/RoleChoices"
@@ -36,20 +37,21 @@ export function GroupMemberForm({ group, member, roles, close, onSaved }: {
     <form className="account-workspace__form" onSubmit={submit}>
       {member ? <h3>{member.user_name || member.username}</h3> : (
         <div className="account-workspace__fields">
-          <label>جستجوی کاربر<input value={search} onChange={(event) => { setSearch(event.target.value); setUser(0) }} placeholder="نام یا ایمیل" /></label>
+          <label>جستجوی کاربر<SingleLineInput value={search} onChange={(event) => { setSearch(event.target.value); setUser(0) }} placeholder="نام یا ایمیل" /></label>
           <AccountStatus loading={users.loading && !!search} error={users.error} retry={users.refresh} />
-          <label>کاربر<select required value={user || ""} onChange={(event) => setUser(Number(event.target.value))}>
-            <option value="">انتخاب کاربر</option>
-            {users.data?.results.map((account) => <option value={account.id} key={account.id}>{accountName(account)} · {account.email}</option>)}
-          </select></label>
+          <label>کاربر<SelectInput required value={user || ""} placeholder="انتخاب کاربر"
+            onChange={(value) => setUser(Number(value))}
+            options={(users.data?.results ?? []).map((account) => ({
+              value: String(account.id), label: `${accountName(account)} · ${account.email}`,
+            }))} /></label>
         </div>
       )}
       <RoleChoices label="نقش‌های گروه" roles={roles} selected={rolesSelected} onChange={setRolesSelected} />
       <label className="account-workspace__check"><input type="checkbox" checked={active} onChange={(event) => setActive(event.target.checked)} />عضویت فعال</label>
       <AccountStatus error={error} />
       <div className="account-workspace__actions">
-        <Button color="primary" type="submit" isLoading={saving} isDisabled={!user}>ذخیره عضویت</Button>
-        <Button variant="flat" onPress={close}>انصراف</Button>
+        <GlassButton color="primary" type="submit" isLoading={saving} isDisabled={!user}>ذخیره عضویت</GlassButton>
+        <GlassButton variant="flat" onPress={close}>انصراف</GlassButton>
       </div>
     </form>
   )

@@ -1,5 +1,8 @@
+import { SingleLineInput, SelectInput } from "@/components/ui/inputs"
+import { GlassButton } from "@/components/ui/GlassButton"
 import { useCallback, useState } from "react"
-import { Button } from "@heroui/react"
+import { GlassTable, type GlassTableColumn } from "@/components/ui/tables/GlassTable"
+import type { DirectoryUser } from "@/types/account"
 import { accountApi } from "@/dataset_services/accountApi"
 import { accountName, formatCoins } from "../shared/accountFormat"
 import { AccountStatus } from "../shared/AccountStatus"
@@ -17,43 +20,40 @@ export function UsersTab({ viewerId, initialStatus = "", onAccessChanged }: {
   const [userId, setUserId] = useState<number>()
   const users = useAccountQuery(useCallback(() => accountApi.users(page, search, role, status), [page, search, role, status]))
   const roles = useAccountQuery(accountApi.allRoles)
+  const columns: GlassTableColumn<DirectoryUser>[] = [
+    { key: "identity", label: "نام و ایمیل", render: (user) => <><strong>{accountName(user)}</strong><br /><bdi>{user.email}</bdi></> },
+    { key: "roles", label: "نقش‌ها", render: (user) => user.roles.map((item) => item.label).join("، ") },
+    { key: "groups", label: "گروه‌ها", render: (user) => user.groups.map((item) => item.name).join("، ") || "—" },
+    { key: "status", label: "وضعیت", render: (user) => user.is_active ? "فعال" : "غیرفعال" },
+    { key: "credit", label: "Beat Coin", render: (user) => formatCoins(user.balance) },
+    { key: "action", label: "جزئیات", render: (user) => (
+      <GlassButton size="sm" aria-label={`جزئیات ${accountName(user)}`} onPress={() => setUserId(user.id)}>مشاهده</GlassButton>
+    ) },
+  ]
   return (
-    <section className="account-workspace__panel glass">
+    <div className="account-workspace__stack">
       <h1>کاربران</h1>
-      <div className="account-workspace__form account-workspace__fields">
-        <label>جستجو<input type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} placeholder="نام، ایمیل یا نام کاربری" /></label>
-        <label>نقش<select value={role} onChange={(event) => { setRole(event.target.value); setPage(1) }}>
-          <option value="">همه نقش‌ها</option>
-          {roles.data?.filter((item) => item.scope === "platform").map((item) => <option key={item.id} value={item.code}>{item.label}</option>)}
-        </select></label>
-        <label>وضعیت<select value={status} onChange={(event) => { setStatus(event.target.value); setPage(1) }}>
-          <option value="">همه حساب‌ها</option><option value="true">فعال</option><option value="false">غیرفعال</option>
-        </select></label>
-      </div>
-      <AccountStatus loading={users.loading} error={users.error} retry={users.refresh} />
-      {users.data?.results.length === 0 && <p>کاربری یافت نشد.</p>}
-      {!!users.data?.results.length && <div className="account-workspace__table-wrap">
-        <table className="account-workspace__table">
-          <thead><tr><th>نام و ایمیل</th><th>نقش‌ها</th><th>گروه‌ها</th><th>وضعیت</th><th>Beat Coin</th><th>جزئیات</th></tr></thead>
-          <tbody>
-            {users.data.results.map((user) => (
-              <tr key={user.id}>
-                <td><strong>{accountName(user)}</strong><br /><bdi>{user.email}</bdi></td>
-                <td>{user.roles.map((item) => item.label).join("، ")}</td>
-                <td>{user.groups.map((item) => item.name).join("، ") || "—"}</td>
-                <td>{user.is_active ? "فعال" : "غیرفعال"}</td>
-                <td>{formatCoins(user.balance)}</td>
-                <td><Button size="sm" variant="flat" aria-label={`جزئیات ${accountName(user)}`} onPress={() => setUserId(user.id)}>مشاهده</Button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>}
-      <PageControls data={users.data} page={page} onPage={setPage} />
+      <GlassTable label="کاربران" rows={users.data?.results ?? []} columns={columns} rowKey={(user) => user.id}
+        controls={<>
+          <div className="account-workspace__form account-workspace__fields">
+            <label>جستجو<SingleLineInput type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} placeholder="نام، ایمیل یا نام کاربری" /></label>
+            <label>نقش<SelectInput value={role} onChange={(value) => { setRole(value); setPage(1) }} options={[
+              { value: "", label: "همه نقش‌ها" },
+              ...(roles.data ?? []).filter((item) => item.scope === "platform").map((item) => ({ value: item.code, label: item.label })),
+            ]} /></label>
+            <label>وضعیت<SelectInput value={status} onChange={(value) => { setStatus(value); setPage(1) }} options={[
+              { value: "", label: "همه حساب‌ها" }, { value: "true", label: "فعال" }, { value: "false", label: "غیرفعال" },
+            ]} /></label>
+          </div>
+          <AccountStatus loading={users.loading} error={users.error} retry={users.refresh} />
+        </>}
+        footer={<PageControls data={users.data} page={page} onPage={setPage} />}
+        empty={users.data && <p>کاربری یافت نشد.</p>}
+      />
       {userId && <UserDetailDialog key={userId} id={userId} viewerId={viewerId} onClose={() => setUserId(undefined)} onUpdated={() => {
         void users.refresh()
         if (viewerId === userId) onAccessChanged()
       }} />}
-    </section>
+    </div>
   )
 }

@@ -92,7 +92,6 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
               onChange={onSelectExistingProject}
               placeholder="پروژه را انتخاب کنید"
               chevronIcon={<ChevronIcon />}
-              searchable={projectOptions.length > 6}
               dir="rtl"
             />
           </div>

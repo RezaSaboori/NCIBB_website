@@ -88,19 +88,19 @@ NCIBB/
 2. **Backend Setup**
    ```bash
    cd backend
-   python -m venv .venv
-   source .venv/bin/activate
-   python -m pip install -r requirements.txt
+   python3 -m venv .venv
+   .venv/bin/python -m pip install -r requirements.txt
    
    # Run migrations
-   python manage.py migrate
+   .venv/bin/python manage.py migrate
    
    # Create superuser
-   python manage.py createsuperuser
+   .venv/bin/python manage.py createsuperuser
    
    # Start development server
-   python manage.py runserver 127.0.0.1:8000
+   .venv/bin/python manage.py runserver
    ```
+   Django starts on `127.0.0.1:8317` by default. Keep it running while using Vite. Local `manage.py` commands started with an incompatible Django version retry using `backend/.venv` when it exists.
 
 3. **Frontend Setup** (in a second terminal, from the repository root)
    ```bash
@@ -116,9 +116,9 @@ NCIBB/
    ```
 
 4. **Access the application**
-   - Backend API: http://localhost:8000/api/
+   - Backend API: http://localhost:8317/api/
    - Frontend: http://localhost:5173
-   - Admin Panel: http://localhost:8000/admin/
+   - Admin Panel: http://localhost:8317/admin/
 
 ### Docker Setup
 
@@ -135,9 +135,9 @@ NCIBB/
    ```
 
 2. **Access the application**
-   - Backend API: http://localhost:8000/api/
+   - Backend API: http://localhost:8317/api/
    - Frontend: http://localhost:3000
-   - Admin Panel: http://localhost:8000/admin/
+   - Admin Panel: http://localhost:8317/admin/
 
 ## 🔐 Authentication
 

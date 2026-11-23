@@ -1,5 +1,6 @@
+import { SingleLineInput, SelectInput } from "@/components/ui/inputs"
+import { GlassButton } from "@/components/ui/GlassButton"
 import { useRef, useState, type FormEvent } from "react"
-import { Button } from "@heroui/react"
 import { accountError } from "@/dataset_services/accountApi"
 import type { Adjustment } from "@/types/account"
 
@@ -43,13 +44,14 @@ export function AdjustmentForm({ save, onSaved, shared = false }: { save: (data:
   return (
     <form className="account-workspace__form" onSubmit={submit}>
       <div className="account-workspace__fields">
-        <label>نوع تغییر<select value={direction} onChange={(event) => setDirection(event.target.value)}>
-          <option value="add">افزایش اعتبار {shared ? "اشتراکی" : "دائمی"}</option><option value="subtract">کاهش اعتبار {shared ? "اشتراکی" : "دائمی"}</option>
-        </select></label>
-        <label>مبلغ Beat Coin<input required inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} /></label>
-        <label>دلیل تغییر<input required maxLength={500} value={reason} onChange={(event) => setReason(event.target.value)} /></label>
+        <label>نوع تغییر<SelectInput value={direction} onChange={setDirection} options={[
+          { value: "add", label: `افزایش اعتبار ${shared ? "اشتراکی" : "دائمی"}` },
+          { value: "subtract", label: `کاهش اعتبار ${shared ? "اشتراکی" : "دائمی"}` },
+        ]} /></label>
+        <label>مبلغ Beat Coin<SingleLineInput required inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} /></label>
+        <label>دلیل تغییر<SingleLineInput required maxLength={500} value={reason} onChange={(event) => setReason(event.target.value)} /></label>
       </div>
-      <Button className="account-workspace__submit" type="submit" color="primary" isLoading={saving}>ثبت تغییر</Button>
+      <GlassButton className="account-workspace__submit" type="submit" color="primary" isLoading={saving}>ثبت تغییر</GlassButton>
       {status && <p role="status">{status}</p>}
       {error && <p role="alert">{error}</p>}
     </form>

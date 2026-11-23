@@ -9,7 +9,7 @@ interface ThemeProviderProps {
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   return (
     <ThemeContextProvider>
-      <HeroUIProvider>{children}</HeroUIProvider>
+      <HeroUIProvider locale="fa-IR">{children}</HeroUIProvider>
     </ThemeContextProvider>
   )
 }

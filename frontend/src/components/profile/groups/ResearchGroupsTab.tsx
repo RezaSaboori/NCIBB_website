@@ -1,23 +1,27 @@
+import { GlassTable, type GlassTableColumn } from "@/components/ui/tables/GlassTable"
 import { Link } from "react-router-dom"
 import { accountApi } from "@/dataset_services/accountApi"
 import { AccountStatus } from "../shared/AccountStatus"
 import { useAccountQuery } from "../shared/useAccountQuery"
 
+type ResearchGroup = Awaited<ReturnType<typeof accountApi.researchGroups>>[number]
+
+const columns: GlassTableColumn<ResearchGroup>[] = [
+  { key: "group", label: "نام گروه", render: (group) => <strong>{group.name}</strong> },
+  { key: "roles", label: "نقش‌ها", render: (group) => group.roles.map((role) => role.label).join("، ") || "—" },
+  { key: "contacts", label: "افراد مرتبط", render: (group) => group.contacts.length
+    ? <Link className="ui-glass-button glass" to="/profile?tab=messages">{group.contacts.map((contact) => contact.name).join("، ")}</Link>
+    : "—" },
+]
+
 export function ResearchGroupsTab() {
   const groups = useAccountQuery(accountApi.researchGroups)
   return (
-    <section className="account-workspace__panel glass">
+    <section className="account-workspace__stack">
       <h1>گروه‌های پژوهشی</h1>
-      <AccountStatus loading={groups.loading} error={groups.error} retry={groups.refresh} />
-      {groups.data?.length === 0 && <p>عضو هیچ گروه پژوهشی نیستید.</p>}
-      <ul className="account-workspace__rows">
-        {groups.data?.map((group) => (
-          <li key={group.id}>
-            <div><strong>{group.name}</strong><small>{group.roles.map((role) => role.label).join("، ")}</small></div>
-            {group.contacts.length > 0 && <Link to="/profile?tab=messages">{group.contacts.map((contact) => contact.name).join("، ")}</Link>}
-          </li>
-        ))}
-      </ul>
+      <GlassTable label="گروه‌های پژوهشی" rows={groups.data ?? []} columns={columns} rowKey={(group) => group.id}
+        controls={<AccountStatus loading={groups.loading} error={groups.error} retry={groups.refresh} />}
+        empty={groups.data && <p>عضو هیچ گروه پژوهشی نیستید.</p>} />
     </section>
   )
 }

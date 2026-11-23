@@ -1,5 +1,7 @@
-import { useCallback, useState, type FormEvent } from "react"
-import { Button, Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react"
+import { SingleLineInput, SelectInput, MessageInput } from "@/components/ui/inputs"
+import { GlassButton } from "@/components/ui/GlassButton"
+import { useCallback, useId, useState, type FormEvent } from "react"
+import { ProfileModal } from "../shared/ProfileModal"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
 import type { Destination, Thread, ThreadMessage } from "@/types/account"
 import { AccountStatus } from "../shared/AccountStatus"
@@ -13,6 +15,7 @@ export function ComposeDialog({ source, selected, onClose, onSent }: {
   onClose: () => void
   onSent: (thread: Thread) => void
 }) {
+  const formId = useId()
   const [search, setSearch] = useState("")
   const [recipient, setRecipient] = useState("")
   const [subject, setSubject] = useState(source ? `ارسال مجدد · ${source.subject}`.slice(0, 200) : "")
@@ -44,42 +47,38 @@ export function ComposeDialog({ source, selected, onClose, onSent }: {
   }
 
   return (
-    <Modal isOpen onOpenChange={(open) => { if (!open && !saving) onClose() }} size="lg" scrollBehavior="inside">
-      <ModalContent dir="rtl" className="account-workspace__modal">
-        <ModalHeader>{source ? "ارسال مجدد پیام" : "گفتگوی جدید"}</ModalHeader>
-        <ModalBody>
-          <form className="account-workspace__form" onSubmit={submit}>
-            <label>جستجوی گیرنده<input value={search} onChange={(event) => {
-              setSearch(event.target.value)
-              setRecipient("")
-            }} /></label>
-            <AccountStatus loading={destinations.loading} error={destinations.error} retry={destinations.refresh} />
-            <label>گیرنده
-              <select required value={recipient} onChange={(event) => setRecipient(event.target.value)}>
-                <option value="">انتخاب گیرنده</option>
-                {destinations.data?.map((option) => (
-                  <option key={destinationKey(option)} value={destinationKey(option)}>
-                    {option.label}{option.group ? ` · گروه ${option.group}` : ""}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>موضوع<input required maxLength={200} value={subject} onChange={(event) => setSubject(event.target.value)} /></label>
-            {source && <div className="account-workspace__stack">
-              <h3>پیش‌نمایش پیام‌های انتخاب‌شده</h3>
-              {selected.map((message) => <blockquote key={message.id}>{message.content}</blockquote>)}
-            </div>}
-            <label>{source ? "یادداشت (اختیاری)" : "متن پیام"}
-              <textarea required={!source} maxLength={6000} rows={5} value={content} onChange={(event) => setContent(event.target.value)} />
-            </label>
-            <AccountStatus error={error} />
-            <div className="account-workspace__actions">
-              <Button type="submit" color="primary" isLoading={saving} isDisabled={!recipient || !subject.trim() || (!source && !content.trim())}>ارسال</Button>
-              <Button variant="flat" isDisabled={saving} onPress={onClose}>انصراف</Button>
-            </div>
-          </form>
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+    <ProfileModal isOpen size="lg" title={source ? "ارسال مجدد پیام" : "گفتگوی جدید"}
+      onOpenChange={(open) => { if (!open && !saving) onClose() }}
+      footer={(
+        <>
+          <GlassButton variant="flat" isDisabled={saving} onPress={onClose}>انصراف</GlassButton>
+          <GlassButton type="submit" form={formId} color="primary" isLoading={saving}
+            isDisabled={!recipient || !subject.trim() || (!source && !content.trim())}>ارسال</GlassButton>
+        </>
+      )}>
+      <form id={formId} className="account-workspace__form" onSubmit={submit}>
+        <label>جستجوی گیرنده<SingleLineInput value={search} onChange={(event) => {
+          setSearch(event.target.value)
+          setRecipient("")
+        }} /></label>
+        <AccountStatus loading={destinations.loading} error={destinations.error} retry={destinations.refresh} />
+        <label>گیرنده
+          <SelectInput required value={recipient} onChange={setRecipient} placeholder="انتخاب گیرنده"
+            options={(destinations.data ?? []).map((option) => ({
+              value: destinationKey(option),
+              label: option.group ? `${option.label} · گروه ${option.group}` : option.label,
+            }))} />
+        </label>
+        <label>موضوع<SingleLineInput required maxLength={200} value={subject} onChange={(event) => setSubject(event.target.value)} /></label>
+        {source && <div className="account-workspace__stack">
+          <h3>پیش‌نمایش پیام‌های انتخاب‌شده</h3>
+          {selected.map((message) => <blockquote key={message.id}>{message.content}</blockquote>)}
+        </div>}
+        <label>{source ? "یادداشت (اختیاری)" : "متن پیام"}
+          <MessageInput required={!source} maxLength={6000} rows={5} value={content} onChange={(event) => setContent(event.target.value)} />
+        </label>
+        <AccountStatus error={error} />
+      </form>
+    </ProfileModal>
   )
 }

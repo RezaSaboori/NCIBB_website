@@ -1,33 +1,17 @@
+import { GlassButton } from "@/components/ui/GlassButton"
+import { GlassCard } from "@/components/ui/GlassCard"
 // frontend/src/components/profile/ProfileForm.jsx
-import React, { useState, useRef } from "react"
-import { useForm, Controller } from "react-hook-form"
+import React, { useMemo, useState, useRef } from "react"
+import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  Input,
-  Textarea,
-  Button,
-  Select,
-  SelectItem,
-  Divider,
-  Progress,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from "@heroui/react"
-import { Icon } from "@iconify/react"
+import { useDisclosure } from "@heroui/react"
+import { ProfileModal } from "./shared/ProfileModal"
 import { profileService } from "../../dataset_services/profileService"
 import ImageCropModal from "./ImageCropModal"
 import UserAvatar from "../common/UserAvatar"
 import CompletionCard from "./CompletionCard"
-import "./modal.css"
+import AccountFields from "./account/AccountFields"
 
 const profileSchema = yup.object({
   first_name: yup
@@ -49,11 +33,6 @@ const profileSchema = yup.object({
   company: yup.string().max(200, "نام شرکت باید کمتر از ۲۰۰ کاراکتر باشد"),
 })
 
-const genderOptions = [
-  { key: "male", label: "مرد" },
-  { key: "female", label: "زن" },
-]
-
 const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
   const [basicEditMode, setBasicEditMode] = useState(false)
   const [professionalEditMode, setProfessionalEditMode] = useState(false)
@@ -71,26 +50,23 @@ const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
     onClose: onDeleteClose,
   } = useDisclosure()
 
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors, isValid, isDirty },
-  } = useForm({
+  const savedValues = useMemo(() => ({
+    first_name: profileData?.profile?.first_name || "",
+    last_name: profileData?.profile?.last_name || "",
+    email: profileData?.email || "",
+    phone: profileData?.phone || "",
+    job_title: profileData?.profile?.job_title || "",
+    company: profileData?.profile?.company || "",
+    department: profileData?.profile?.department || "",
+    city: profileData?.profile?.city || "",
+    state_province: profileData?.profile?.state_province || "",
+    country: profileData?.profile?.country || "",
+    gender: profileData?.profile?.gender || "",
+  }), [profileData])
+  const lastSavedValues = useRef(savedValues)
+  const { control, handleSubmit, reset, formState: { errors, isValid, isDirty } } = useForm({
     resolver: yupResolver(profileSchema),
-    defaultValues: {
-      first_name: profileData?.profile?.first_name || "",
-      last_name: profileData?.profile?.last_name || "",
-      email: profileData?.email || "",
-      phone: profileData?.phone || "",
-      job_title: profileData?.profile?.job_title || "",
-      company: profileData?.profile?.company || "",
-      department: profileData?.profile?.department || "",
-      city: profileData?.profile?.city || "",
-      state_province: profileData?.profile?.state_province || "",
-      country: profileData?.profile?.country || "",
-      gender: profileData?.profile?.gender || "",
-    },
+    defaultValues: savedValues,
     mode: "onChange",
   })
 
@@ -99,23 +75,10 @@ const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
   }, [profileData])
 
   React.useEffect(() => {
-    // Reset form when profileData changes
-    if (profileData) {
-      reset({
-        first_name: profileData.profile.first_name || "",
-        last_name: profileData.profile.last_name || "",
-        email: profileData.email || "",
-        phone: profileData.phone || "",
-        job_title: profileData.profile.job_title || "",
-        company: profileData.profile.company || "",
-        department: profileData.profile.department || "",
-        city: profileData.profile.city || "",
-        state_province: profileData.profile.state_province || "",
-        country: profileData.profile.country || "",
-        gender: profileData.profile.gender || "",
-      })
-    }
-  }, [profileData, reset])
+    if (Object.entries(savedValues).every(([field, value]) => lastSavedValues.current[field] === value)) return
+    lastSavedValues.current = savedValues
+    reset(savedValues)
+  }, [savedValues, reset])
 
   const loadCompletionData = async () => {
     try {
@@ -134,6 +97,9 @@ const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
         email: formData.email,
         phone: formData.phone,
         gender: formData.gender,
+        city: formData.city,
+        state_province: formData.state_province,
+        country: formData.country,
       }
       await onUpdate(basicPayload)
       setBasicEditMode(false)
@@ -150,9 +116,6 @@ const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
         job_title: formData.job_title,
         company: formData.company,
         department: formData.department,
-        city: formData.city,
-        state_province: formData.state_province,
-        country: formData.country,
       }
       await onUpdate(professionalPayload)
       setProfessionalEditMode(false)
@@ -202,501 +165,41 @@ const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
   const profile = profileData?.profile
 
   return (
-    <div
-      className="u-container u-container--lg text-right overflow-hidden rounded-none"
-      style={{ "--radius": "0" }}
-    >
-      {/* Instruction and Avatar side-by-side */}
-      <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr] gap-8 items-stretch w-full">
-        <Card className="h-full w-full lg:order-2 shadow-none rounded-4xl p-[var(--gap)] bg-[var(--color-gray1)]">
-          <CardBody className="h-full flex items-center">
-            <p>
-              جهت به‌روزرسانی و تغییر اطلاعات، روی «ویرایش» هر بخش کلیک کرده و
-              بعد از اتمام بر روی «ذخیره تغییرات» کلیک کنید.
-            </p>
-          </CardBody>
-        </Card>
-
-        <Card className="h-52 w-52 lg:order-1 lg:justify-self-start p-0 shadow-none bg-transparent">
-          <CardBody className="flex flex-col h-fit items-center p-0">
-            <div className="relative">
-              <UserAvatar
-                src={profile?.profile_picture_url}
-                name={profile?.full_name || "کاربر ناشناس"}
-                seed={profileData?.id ?? profileData?.email ?? profile?.full_name}
-                size="lg"
-                className="shadow-lg"
-              />
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
-
-              <Button
-                isIconOnly
-                size="sm"
-                variant="solid"
-                color="primary"
-                className="absolute -bottom-1 -right-0 rounded-full"
-                onPress={() => fileInputRef.current?.click()}
-              >
-                <Icon icon="fluent:edit-24-regular" className="w-4 h-4" />
-              </Button>
-            </div>
-
-            <div className="flex flex-col items-center text-center mt-auto r">
-              <div className="flex flex-col text-center items-center">
-                <h3 className="text-lg font-semibold">
-                  {profile?.full_name || "کاربر ناشناس"}
-                </h3>
-                <p className="text-small text-default-500">
-                  {profile?.job_title
-                    ? `${profile.job_title}${profile.company ? ` در ${profile.company}` : ""}`
-                    : "عنوان شغلی ثبت نشده است"}
-                </p>
-              </div>
-
-              {profile?.profile_picture_url && (
-                <Button
-                  color="danger"
-                  variant="flat"
-                  size="sm"
-                  startContent={
-                    <Icon icon="heroicons:trash" className="w-4 h-4" />
-                  }
-                  onPress={onDeleteOpen}
-                >
-                  حذف عکس
-                </Button>
-              )}
-            </div>
-          </CardBody>
-        </Card>
-      </div>
-
-      {completionData && (
-        <CompletionCard data={completionData} onRefresh={loadCompletionData} />
-      )}
-
-      <div className="grid grid-cols-1 gap-[var(--gap)] ">
-        {/* Profile Form - split into two sections */}
-        <div className="space-y-[var(--gap)]">
-          {/* Basic Information Card */}
-          <Card className="shadow-none rounded-4xl p-[var(--gap)] p-t-0 bg-[var(--color-gray1)] mt-16">
-            <CardHeader className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold">اطلاعات پایه</h3>
-              {!basicEditMode ? (
-                <Button
-                  color="primary"
-                  className="rounded-full"
-                  variant="flat"
-                  startContent={
-                    <Icon icon="heroicons:pencil" className="w-4 h-4" />
-                  }
-                  onPress={() => setBasicEditMode(true)}
-                >
-                  ویرایش
-                </Button>
-              ) : (
-                <div className="flex gap-[calc(var(--gap)/3)]">
-                  <Button
-                    color="primary"
-                    className="rounded-full"
-                    startContent={
-                      <Icon icon="heroicons:check" className="w-4 h-4" />
-                    }
-                    onPress={handleSubmit(onSubmitBasic)}
-                    isLoading={saving}
-                    isDisabled={!isValid || !isDirty}
-                  >
-                    ذخیره تغییرات
-                  </Button>
-                  <Button
-                    variant="flat"
-                    className="rounded-full"
-                    onPress={() => {
-                      setBasicEditMode(false)
-                      reset()
-                    }}
-                  >
-                    لغو
-                  </Button>
-                </div>
-              )}
-            </CardHeader>
-            <CardBody>
-              <form onSubmit={handleSubmit(onSubmitBasic)}>
-                <div
-                  className="grid grid-cols-1 md:grid-cols-2 gap-[calc(var(--gap)/2)]"
-                  dir="rtl"
-                >
-                  <Controller
-                    name="first_name"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        radius="full"
-                        {...field}
-                        label="نام"
-                        placeholder="نام خود را وارد کنید"
-                        isRequired
-                        isDisabled={!basicEditMode}
-                        isInvalid={!!errors.first_name}
-                        errorMessage={errors.first_name?.message}
-                        labelPlacement="outside"
-                        classNames={{
-                          label: "text-right",
-                          input: "text-right",
-                          inputWrapper:
-                            "rounded-full bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2 data-[has-value=false]:bg-gray2 data-[filled=false]:bg-gray2",
-                        }}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="last_name"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        radius="full"
-                        {...field}
-                        label="نام خانوادگی"
-                        placeholder="نام خانوادگی خود را وارد کنید"
-                        isRequired
-                        isDisabled={!basicEditMode}
-                        isInvalid={!!errors.last_name}
-                        errorMessage={errors.last_name?.message}
-                        labelPlacement="outside"
-                        classNames={{
-                          label: "text-right",
-                          input: "text-right",
-                          inputWrapper:
-                            "rounded-full bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2 data-[has-value=false]:bg-gray2 data-[filled=false]:bg-gray2",
-                        }}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="email"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        radius="full"
-                        {...field}
-                        label="ایمیل"
-                        isReadOnly
-                        isDisabled={true}
-                        labelPlacement="outside"
-                        classNames={{
-                          label: "text-right",
-                          input: "text-right",
-                          inputWrapper:
-                            "rounded-full bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2 data-[has-value=false]:bg-gray2 data-[filled=false]:bg-gray2",
-                        }}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="phone"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        radius="full"
-                        {...field}
-                        label="شماره موبایل"
-                        placeholder="شماره موبایل خود را وارد کنید"
-                        isDisabled={!basicEditMode}
-                        isInvalid={!!errors.phone}
-                        errorMessage={errors.phone?.message}
-                        labelPlacement="outside"
-                        classNames={{
-                          label: "text-right",
-                          input: "text-right",
-                          inputWrapper:
-                            "rounded-full bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2 data-[has-value=false]:bg-gray2 data-[filled=false]:bg-gray2",
-                        }}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="gender"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        radius="full"
-                        {...field}
-                        label="جنسیت"
-                        placeholder="جنسیت"
-                        isDisabled={!basicEditMode}
-                        selectedKeys={field.value ? [field.value] : []}
-                        onSelectionChange={(keys) => {
-                          const selectedValue = Array.from(keys)[0]
-                          field.onChange(selectedValue || "")
-                        }}
-                        labelPlacement="outside"
-                        classNames={{
-                          label: "text-right",
-                          value: "text-right",
-                          trigger:
-                            "rounded-full text-right bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2 data-[placeholder=true]:bg-gray2 data-[has-value=false]:bg-gray2",
-                        }}
-                      >
-                        {genderOptions.map((option) => (
-                          <SelectItem key={option.key} value={option.key}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </Select>
-                    )}
-                  />
-                  <Controller
-                    name="city"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        radius="full"
-                        {...field}
-                        label="شهر"
-                        placeholder="مثلا: تهران"
-                        isDisabled={!basicEditMode}
-                        labelPlacement="outside"
-                        classNames={{
-                          label: "text-right",
-                          input: "text-right",
-                          inputWrapper:
-                            "rounded-full bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2 data-[has-value=false]:bg-gray2 data-[filled=false]:bg-gray2",
-                        }}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="state_province"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        radius="full"
-                        {...field}
-                        label="استان"
-                        placeholder="مثلا: تهران"
-                        isDisabled={!basicEditMode}
-                        labelPlacement="outside"
-                        classNames={{
-                          label: "text-right",
-                          input: "text-right",
-                          inputWrapper:
-                            "bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2",
-                        }}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="country"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        radius="full"
-                        {...field}
-                        label="کشور"
-                        placeholder="مثلا: ایران"
-                        isDisabled={!basicEditMode}
-                        labelPlacement="outside"
-                        classNames={{
-                          label: "text-right",
-                          input: "text-right",
-                          inputWrapper:
-                            "bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2",
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-              </form>
-            </CardBody>
-          </Card>
-
-          {/* Professional Information Card */}
-          <Card className="shadow-none rounded-4xl p-[var(--gap)] p-t-0 bg-[var(--color-gray1)]">
-            <CardHeader className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold">اطلاعات حرفه ای</h3>
-              {!professionalEditMode ? (
-                <Button
-                  color="primary"
-                  className="rounded-full"
-                  variant="flat"
-                  startContent={
-                    <Icon icon="heroicons:pencil" className="w-4 h-4" />
-                  }
-                  onPress={() => setProfessionalEditMode(true)}
-                >
-                  ویرایش
-                </Button>
-              ) : (
-                <div className="flex gap-[calc(var(--gap)/3)]">
-                  <Button
-                    color="primary"
-                    className="rounded-full"
-                    startContent={
-                      <Icon icon="heroicons:check" className="w-4 h-4" />
-                    }
-                    onPress={handleSubmit(onSubmitProfessional)}
-                    isLoading={saving}
-                    isDisabled={!isValid || !isDirty}
-                  >
-                    ذخیره تغییرات
-                  </Button>
-                  <Button
-                    variant="flat"
-                    className="rounded-full"
-                    onPress={() => {
-                      setProfessionalEditMode(false)
-                      reset()
-                    }}
-                  >
-                    لغو
-                  </Button>
-                </div>
-              )}
-            </CardHeader>
-            <CardBody>
-              <form
-                onSubmit={handleSubmit(onSubmitProfessional)}
-                className="space-y-[var(--gap)]"
-              >
-                <div
-                  className="grid grid-cols-1 md:grid-cols-2 gap-[calc(var(--gap)/2)]"
-                  dir="rtl"
-                >
-                  <Controller
-                    name="job_title"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        radius="full"
-                        {...field}
-                        label="عنوان شغلی"
-                        placeholder="مثلا: مهندس نرم افزار"
-                        isDisabled={!professionalEditMode}
-                        isInvalid={!!errors.job_title}
-                        errorMessage={errors.job_title?.message}
-                        labelPlacement="outside"
-                        classNames={{
-                          label: "text-right",
-                          input: "text-right",
-                          inputWrapper:
-                            "bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2",
-                        }}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="company"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        radius="full"
-                        {...field}
-                        label="شرکت"
-                        placeholder="مثلا: انستیتو قلب رجایی"
-                        isDisabled={!professionalEditMode}
-                        isInvalid={!!errors.company}
-                        errorMessage={errors.company?.message}
-                        labelPlacement="outside"
-                        classNames={{
-                          label: "text-right",
-                          input: "text-right",
-                          inputWrapper:
-                            "rounded-full bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2 data-[has-value=false]:bg-gray2 data-[filled=false]:bg-gray2",
-                        }}
-                      />
-                    )}
-                  />
-                  <Controller
-                    name="department"
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        {...field}
-                        label="دپارتمان"
-                        placeholder="مثلا: نوآوری و فناوری "
-                        isDisabled={!professionalEditMode}
-                        labelPlacement="outside"
-                        classNames={{
-                          label: "text-right",
-                          input: "text-right",
-                          inputWrapper:
-                            "rounded-full bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2 data-[has-value=false]:bg-gray2 data-[filled=false]:bg-gray2",
-                        }}
-                      />
-                    )}
-                  />
-                </div>
-
-                {/* Location moved to Basic Information */}
-              </form>
-            </CardBody>
-          </Card>
+    <div className="account-workspace__stack">
+      <GlassCard className="account-workspace__identity" size="sm" heading={<h2>تصویر پروفایل</h2>}
+        footer={<>
+          <GlassButton color="primary" onPress={() => fileInputRef.current?.click()}>تغییر عکس</GlassButton>
+          {profile?.profile_picture_url && <GlassButton onPress={onDeleteOpen}>حذف عکس</GlassButton>}
+        </>}>
+        <div className="account-workspace__identity-body">
+          <UserAvatar src={profile?.profile_picture_url} name={profile?.full_name || "کاربر ناشناس"}
+            seed={profileData?.id ?? profileData?.email ?? profile?.full_name} size="lg" />
+          <div>
+            <strong>{profile?.full_name || "کاربر ناشناس"}</strong>
+            {profile?.job_title && <p className="account-workspace__muted">{profile.job_title}{profile.company ? ` در ${profile.company}` : ""}</p>}
+          </div>
+          <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
         </div>
-      </div>
+      </GlassCard>
 
-      <Modal
-        isOpen={isCropOpen}
-        onOpenChange={onCropClose}
-        className="modal-container"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                تصویر پروفایل
-              </ModalHeader>
-              <ModalBody>
-                <ImageCropModal
-                  imageFile={imageFile}
-                  onCropComplete={handleImageUpload}
-                  onClose={onClose}
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="flat" onPress={onClose}>
-                  لغو
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+      {completionData && <CompletionCard data={completionData} />}
 
-      <Modal
-        isOpen={isDeleteOpen}
-        onOpenChange={onDeleteClose}
-        className="modal-container"
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                حذف عکس پروفایل
-              </ModalHeader>
-              <ModalBody>
-                <p>
-                  آیا از حذف عکس پروفایل اطمینان دارید؟ این عمل برگشت پذیر نیست.
-                </p>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" onPress={handleImageDelete}>
-                  حذف
-                </Button>
-                <Button color="primary" variant="flat" onPress={onClose}>
-                  لغو
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+      <AccountFields kind="basic" control={control} errors={errors} editing={basicEditMode}
+        onEdit={() => setBasicEditMode(true)} onCancel={() => { setBasicEditMode(false); reset() }}
+        onSubmit={handleSubmit(onSubmitBasic)} saving={saving} canSave={isValid && isDirty} />
+      <AccountFields kind="professional" control={control} errors={errors} editing={professionalEditMode}
+        onEdit={() => setProfessionalEditMode(true)} onCancel={() => { setProfessionalEditMode(false); reset() }}
+        onSubmit={handleSubmit(onSubmitProfessional)} saving={saving} canSave={isValid && isDirty} />
+
+      <ImageCropModal isOpen={isCropOpen} image={imageFile} onSave={handleImageUpload} onClose={onCropClose} />
+      <ProfileModal isOpen={isDeleteOpen} onClose={onDeleteClose} title="حذف عکس پروفایل" footer={(
+        <>
+          <GlassButton onPress={onDeleteClose}>لغو</GlassButton>
+          <GlassButton color="danger" onPress={handleImageDelete}>حذف</GlassButton>
+        </>
+      )}>
+        <p>آیا عکس پروفایل حذف شود؟</p>
+      </ProfileModal>
     </div>
   )
 }

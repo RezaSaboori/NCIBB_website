@@ -1,15 +1,14 @@
+import { coinIcon } from "@/components/ui/coinIcon"
 import { useCallback } from "react"
-import { Icon } from "@iconify/react"
-import { Link } from "react-router-dom"
 import { useSelector } from "react-redux"
-
 import { accountApi } from "@/dataset_services/accountApi"
 import type { RootState } from "@/store/store"
 import type { AccountProfile } from "@/types/account"
 import { fetchAllUserProjects } from "../projects/profileProjectsApi"
-import { accountName, formatCoins } from "../shared/accountFormat"
+import { accountName } from "../shared/accountFormat"
 import { AccountStatus } from "../shared/AccountStatus"
 import { useAccountQuery } from "../shared/useAccountQuery"
+import { DashboardMetric } from "./DashboardMetric"
 
 export default function DashboardTab({ profile }: { profile: AccountProfile }) {
   const isAdmin = profile.capabilities.includes("platform.admin")
@@ -22,30 +21,31 @@ export default function DashboardTab({ profile }: { profile: AccountProfile }) {
 
   return (
     <div className="account-workspace__stack">
-      <section className="account-workspace__panel glass">
+      <div className="account-workspace__page-heading">
         <h1>داشبورد</h1>
         <p className="account-workspace__muted">{accountName(profile)} · {profile.roles.map((role) => role.label).join("، ")}</p>
-        <div className="account-workspace__metrics">
-          <Link to="/profile?tab=wallet"><Icon icon="mdi:heart-pulse" /><span>Beat Coin</span><strong>{wallet ? formatCoins(wallet.balance) : "—"}</strong></Link>
-          <Link to="/profile?tab=messages"><Icon icon="tabler:message-circle" /><span>پیام‌های خوانده‌نشده</span><strong>{messages.data ? formatCoins(messages.data.unread_count) : "—"}</strong></Link>
-          <Link to="/profile?tab=projects"><Icon icon="solar:folder-linear" /><span>پروژه‌های من</span><strong>{projects.data ? formatCoins(projects.data.length) : "—"}</strong></Link>
-        </div>
-      </section>
-      {isSupport && (
-        <section className="account-workspace__panel glass">
-          <h2>صف پشتیبانی</h2>
-          <AccountStatus loading={queue.loading} error={queue.error} retry={queue.refresh} />
-          {queue.data && <Link to="/profile?tab=support">{formatCoins(queue.data.count)} گفتگو در صف پشتیبانی</Link>}
-        </section>
-      )}
+      </div>
+      <div className="account-workspace__metrics">
+        <DashboardMetric label="موجودی Beat Coin" icon={coinIcon} value={wallet?.balance}
+          action={{ to: "/profile?tab=wallet", label: "کیف پول", primary: true }} />
+        <DashboardMetric label="پیام‌های خوانده‌نشده" icon="tabler:message-circle" value={messages.data?.unread_count}
+          action={{ to: "/profile?tab=messages", label: "پیام‌ها" }} />
+        <DashboardMetric label="پروژه‌های من" icon="tabler:folder" value={projects.data?.length}
+          action={{ to: "/profile?tab=projects", label: "مشاهده پروژه‌ها" }} />
+        {isSupport && <DashboardMetric label="گفتگوهای پشتیبانی" icon="tabler:headset" value={queue.data?.count}
+          action={{ to: "/profile?tab=support", label: "صف پشتیبانی" }} />}
+      </div>
+      {isSupport && queue.error && <AccountStatus error={queue.error} retry={queue.refresh} />}
       {isAdmin && (
-        <section className="account-workspace__panel glass">
+        <section className="account-workspace__section">
           <h2>مدیریت سامانه</h2>
           <AccountStatus loading={platform.loading} error={platform.error} retry={platform.refresh} />
           {platform.data && <div className="account-workspace__metrics">
-            <Link to="/profile?tab=users"><span>کاربران</span><strong>{formatCoins(platform.data.total_users)}</strong></Link>
-            <Link to="/profile?tab=users&status=true"><span>کاربران فعال</span><strong>{formatCoins(platform.data.active_users)}</strong></Link>
-            <div><span>پروژه‌های سامانه</span><strong>{formatCoins(platform.data.total_projects)}</strong></div>
+            <DashboardMetric label="کاربران" icon="tabler:users" value={platform.data.total_users}
+              action={{ to: "/profile?tab=users", label: "مشاهده کاربران" }} />
+            <DashboardMetric label="کاربران فعال" icon="tabler:user-check" value={platform.data.active_users}
+              action={{ to: "/profile?tab=users&status=true", label: "مشاهده حساب‌های فعال" }} />
+            <DashboardMetric label="پروژه‌های سامانه" icon="tabler:folders" value={platform.data.total_projects} />
           </div>}
         </section>
       )}

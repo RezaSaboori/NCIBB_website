@@ -1,5 +1,6 @@
 import { useState } from "react"
-import { Button } from "@heroui/react"
+import { GlassButton } from "@/components/ui/GlassButton"
+import { GlassCard } from "@/components/ui/GlassCard"
 import { Link, useLocation } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { accountApi } from "@/dataset_services/accountApi"
@@ -28,15 +29,15 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div className="page-content page-content--narrow account-workspace" dir="rtl">
-      <section className="account-workspace__panel glass">
-        <h1>تأیید ایمیل</h1>
+    <div className="page-content page-content--narrow account-workspace account-workspace__stack" dir="rtl">
+      <h1>تأیید ایمیل</h1>
+      <GlassCard size="md" footer={state === "verified" ? (
+        <Link className="glass ui-glass-button" to="/profile">بازگشت به پروفایل</Link>
+      ) : token && <GlassButton color="primary" isLoading={state === "checking"} onPress={() => void verify()}>تأیید ایمیل</GlassButton>}>
         {!token && <p role="alert">پیوند تأیید معتبر نیست.</p>}
         {state === "error" && <p role="alert">تأیید انجام نشد. پیوند را بررسی کنید یا پیوند تازه‌ای درخواست دهید.</p>}
-        {state === "verified" ? (
-          <><p role="status">ایمیل شما تأیید شد.</p><Link to="/profile">بازگشت به پروفایل</Link></>
-        ) : token && <Button color="primary" isLoading={state === "checking"} onPress={() => void verify()}>تأیید ایمیل</Button>}
-      </section>
+        {state === "verified" && <p role="status">ایمیل شما تأیید شد.</p>}
+      </GlassCard>
     </div>
   )
 }

@@ -59,7 +59,6 @@ export const CriteriaWindowRow: React.FC<CriteriaWindowRowProps> = ({
           onChange={(v) => onChange(row.id, { inputValue: v })}
           placeholder="Select value..."
           chevronIcon={<ChevronIcon />}
-          searchable={values!.length > 6}
         />
       ) : isNumeric ? (
         <div className="s2-criteria-window__numeric-row">

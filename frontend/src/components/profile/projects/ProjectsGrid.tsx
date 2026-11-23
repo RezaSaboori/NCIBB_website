@@ -34,13 +34,15 @@ export const ProjectsGrid: React.FC = () => {
     navigate(project.openUrl);
   };
 
-  if (loading) return <div className="project-grid__loading">در حال بارگذاری...</div>;
-  if (error) return <div className="project-grid__error">{error}</div>;
+  const heading = <h1>پروژه‌ها</h1>;
+  if (loading) return <>{heading}<div className="project-grid__loading">در حال بارگذاری...</div></>;
+  if (error) return <>{heading}<div className="project-grid__error">{error}</div></>;
   if (!projects.length)
-    return <div className="project-grid__empty">هنوز پروژه‌ای ایجاد نشده است.</div>;
+    return <>{heading}<div className="project-grid__empty">هنوز پروژه‌ای ایجاد نشده است.</div></>;
 
   return (
-    <>
+    <div className="account-workspace__stack">
+      {heading}
       <div className="project-grid">
         {projects.map((p) => (
           <ProjectCard
@@ -59,6 +61,6 @@ export const ProjectsGrid: React.FC = () => {
           onCancel={() => setPendingDelete(null)}
         />
       )}
-    </>
+    </div>
   );
 };

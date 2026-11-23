@@ -17,7 +17,7 @@ export const ProfileButton = ({
   const { isOpen, onOpen, onOpenChange } = useDisclosure()
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth)
   const location = useLocation()
-  const isActive = location.pathname === "/profile" && new URLSearchParams(location.search).get("tab") !== "wallet"
+  const isActive = location.pathname === "/profile"
   const tokenUserId = useMemo(
     () => getUserIdFromAccessToken(),
     [isAuthenticated, user?.id],

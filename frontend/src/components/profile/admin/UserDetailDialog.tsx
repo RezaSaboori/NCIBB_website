@@ -1,14 +1,17 @@
+import { GlassCard } from "@/components/ui/GlassCard"
+import { GlassTabs } from "@/components/ui/GlassTabs"
 import { useCallback, useEffect, useState, type FormEvent } from "react"
-import { Button, Modal, ModalBody, ModalContent, ModalHeader, Tab, Tabs } from "@heroui/react"
+import { Tab } from "@heroui/react"
 import { useDispatch } from "react-redux"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
 import type { AppDispatch } from "@/store/store"
 import { fetchWallet } from "@/store/walletSlice"
-import { accountName, formatAccountDate, formatCoins } from "../shared/accountFormat"
+import { accountName, formatCoins } from "../shared/accountFormat"
 import { AccountStatus } from "../shared/AccountStatus"
 import { useAccountQuery } from "../shared/useAccountQuery"
 import { AdjustmentForm } from "../wallet/AdjustmentForm"
-import { RoleChoices } from "./RoleChoices"
+import { ProfileModal } from "../shared/ProfileModal"
+import { UserAccountSection } from "./UserAccountSection"
 import { UserAuditSection, UserLedgerSection, UserMessagesSection, UserProjectsSection } from "./UserDetailSections"
 
 export function UserDetailDialog({ id, viewerId, onClose, onUpdated }: {
@@ -53,55 +56,37 @@ export function UserDetailDialog({ id, viewerId, onClose, onUpdated }: {
     }
   }
   return (
-    <Modal isOpen size="4xl" scrollBehavior="inside" onOpenChange={(open) => { if (!open) onClose() }}>
-      <ModalContent dir="rtl" className="account-workspace__modal">
-        <ModalHeader>{user ? accountName(user) : "جزئیات کاربر"}</ModalHeader>
-        <ModalBody>
-          <AccountStatus loading={detail.loading} error={detail.error} retry={detail.refresh} />
-          {user && (
-            <Tabs aria-label="جزئیات کاربر" selectedKey={section} onSelectionChange={(key) => setSection(String(key))}>
-              <Tab key="account" title="حساب">
-                <div className="account-workspace__stack">
-                  <dl className="account-workspace__definitions">
-                    <div><dt>ایمیل</dt><dd><bdi>{user.email}</bdi></dd></div>
-                    <div><dt>تأیید ایمیل</dt><dd>{user.is_email_verified ? "تأیید شده" : "تأیید نشده"}</dd></div>
-                    <div><dt>آخرین ورود</dt><dd>{formatAccountDate(user.last_login)}</dd></div>
-                    <div><dt>تاریخ ثبت نام</dt><dd>{formatAccountDate(user.created_at)}</dd></div>
-                    {user.profile.job_title && <div><dt>عنوان شغلی</dt><dd>{user.profile.job_title}</dd></div>}
-                    {user.profile.company && <div><dt>سازمان</dt><dd>{user.profile.company}</dd></div>}
-                    {user.profile.department && <div><dt>واحد</dt><dd>{user.profile.department}</dd></div>}
-                    <div><dt>گروه‌ها</dt><dd>{user.groups.map((group) => group.name).join("، ") || "—"}</dd></div>
-                  </dl>
-                  <form className="account-workspace__form" onSubmit={save}>
-                    <AccountStatus loading={roles.loading} error={roles.error} retry={roles.refresh} />
-                    {roles.data && <RoleChoices label="نقش‌های سامانه" selected={roleIds} onChange={setRoleIds}
-                      roles={roles.data.filter((role) => role.scope === "platform" && role.code !== "user")} />}
-                    <label className="account-workspace__check"><input type="checkbox" checked={active} onChange={(event) => setActive(event.target.checked)} />حساب فعال</label>
-                    <Button className="account-workspace__submit" color="primary" type="submit" isLoading={saving} isDisabled={!roles.data}>ذخیره دسترسی حساب</Button>
-                    {status && <p role="status">{status}</p>}
-                    {error && <p role="alert">{error}</p>}
-                  </form>
-                </div>
-              </Tab>
-              <Tab key="projects" title="پروژه‌ها"><UserProjectsSection id={id} /></Tab>
-              <Tab key="messages" title="پیام‌ها"><UserMessagesSection id={id} /></Tab>
-              <Tab key="wallet" title="اعتبار">
-                <div className="account-workspace__stack">
-                  <p>موجودی {formatCoins(user.wallet.balance)} Beat Coin · ماهانه {formatCoins(user.wallet.monthly_balance)} · دائمی {formatCoins(user.wallet.permanent_balance)}</p>
-                  <AdjustmentForm save={(data) => accountApi.adjustUser(id, data)} onSaved={() => {
-                    setLedgerRevision((value) => value + 1)
-                    void detail.refresh()
-                    onUpdated()
-                    if (viewerId === id) void dispatch(fetchWallet())
-                  }} />
-                  <UserLedgerSection id={id} revision={ledgerRevision} />
-                </div>
-              </Tab>
-              <Tab key="audit" title="رویدادها"><UserAuditSection id={id} /></Tab>
-            </Tabs>
-          )}
-        </ModalBody>
-      </ModalContent>
-    </Modal>
+    <ProfileModal isOpen size="4xl" animateSize title={user ? accountName(user) : "جزئیات کاربر"} onClose={onClose}>
+      <AccountStatus loading={detail.loading} error={detail.error} retry={detail.refresh} />
+      {user && (
+        <GlassTabs aria-label="جزئیات کاربر" selectedKey={section} onSelectionChange={(key) => setSection(String(key))}>
+          <Tab key="account" title="حساب">
+            <UserAccountSection user={user} roles={roles.data?.filter((role) => role.scope === "platform" && role.code !== "user")}
+              active={active} selectedRoles={roleIds} saving={saving} onActiveChange={setActive}
+              onRolesChange={setRoleIds} onSave={save}
+              accessFeedback={<AccountStatus loading={roles.loading} error={roles.error} retry={roles.refresh} />}
+              saveFeedback={<>
+                {status && <p role="status">{status}</p>}
+                {error && <p className="account-workspace__error" role="alert">{error}</p>}
+              </>} />
+          </Tab>
+          <Tab key="projects" title="پروژه‌ها"><UserProjectsSection id={id} /></Tab>
+          <Tab key="messages" title="پیام‌ها"><GlassCard size="sm"><UserMessagesSection id={id} /></GlassCard></Tab>
+          <Tab key="wallet" title="اعتبار">
+            <div className="account-workspace__stack">
+              <GlassCard size="sm"><p>موجودی {formatCoins(user.wallet.balance)} Beat Coin · ماهانه {formatCoins(user.wallet.monthly_balance)} · دائمی {formatCoins(user.wallet.permanent_balance)}</p>
+              <AdjustmentForm save={(data) => accountApi.adjustUser(id, data)} onSaved={() => {
+                setLedgerRevision((value) => value + 1)
+                void detail.refresh()
+                onUpdated()
+                if (viewerId === id) void dispatch(fetchWallet())
+              }} /></GlassCard>
+              <UserLedgerSection id={id} revision={ledgerRevision} />
+            </div>
+          </Tab>
+          <Tab key="audit" title="رویدادها"><UserAuditSection id={id} /></Tab>
+        </GlassTabs>
+      )}
+    </ProfileModal>
   )
 }

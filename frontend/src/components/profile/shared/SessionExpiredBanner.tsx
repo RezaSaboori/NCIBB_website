@@ -1,5 +1,6 @@
+import { GlassButton } from "@/components/ui/GlassButton"
 import React, { useState } from "react"
-import { Alert, Button } from "@heroui/react"
+import { GlassCard } from "@/components/ui/GlassCard"
 import { AuthModal } from "../../auth/modal/AuthModal"
 
 interface SessionExpiredBannerProps {
@@ -13,21 +14,12 @@ const SessionExpiredBanner: React.FC<SessionExpiredBannerProps> = ({
 
   return (
     <>
-      <div className="max-w-4xl mx-auto p-6">
-        <Alert
-          color="danger"
-          title="دسترسی محدود"
-          description={message}
-          endContent={
-            <Button
-              size="sm"
-              variant="flat"
-              onPress={() => setIsAuthModalOpen(true)}
-            >
-              ورود به حساب
-            </Button>
-          }
-        />
+      <div className="page-content page-content--narrow account-workspace">
+        <GlassCard heading={<h2>دسترسی محدود</h2>} footer={
+          <GlassButton color="primary" onPress={() => setIsAuthModalOpen(true)}>ورود به حساب</GlassButton>
+        }>
+          <p>{message}</p>
+        </GlassCard>
       </div>
 
       <AuthModal

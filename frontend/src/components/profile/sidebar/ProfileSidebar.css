@@ -1,154 +1,91 @@
-@import "../../../components/layout/sidebar.css";
-
-/* ── Profile sidebar geometry ────────────────────────────────── */
-.sidebar-nav {
+.sidebar-nav.glass {
+  position: fixed;
+  inset-block: var(--spacing-xl);
+  inset-inline-start: var(--spacing-lg);
+  z-index: 10;
   width: 260px;
-  border-radius: var(--border-radius-container-lg);
-  padding: var(--spacing-lg) var(--spacing-md);
-  gap: var(--spacing-md);
-  transition:
-    width var(--motion-duration-slow) var(--motion-easing-easeInOut),
-    padding var(--motion-duration-slow) var(--motion-easing-easeInOut);
-}
-
-/* ── Collapsed state ─────────────────────────────────────────── */
-.sidebar-nav--collapsed {
-  width: 72px;
-  padding: var(--spacing-md);
-}
-
-/* Center icons when collapsed */
-.sidebar-nav--collapsed .sidebar-nav__item {
-  justify-content: center;
-  padding: 12px;
-}
-
-/* ── Collapse toggle button ──────────────────────────────────── */
-.sidebar-nav__toggle {
+  max-inline-size: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-end;
-  margin: 0 var(--spacing-sm);
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-  border: none;
-  border-radius: var(--border-radius-container-md);
-  background: transparent;
-  color: var(--color-gray6);
-  cursor: pointer;
-  padding: 0;
-  transition:
-    color var(--motion-duration-fast) var(--motion-easing-easeOut),
-    background-color var(--motion-duration-fast) var(--motion-easing-easeOut);
-}
-
-.sidebar-nav__toggle:hover {
-  color: var(--color-blue);
-  background-color: color-mix(in srgb, var(--color-blue) 10%, transparent);
-}
-
-.sidebar-nav--collapsed .sidebar-nav__toggle {
-  align-self: center;
-}
-
-/* ── Chevron icon inside toggle ──────────────────────────────── */
-.sidebar-nav__toggle-icon {
-  width: 14px;
-  height: 14px;
-  /* Points left (collapse) — chevron SVG points down by default, rotate to point left */
-  transform: rotate(90deg);
-  transition: transform var(--motion-duration-slow) var(--motion-easing-easeInOut);
-}
-
-/* When collapsed, flip to point right (expand) */
-.sidebar-nav__toggle-icon--flipped {
-  transform: rotate(-90deg);
-}
-
-/* ── Menu group gap ──────────────────────────────────────────── */
-.sidebar-nav__menu {
-  gap: var(--spacing-md);
-}
-
-/* ── Danger variant ──────────────────────────────────────────── */
-.sidebar-nav__item--danger:hover {
-  --c: var(--color-red);
-}
-
-/* ── Dark mode toggle ────────────────────────────────────────── */
-[data-theme="dark"] .sidebar-nav__toggle {
-  color: var(--color-gray7);
-}
-
-[data-theme="dark"] .sidebar-nav__toggle:hover {
-  color: var(--color-blue);
-}
-.sidebar-nav {
+  flex-direction: column;
   overflow: auto;
   scrollbar-width: thin;
-  padding-inline: var(--spacing-sm);
-  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-sm);
+  gap: var(--spacing-lg);
+  border-radius: var(--border-radius-container-lg);
+  transition: width var(--motion-duration-slow) var(--motion-easing-easeInOut);
 }
 
-.sidebar-nav__menu {
-  gap: var(--spacing-xs);
-}
+.sidebar-nav.glass.sidebar-nav--collapsed { width: 72px; }
+.sidebar-nav__menu { display: flex; flex-direction: column; gap: var(--spacing-sm); }
+.sidebar-nav__bottom-menu { margin-block-start: auto; }
 
-.sidebar-nav__item {
-  text-align: start;
-  background: transparent;
-  border: 0;
-  padding: .65rem .875rem;
-  border-radius: var(--border-radius-pill);
-  white-space: nowrap;
-  gap: .675rem;
-}
-
-.sidebar-nav__item[aria-current="page"] {
-  color: var(--color-gray1);
-  background: var(--color-blue);
-}
-
-.sidebar-nav__icon {
+.sidebar-nav__item, .sidebar-nav__toggle {
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
+  gap: var(--spacing-md);
+  min-block-size: 2.75rem;
+  padding-inline: var(--spacing-md);
+  border-radius: var(--border-radius-pill);
+  color: var(--color-gray11);
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
 }
 
-.sidebar-nav--collapsed .sidebar-nav__label {
-  display: none;
+.sidebar-nav__item.blue-glass { color: var(--color-gray1); font-weight: var(--font-weight-semibold); }
+.dark .sidebar-nav__item.blue-glass { color: var(--color-gray12); }
+.sidebar-nav__item:not(.blue-glass):hover, .sidebar-nav__toggle:hover { color: var(--color-blue); }
+.sidebar-nav__item.sidebar-nav__item--danger:hover { color: var(--color-red); }
+.sidebar-nav__icon { flex: none; }
+.sidebar-nav__toggle { align-self: flex-end; inline-size: 2.75rem; padding: 0; justify-content: center; }
+.sidebar-nav--collapsed :is(.sidebar-nav__item, .sidebar-nav__toggle) {
+  align-self: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  justify-content: center;
+  padding: 0;
 }
+.sidebar-nav--collapsed .sidebar-nav__label { display: none; }
 
 .sidebar-nav__item:focus-visible, .sidebar-nav__toggle:focus-visible {
-  outline: 2px solid var(--color-blue);
+  outline: var(--border-width-thin) solid var(--color-blue);
   outline-offset: -2px;
 }
 
 @media (max-width: 960px) {
-  .sidebar-nav, .sidebar-nav.sidebar-nav--collapsed {
+  .sidebar-nav.glass, .sidebar-nav.glass.sidebar-nav--collapsed {
     position: sticky;
     inset: auto;
     inset-block-start: 3.5rem;
-    display: flex;
     flex-direction: row;
     align-items: center;
     width: auto;
     margin-inline: var(--spacing-md);
-    padding: .3rem;
-    gap: .3rem;
-    z-index: 10;
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
     border-radius: var(--border-radius-pill);
-    background: var(--color-gray2);
+    scrollbar-width: none;
   }
 
+  .sidebar-nav.glass::before { display: none; }
   .sidebar-nav__menu { flex-direction: row; }
   .sidebar-nav__bottom-menu { margin-block-start: 0; }
   .sidebar-nav__toggle { display: none; }
   .sidebar-nav--collapsed .sidebar-nav__label { display: inline; }
+  .sidebar-nav--collapsed .sidebar-nav__item {
+    inline-size: auto;
+    block-size: auto;
+    aspect-ratio: auto;
+    border-radius: var(--border-radius-pill);
+    padding-inline: var(--spacing-md);
+  }
 }
 
 @media (max-width: 620px) {
-  .sidebar-nav, .sidebar-nav.sidebar-nav--collapsed {
+  .sidebar-nav.glass, .sidebar-nav.glass.sidebar-nav--collapsed {
     inset-block-start: 5.75rem;
     margin-inline: var(--spacing-xs);
   }

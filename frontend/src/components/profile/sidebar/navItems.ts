@@ -1,9 +1,11 @@
+import type { IconifyIcon } from "@iconify/react"
+import { coinIcon } from "@/components/ui/coinIcon"
 import type { AccountProfile } from "@/types/account"
 
 export interface NavItem {
   id: string
   label: string
-  icon: string
+  icon: string | IconifyIcon
 }
 
 export function profileNavigation(profile: AccountProfile) {
@@ -11,7 +13,7 @@ export function profileNavigation(profile: AccountProfile) {
   const primary: NavItem[] = [
     { id: "dashboard", label: "داشبورد", icon: "streamline-sharp:dashboard-circle-solid" },
     { id: "account", label: "پروفایل", icon: "solar:user-bold" },
-    { id: "wallet", label: "کیف پول", icon: "mdi:heart-pulse" },
+    { id: "wallet", label: "کیف پول", icon: coinIcon },
     { id: "messages", label: "پیام‌ها", icon: "tabler:message-circle-filled" },
   ]
   if (has("profile.projects")) primary.push({ id: "projects", label: "پروژه‌ها", icon: "material-symbols:folder-open-rounded" })

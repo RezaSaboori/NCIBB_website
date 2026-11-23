@@ -1,0 +1,114 @@
+/* ── Datasaz Glass Container — Parent Styles ──────────────────── */
+/*
+ * Usage:
+ *   <div className="glass dz-glass-container dz-glass-container--lg">
+ *     <div className="dz-glass-container__header"> ... </div>
+ *     <div className="dz-glass-container__body"> ... </div>
+ *   </div>
+ *
+ * The `glass` class (from glass.css) provides the visual frosted effect.
+ * These classes provide only structure: display, radius, padding, gap.
+ *
+ * Sizes:
+ *   --lg  → border-radius-container-lg  | padding-xl  | header mb-md
+ *   --md  → border-radius-container-md  | padding-lg  | header mb-sm  (mirrors s1-glass-card)
+ *   --sm  → border-radius-container-sm  | padding-md  | header mb-sm
+ */
+
+.dz-glass-container {
+  display: flex;
+  flex-direction: column;
+  overflow: clip;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Size variants ─────────────────────────────────────────────── */
+
+.dz-glass-container--lg {
+  border-radius: var(--border-radius-container-lg);
+  padding: var(--spacing-xl);
+  gap: var(--spacing-lg);
+}
+
+.dz-glass-container--md {
+  border-radius: var(--border-radius-container-md);
+  padding: var(--spacing-lg);
+  gap: var(--spacing-lg);
+}
+
+.dz-glass-container--sm {
+  border-radius: var(--border-radius-container-sm);
+  padding: var(--spacing-md);
+  gap: var(--spacing-sm);
+}
+
+.dz-glass-container--xs {
+  border-radius: var(--border-radius-container-xs);
+  padding: var(--spacing-sm);
+  gap: var(--spacing-sm);
+}
+
+/* ── Header ────────────────────────────────────────────────────── */
+
+.dz-glass-container__header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-shrink: 0;
+  --dz-icon-btn-size: 2rem;
+}
+
+.dz-glass-container--lg .dz-glass-container__header {
+  padding-bottom: var(--spacing-md);
+}
+
+.dz-glass-container--md .dz-glass-container__header {
+  padding-bottom: var(--spacing-sm);
+}
+
+.dz-glass-container--sm .dz-glass-container__header {
+  padding-bottom: var(--spacing-xs);
+}
+
+.dz-glass-container--xs .dz-glass-container__header {
+  padding-bottom: var(--spacing-xs);
+}
+
+/* ── Body ──────────────────────────────────────────────────────── */
+
+.dz-glass-container__body {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.dz-glass-container--lg .dz-glass-container__body {
+  gap: var(--spacing-lg);
+}
+
+.dz-glass-container--md .dz-glass-container__body {
+  gap: var(--spacing-md);
+}
+
+.dz-glass-container--sm .dz-glass-container__body {
+  gap: var(--spacing-sm);
+}
+
+.ui-glass-card > .dz-glass-container__header,
+.ui-glass-card > .dz-glass-container__body,
+.ui-glass-card > .dz-glass-container__footer {
+  position: relative;
+  min-inline-size: 0;
+}
+
+.ui-glass-card > .dz-glass-container__header { padding-block-end: 0; }
+
+.ui-glass-card > .dz-glass-container__footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.ui-glass-card > :is(header, footer):empty { display: none; }

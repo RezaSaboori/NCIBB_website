@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useNavigate, useOutletContext, useSearchParams } from "react-router-dom"
 
+import { GlassCard } from "@/components/ui/GlassCard"
 import { accountApi } from "@/dataset_services/accountApi"
 import { authService } from "@/dataset_services/authService"
 import type { LayoutContext } from "@/layouts/default"
@@ -23,6 +24,7 @@ import { useAccountQuery } from "./shared/useAccountQuery"
 import { profileNavigation } from "./sidebar/navItems"
 import ProfileSidebar from "./sidebar/ProfileSidebar"
 import { WalletTab } from "./wallet/WalletTab"
+import { useProfileWallet } from "./wallet/useProfileWallet"
 import { UserProjectsList } from "./UserProjectsList"
 import "./accountWorkspace.css"
 
@@ -40,6 +42,7 @@ export default function ProfileManager() {
   const refresh = query.refresh
   const navigation = useMemo(() => profile ? profileNavigation(profile) : null, [profile])
   const canOpen = navigation && [...navigation.primary, ...navigation.bottom].some((item) => item.id === activeTab)
+  useProfileWallet(isAuthenticated && (activeTab === "dashboard" || activeTab === "wallet"))
 
   const logout = useCallback(async () => {
     await authService.logout()
@@ -85,9 +88,10 @@ export default function ProfileManager() {
 
   const admin = profile.capabilities.includes("platform.admin")
   const renderTab = () => {
-    if (!canOpen) return <section className="account-workspace__panel glass">
-      <h1>دسترسی به این بخش در دسترس نیست</h1><Link to="/profile">بازگشت به داشبورد</Link>
-    </section>
+    if (!canOpen) return <div className="account-workspace__stack">
+      <h1>دسترسی به این بخش در دسترس نیست</h1>
+      <GlassCard size="sm"><Link className="glass ui-glass-button account-workspace__submit" to="/profile">بازگشت به داشبورد</Link></GlassCard>
+    </div>
     switch (activeTab) {
       case "dashboard": return <DashboardTab profile={profile} />
       case "account": return <div className="account-workspace__stack">

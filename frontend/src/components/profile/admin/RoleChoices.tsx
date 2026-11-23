@@ -1,10 +1,10 @@
 import type { Role } from "@/types/account"
 
-export function RoleChoices({ roles, selected, onChange, label, disabled = false }: {
-  roles: Role[]; selected: number[]; onChange: (ids: number[]) => void; label: string; disabled?: boolean
+export function RoleChoices({ roles, selected, onChange, label, disabled = false, className = "" }: {
+  roles: Role[]; selected: number[]; onChange: (ids: number[]) => void; label: string; disabled?: boolean; className?: string
 }) {
   return (
-    <fieldset className="account-workspace__options" disabled={disabled}>
+    <fieldset className={`account-workspace__options ${className}`} disabled={disabled}>
       <legend>{label}</legend>
       {roles.map((role) => (
         <label key={role.id}>

@@ -11,7 +11,7 @@ export function MessageHistory({ messages, userId, selected, toggle }: {
   return (
     <ol className="account-messages__history" aria-label="پیام‌های گفتگو">
       {[...messages].reverse().map((message) => (
-        <li key={message.id} className={`account-messages__bubble${message.sender === userId ? " account-messages__bubble--mine" : ""}`}>
+        <li key={message.id} className={`glass account-messages__bubble${message.sender === userId ? " account-messages__bubble--mine" : ""}`}>
           <div className="account-messages__meta">
             <b>{message.sender_name}</b>
             <time dateTime={message.created_at}>{formatAccountDate(message.created_at)}</time>

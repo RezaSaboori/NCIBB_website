@@ -1,5 +1,10 @@
+import { GlassCard } from "@/components/ui/GlassCard"
+import { GlassTable, type GlassTableColumn } from "@/components/ui/tables/GlassTable"
+import { GlassTabs } from "@/components/ui/GlassTabs"
+import { SingleLineInput } from "@/components/ui/inputs"
+import { GlassButton } from "@/components/ui/GlassButton"
 import { useCallback, useState } from "react"
-import { Button, Tab, Tabs } from "@heroui/react"
+import { Tab } from "@heroui/react"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
 import type { Group, GroupMember } from "@/types/account"
 import { AccountStatus } from "../shared/AccountStatus"
@@ -16,15 +21,19 @@ function GroupWalletPanel({ group, admin }: { group: Group; admin: boolean }) {
   const wallet = useAccountQuery(useCallback(() => accountApi.groupWallet(group.id, page), [group.id, page]))
   return (
     <div className="account-workspace__stack">
-      <h3>کیف پول اشتراکی</h3>
-      <AccountStatus loading={wallet.loading} error={wallet.error} retry={wallet.refresh} />
-      {wallet.data && <p>موجودی {formatCoins(wallet.data.balance)} Beat Coin</p>}
-      {admin && <AdjustmentForm shared save={(data) => accountApi.adjustGroup(group.id, data)} onSaved={() => {
-        if (page === 1) void wallet.refresh()
-        else setPage(1)
-      }} />}
-      {wallet.data && <CreditLedger entries={wallet.data.results} />}
-      <PageControls data={wallet.data} page={page} onPage={setPage} />
+      {admin && <GlassCard size="sm" heading={<h3>تنظیم موجودی گروه</h3>}>
+        <AdjustmentForm shared save={(data) => accountApi.adjustGroup(group.id, data)} onSaved={() => {
+          if (page === 1) void wallet.refresh()
+          else setPage(1)
+        }} />
+      </GlassCard>}
+      <CreditLedger entries={wallet.data?.results ?? []}
+        controls={<>
+          <AccountStatus loading={wallet.loading} error={wallet.error} retry={wallet.refresh} />
+          {wallet.data && <p>موجودی {formatCoins(wallet.data.balance)} Beat Coin</p>}
+        </>}
+        footer={<PageControls data={wallet.data} page={page} onPage={setPage} />}
+        showEmpty={!!wallet.data} />
     </div>
   )
 }
@@ -50,43 +59,42 @@ export function GroupDetails({ group, admin }: { group: Group; admin: boolean })
       setBusy(undefined)
     }
   }
+  const columns: GlassTableColumn<GroupMember>[] = [
+    { key: "name", label: "عضو", render: (member) => <strong><bdi>{member.user_name || member.username}</bdi></strong> },
+    { key: "roles", label: "نقش‌ها", render: (member) => member.roles.map((role) => role.label).join("، ") || "عضو" },
+    { key: "status", label: "وضعیت", render: (member) => member.active ? "فعال" : "غیرفعال" },
+    { key: "actions", label: "مدیریت", render: (member) => (
+      <div className="account-workspace__actions">
+        <GlassButton size="sm" isLoading={busy === member.id} isDisabled={!member.active || busy !== undefined}
+          onPress={() => void toggleSpend(member)}>{member.can_spend ? "لغو اجازه برداشت" : "اجازه برداشت"}</GlassButton>
+        {admin && <GlassButton size="sm" onPress={() => setEditedMember(member)}>ویرایش عضویت</GlassButton>}
+      </div>
+    ) },
+  ]
   return (
-    <section className="account-workspace__panel glass">
+    <section className="account-workspace__section">
       <h2>{group.name}</h2>
-      <Tabs aria-label="مدیریت گروه" selectedKey={section} onSelectionChange={(key) => setSection(String(key))}>
+      <GlassTabs aria-label="مدیریت گروه" selectedKey={section} onSelectionChange={(key) => setSection(String(key))}>
         <Tab title="اعضا" key="members">
-          <div className="account-workspace__stack">
-            <div className="account-workspace__toolbar">
-              <label className="account-workspace__form">جستجوی اعضا<input value={search} type="search" onChange={(event) => {
-                setSearch(event.target.value)
-                setPage(1)
-              }} /></label>
-              {admin && <Button color="primary" isDisabled={!roles.data} onPress={() => setEditedMember(null)}>افزودن عضو</Button>}
-            </div>
-            <AccountStatus loading={members.loading || roles.loading} error={error || members.error || roles.error}
-              retry={() => { void members.refresh(); if (admin) void roles.refresh() }} />
-            {editedMember !== undefined && roles.data && (
-              <GroupMemberForm key={editedMember?.id ?? "new"} group={group.id} member={editedMember}
-                roles={roles.data.filter((role) => role.scope === "group")}
-                close={() => setEditedMember(undefined)} onSaved={() => void members.refresh()} />
-            )}
-            {members.data?.results.length === 0 && <p>عضوی یافت نشد.</p>}
-            <ul className="account-workspace__rows">
-              {members.data?.results.map((member) => (
-                <li key={member.id}>
-                  <div><strong>{member.user_name || member.username}</strong>
-                    <small>{member.active ? "فعال" : "غیرفعال"} · {member.roles.map((role) => role.label).join("، ") || "عضو"}</small>
-                  </div>
-                  <div className="account-workspace__actions">
-                    <Button size="sm" variant="flat" isLoading={busy === member.id} isDisabled={!member.active || busy !== undefined}
-                      onPress={() => void toggleSpend(member)}>{member.can_spend ? "لغو اجازه برداشت" : "اجازه برداشت"}</Button>
-                    {admin && <Button size="sm" variant="flat" onPress={() => setEditedMember(member)}>ویرایش عضویت</Button>}
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <PageControls data={members.data} page={page} onPage={setPage} />
-          </div>
+          <GlassTable label="اعضای گروه" rows={members.data?.results ?? []} columns={columns} rowKey={(member) => member.id}
+            controls={<div className="account-workspace__section">
+              <div className="account-workspace__toolbar">
+                <label className="account-workspace__form">جستجوی اعضا<SingleLineInput value={search} type="search" onChange={(event) => {
+                  setSearch(event.target.value)
+                  setPage(1)
+                }} /></label>
+                {admin && <GlassButton color="primary" isDisabled={!roles.data} onPress={() => setEditedMember(null)}>افزودن عضو</GlassButton>}
+              </div>
+              <AccountStatus loading={members.loading || roles.loading} error={error || members.error || roles.error}
+                retry={() => { void members.refresh(); if (admin) void roles.refresh() }} />
+              {editedMember !== undefined && roles.data && (
+                <GroupMemberForm key={editedMember?.id ?? "new"} group={group.id} member={editedMember}
+                  roles={roles.data.filter((role) => role.scope === "group")}
+                  close={() => setEditedMember(undefined)} onSaved={() => void members.refresh()} />
+              )}
+            </div>}
+            footer={<PageControls data={members.data} page={page} onPage={setPage} />}
+            empty={members.data && <p>عضوی یافت نشد.</p>} />
         </Tab>
         <Tab title="اعتبار اشتراکی" key="wallet"><GroupWalletPanel group={group} admin={admin} /></Tab>
         {admin && <Tab title="استاد و دانشجو" key="mentors">
@@ -94,7 +102,7 @@ export function GroupDetails({ group, admin }: { group: Group; admin: boolean })
             (member) => [member.id, member.user_name || member.username],
           ))} />
         </Tab>}
-      </Tabs>
+      </GlassTabs>
     </section>
   )
 }

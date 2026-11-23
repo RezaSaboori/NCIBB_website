@@ -23,7 +23,7 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8000:8000"
+      - "8317:8000"
     environment:
       - DEBUG=1
       - DB_NAME=ncibb_db
@@ -48,7 +48,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - VITE_API_BASE_URL=http://localhost:8000/api
+      - NCIBB_API_ORIGIN=http://backend:8000
     depends_on:
       - backend
 

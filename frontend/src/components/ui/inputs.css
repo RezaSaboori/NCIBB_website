@@ -43,10 +43,6 @@
   box-shadow: var(--elevation-2);
 }
 
-.ui-input-shell--open {
-  border-color: var(--color-blue);
-}
-
 /* ── Growable shell: TextInput/SearchInput with multiline prop ── */
 /*
  * The shell expands freely up to max-height.
@@ -120,158 +116,126 @@
   --dz-icon-btn-size: var(--ui-input-icon-size);
 }
 
-/* ── Dropdown pill text ──────────────────────────────────────── */
+/* ── Dropdown ────────────────────────────────────────────────── */
+
+.ui-dropdown { inline-size: 100%; min-inline-size: 0; }
+
+.ui-dropdown__trigger {
+  box-shadow: var(--elevation-2);
+  color: var(--color-gray11);
+  cursor: pointer;
+  text-align: start;
+}
+
+.ui-dropdown__trigger:disabled { cursor: not-allowed; opacity: .65; }
 
 .ui-dropdown__text {
   flex: 1;
-  min-width: 0;
+  min-inline-size: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
-  color: var(--color-gray11);
-  padding: 1px var(--spacing-sm) 0 var(--spacing-sm);
-  cursor: default;
+  padding-inline: var(--spacing-sm);
+  text-align: start;
 }
 
-.ui-dropdown__text--placeholder {
-  color: var(--color-gray4);
-}
+.ui-dropdown__text--placeholder { color: var(--color-gray8); }
 
-/* ── Chevron icon rotation ───────────────────────────────────── */
+.ui-dropdown__chevron.glass {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--ui-input-icon-size);
+  block-size: var(--ui-input-icon-size);
+  border-radius: var(--border-radius-pill);
+  background-color: var(--color-gray2);
+}
 
 .ui-chevron-icon {
+  inline-size: 1rem;
+  block-size: 1rem;
   transition: transform var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
-.ui-chevron-icon--open {
-  transform: rotate(180deg);
-}
-
-/* ── Dropdown panel ──────────────────────────────────────────── */
-
-.ui-dropdown {
-  position: relative;
-  width: 100%;
-}
+.ui-chevron-icon--open { transform: rotate(180deg); }
 
 .ui-dropdown__panel {
-  /* Default to absolute so the closed panel is taken out of normal flow and
-     does not contribute to body height while portal'd into document.body.
-     When opened, inline `position: fixed` (set via getBoundingClientRect)
-     overrides this and positions the panel under the trigger. */
-  position: absolute;
-  background: var(--color-gray1);
-  border-radius: var(--border-radius-container-xs);
-  box-shadow: var(--elevation-4);
-  border: var(--border-width-thin) solid var(--color-gray3);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
   z-index: 9999;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-8px) scale(0.97);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
-    visibility 0.2s;
-  overflow: visible;
-}
-
-.ui-dropdown__panel.is-open {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0) scale(1);
+  box-sizing: border-box;
+  padding: var(--spacing-sm);
+  gap: var(--spacing-xs);
+  border: var(--border-width-thin) solid var(--color-gray3);
+  border-radius: var(--border-radius-container-xs);
+  background: var(--color-gray1);
+  box-shadow: var(--elevation-4);
+  overflow: hidden;
 }
 
 .ui-dropdown__search-shell {
-  margin: var(--spacing-sm);
+  flex: none;
   height: 2rem;
   min-height: 2rem;
-  width: auto;
   background: var(--color-gray2);
 }
 
-/* ── Portal panel direction isolation ───────────────────────────
- * globals.css has [dir="rtl"] * { text-align: right } which
- * matches all descendants of <html dir="rtl"> regardless of
- * intermediate dir attributes. We counteract it here with higher
- * specificity scoped to the panel's own dir attribute.
- */
-.ui-dropdown__panel[dir="ltr"],
-.ui-dropdown__panel[dir="ltr"] * {
-  text-align: left;
-  direction: ltr;
-}
-
-.ui-dropdown__panel[dir="rtl"],
-.ui-dropdown__panel[dir="rtl"] * {
-  text-align: right;
-  direction: rtl;
+.ui-dropdown__panel[dir] :is(.ui-dropdown__item, .ui-input-field) { text-align: start; }
+.ui-dropdown[dir="rtl"] .ui-dropdown__text,
+.ui-dropdown__panel[dir="rtl"] :is(.ui-dropdown__item, .ui-input-field) {
+  font-family: var(--font-family-persian);
 }
 
 .ui-dropdown__list {
-  overflow-y: auto;
-  max-height: 250px;
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
+  overflow-y: auto;
+  max-block-size: 250px;
   padding: var(--spacing-xs);
 }
+
+.ui-dropdown__list::-webkit-scrollbar { width: 6px; }
+.ui-dropdown__list::-webkit-scrollbar-thumb { border: 0; background-color: var(--color-gray5); }
+.ui-dropdown__list::-webkit-scrollbar-thumb:hover { background-color: var(--color-gray6); }
+.ui-dropdown__list:empty { padding: 0; }
+.ui-dropdown__list:focus-visible { outline: none; }
 
 .ui-dropdown__item {
   display: flex;
   align-items: center;
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-container-xs);
-  font-size: 13px;
+  border-radius: var(--border-radius-pill);
+  font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
-  color: var(--color-gray10);
+  color: var(--color-gray11);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  overflow-wrap: anywhere;
 }
 
-.ui-dropdown__item:hover:not(.is-selected) {
-  color: var(--color-blue);
-}
+.ui-dropdown__item.glass { color: var(--color-blue); }
+.ui-dropdown__item[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
 
 .ui-dropdown__item.is-selected {
   color: var(--color-gray1);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
-.dark .ui-dropdown__item.is-selected {
-  color: var(--color-gray12);
-}
-
-
-.ui-dropdown__item--empty {
-  color: var(--color-gray5);
-  cursor: default;
-  font-style: italic;
-}
+.dark .ui-dropdown__item.is-selected { color: var(--color-gray12); }
+.ui-dropdown__item--empty { color: var(--color-gray9); cursor: default; }
 
 .ui-dropdown__check {
-  width: 1rem;
-  display: inline-block;
-  flex-shrink: 0;
-  font-size: 11px;
-  color: var(--color-blue);
+  inline-size: 1rem;
+  flex: none;
+  font-size: var(--font-size-xs);
 }
 
-/* ── Portal variant: panel rendered into <body> via React Portal ── */
-/*
- * position:fixed is set inline by JS (getBoundingClientRect).
- * We only need to ensure the panel itself isn't constrained by
- * any inherited position/overflow from the DOM tree.
- */
-
-/* Portal root injected into <body> — must have no positioning so that
-   absolute children measure from the document origin correctly. */
-#ui-dropdown-portals {
-  position: static !important;
-  width: 0;
-  height: 0;
-  overflow: visible;
+@media (prefers-reduced-motion: reduce) {
+  .ui-chevron-icon { transition: none; }
 }
 
 /* ── RadioToggle (Required?) ─────────────────────────────────── */
@@ -322,4 +286,9 @@
 
 .ui-input-field[type="number"] {
   -moz-appearance: textfield;
+}
+
+.ui-input-shell:has(.ui-input-field:focus-visible) {
+  outline: var(--border-width-thin) solid var(--color-blue);
+  outline-offset: 2px;
 }

@@ -1,5 +1,7 @@
+import { GlassCard } from "@/components/ui/GlassCard"
+import { SingleLineInput, MessageInput } from "@/components/ui/inputs"
+import { GlassButton } from "@/components/ui/GlassButton"
 import { useCallback, useEffect, useState, type FormEvent } from "react"
-import { Button } from "@heroui/react"
 import { Icon } from "@iconify/react"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
 import type { Thread, ThreadMessage } from "@/types/account"
@@ -69,17 +71,18 @@ export default function MessagesTab({ userId, queue = false }: { userId: number;
     <div className="account-workspace__stack">
       <div className="account-workspace__toolbar">
         <h1>{queue ? "صف پشتیبانی" : "پیام‌ها"}</h1>
-        <Button color="primary" onPress={() => setComposeMode("compose")} startContent={<Icon icon="tabler:message-plus" />}>گفتگوی جدید</Button>
+        <GlassButton color="primary" onPress={() => setComposeMode("compose")} startContent={<Icon icon="tabler:message-plus" />}>گفتگوی جدید</GlassButton>
       </div>
       <div className={`account-messages${active ? " account-messages--active" : ""}`}>
-        <section className="account-workspace__panel account-messages__list glass">
+        <GlassCard size="sm" className="account-messages__list"
+          footer={<PageControls data={list.data} page={page} onPage={setPage} />}>
           <label className="account-workspace__form">جستجو در موضوع گفتگو
-            <input type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} />
+            <SingleLineInput type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} />
           </label>
           <AccountStatus loading={list.loading} error={list.error} retry={list.refresh} />
           {list.data?.results.length === 0 && <p className="account-workspace__muted">گفتگویی یافت نشد.</p>}
           {list.data?.results.map((item) => (
-            <button type="button" className="account-messages__thread" aria-pressed={active?.id === item.id} key={item.id}
+            <button type="button" className={`account-messages__thread ${active?.id === item.id ? "blue-glass" : "glass"}`} aria-pressed={active?.id === item.id} key={item.id}
               onClick={() => open(item)}>
               <span className="account-workspace__toolbar"><strong>{item.subject}</strong>
                 {item.unread_count > 0 && <span className="account-messages__unread" aria-label="پیام خوانده‌نشده">{formatCoins(item.unread_count)}</span>}
@@ -88,29 +91,28 @@ export default function MessagesTab({ userId, queue = false }: { userId: number;
               <span className="account-messages__preview">{item.preview}</span>
             </button>
           ))}
-          <PageControls data={list.data} page={page} onPage={setPage} />
-        </section>
-        <section className="account-workspace__panel account-messages__detail glass">
+        </GlassCard>
+        <GlassCard size="md" className="account-messages__detail"
+          footer={active && <PageControls data={messages.data} page={messagePage} onPage={setMessagePage} />}>
           {!active ? <p className="account-workspace__muted">یک گفتگو را از فهرست انتخاب کنید.</p> : (
             <>
-              <Button className="account-messages__back" size="sm" variant="flat" onPress={() => open()}>بازگشت به گفتگوها</Button>
+              <GlassButton className="account-messages__back" size="sm" variant="flat" onPress={() => open()}>بازگشت به گفتگوها</GlassButton>
               <div className="account-workspace__toolbar">
                 <div><h2>{active.subject}</h2><span className="account-workspace__muted">{active.counterpart}</span></div>
                 {!!selected.length && (
-                  <Button size="sm" variant="flat" onPress={() => setComposeMode("forward")}>ارسال مجدد ({formatCoins(selected.length)})</Button>
+                  <GlassButton size="sm" variant="flat" onPress={() => setComposeMode("forward")}>ارسال مجدد ({formatCoins(selected.length)})</GlassButton>
                 )}
               </div>
               <AccountStatus loading={messages.loading} error={messages.error || thread.error} retry={messages.refresh} />
               {messages.data && <MessageHistory messages={messages.data.results} userId={userId} selected={selected} toggle={toggleMessage} />}
-              <PageControls data={messages.data} page={messagePage} onPage={setMessagePage} />
               {thread.data?.can_reply && <form className="account-workspace__form" onSubmit={reply}>
-                <label>پاسخ<textarea maxLength={6000} rows={3} value={draft} onChange={(event) => setDraft(event.target.value)} /></label>
+                <label>پاسخ<MessageInput maxLength={6000} rows={3} value={draft} onChange={(event) => setDraft(event.target.value)} /></label>
                 <AccountStatus error={error} />
-                <Button className="account-workspace__submit" type="submit" color="primary" isDisabled={!draft.trim()} isLoading={sending}>ارسال پاسخ</Button>
+                <GlassButton className="account-workspace__submit" type="submit" color="primary" isDisabled={!draft.trim()} isLoading={sending}>ارسال پاسخ</GlassButton>
               </form>}
             </>
           )}
-        </section>
+        </GlassCard>
       </div>
       {composeMode && (
         <ComposeDialog source={composeMode === "forward" ? active : undefined} selected={selected}

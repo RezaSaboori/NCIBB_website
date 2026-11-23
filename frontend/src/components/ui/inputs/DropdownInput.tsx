@@ -1,270 +1,238 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import ReactDOM from "react-dom";
-import "../inputs.css";
+import { cloneElement, forwardRef, useCallback, useEffect, useId, useRef, useState, type AriaAttributes, type KeyboardEvent, type ReactElement } from "react"
+import { createPortal } from "react-dom"
+import { useDropdownPosition } from "./useDropdownPosition"
+import "../inputs.css"
 
-interface BaseDropdownProps {
-  options: string[];
-  placeholder?: string;
-  className?: string;
-  chevronIcon: React.ReactNode;
-  searchable?: boolean;
-  dir?: "ltr" | "rtl";
+export interface DropdownOption {
+  value: string
+  label: string
+  disabled?: boolean
+}
+
+interface BaseDropdownProps extends Pick<AriaAttributes, "aria-label" | "aria-describedby" | "aria-invalid"> {
+  options: readonly (string | DropdownOption)[]
+  placeholder?: string
+  className?: string
+  chevronIcon?: ReactElement<{ className?: string }>
+  searchable?: boolean
+  dir?: "ltr" | "rtl"
+  id?: string
+  disabled?: boolean
+  required?: boolean
+  onBlur?: () => void
 }
 
 interface SingleDropdownProps extends BaseDropdownProps {
-  multiple?: false;
-  value: string;
-  onChange: (value: string) => void;
+  multiple?: false
+  value: string
+  onChange: (value: string) => void
 }
 
 interface MultiDropdownProps extends BaseDropdownProps {
-  multiple: true;
-  value: string[];
-  onChange: (value: string[]) => void;
+  multiple: true
+  value: string[]
+  onChange: (value: string[]) => void
 }
 
-type DropdownInputProps = SingleDropdownProps | MultiDropdownProps;
+const searchThreshold = 6
 
-export const DropdownInput: React.FC<DropdownInputProps> = (props) => {
-  const {
-    options,
-    placeholder = "Select value...",
-    className = "",
-    chevronIcon,
-    searchable = false,
-    multiple = false,
-    dir,
-  } = props;
+export const DropdownInput = forwardRef<HTMLButtonElement, SingleDropdownProps | MultiDropdownProps>(
+  function DropdownInput(props, ref) {
+    const { className = "", chevronIcon, disabled, dir, required } = props
+    const searchable = props.searchable ?? (props.options.length > searchThreshold)
+    const options = props.options.map((option) => typeof option === "string" ? { value: option, label: option } : option)
+    const triggerRef = useRef<HTMLButtonElement | null>(null)
+    const panelRef = useRef<HTMLDivElement>(null)
+    const searchRef = useRef<HTMLInputElement>(null)
+    const listRef = useRef<HTMLDivElement>(null)
+    const [portalContainer, setPortalContainer] = useState<Element | null>(null)
+    const [search, setSearch] = useState("")
+    const [activeValue, setActiveValue] = useState<string>()
+    const [rtl, setRtl] = useState(dir === "rtl")
+    const id = useId()
+    const triggerId = props.id ?? id
+    const listId = `${id}-options`
+    const open = Boolean(portalContainer)
+    const selectedValues = props.multiple ? props.value : [props.value]
+    const displayText = selectedValues.map((value) => options.find((option) => option.value === value)?.label ?? value).join(", ")
+    const placeholder = props.placeholder ?? (dir === "rtl" ? "انتخاب کنید" : "Select value...")
+    const searchTerm = search.trim().toLocaleLowerCase()
+    const filtered = searchable && searchTerm
+      ? options.filter(({ label }) => label.toLocaleLowerCase().includes(searchTerm))
+      : options
+    const activeIndex = filtered.findIndex((option) => option.value === activeValue && !option.disabled)
+    const activeId = activeIndex < 0 ? undefined : `${listId}-${activeIndex}`
+    const chevronClass = `ui-chevron-icon${open ? " ui-chevron-icon--open" : ""}`
+    const setTriggerRef = useCallback((button: HTMLButtonElement | null) => {
+      triggerRef.current = button
+      if (typeof ref === "function") ref(button)
+      else if (ref) ref.current = button
+    }, [ref])
 
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const [hoveredOption, setHoveredOption] = useState<string | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const searchRef = useRef<HTMLInputElement>(null);
+    useDropdownPosition(triggerRef, panelRef, portalContainer)
 
-  useEffect(() => {
-    if (!open) { setSearch(""); return; }
-    // Use capture=true so this fires before React's synthetic onClick on the
-    // new dropdown trigger. We skip closing if the click originated inside
-    // ANY .ui-dropdown element — this prevents the race condition where this
-    // instance's handler closes another row's dropdown that was just opened.
-    const handler = (e: MouseEvent) => {
-      const target = e.target as Node;
-      const inSelf =
-        ref.current?.contains(target) || panelRef.current?.contains(target);
-      if (inSelf) return;
-      // If the click is inside any other dropdown trigger/panel, don't close —
-      // let that dropdown's own toggle handle its state.
-      const inOtherDropdown = (target as Element).closest?.(".ui-dropdown");
-      if (inOtherDropdown) return;
-      setOpen(false);
-    };
-    document.addEventListener("mousedown", handler, true);
-    return () => document.removeEventListener("mousedown", handler, true);
-  }, [open]);
+    useEffect(() => {
+      if (!open) return
+      const focusTarget = searchRef.current ?? listRef.current
+      focusTarget?.focus({ preventScroll: true })
 
-  useEffect(() => {
-    if (open && searchable) searchRef.current?.focus();
-  }, [open, searchable]);
+      const dismissOutside = (event: PointerEvent) => {
+        const target = event.target as Node
+        if (!triggerRef.current?.contains(target) && !panelRef.current?.contains(target)) setPortalContainer(null)
+      }
+      document.addEventListener("pointerdown", dismissOutside, true)
+      return () => document.removeEventListener("pointerdown", dismissOutside, true)
+    }, [open, searchable])
 
-  const isSelected = (opt: string) =>
-    multiple
-      ? (props.value as string[]).includes(opt)
-      : props.value === opt;
-
-  const handleSelect = (opt: string) => {
-    if (multiple) {
-      const current = props.value as string[];
-      const next = current.includes(opt)
-        ? current.filter((v) => v !== opt)
-        : [...current, opt];
-      (props as MultiDropdownProps).onChange(next);
-    } else {
-      // Close first so the menu always dismisses on selection, even if the
-      // parent's onChange triggers re-renders, cross-component cascades, or
-      // throws. Prevents the "stays open after selecting" symptom seen in
-      // ProjectInfoCard, where onChange mutates the dropdown's own `value`
-      // and propagates up to a grandparent (goToStep/setActiveProject).
-      setOpen(false);
-      (props as SingleDropdownProps).onChange(opt);
+    const close = (restoreFocus = false) => {
+      if (restoreFocus) triggerRef.current?.focus({ preventScroll: true })
+      setPortalContainer(null)
     }
-  };
 
-  const filteredOptions = searchable && search.trim()
-    ? options.filter((o) => o.toLowerCase().includes(search.toLowerCase()))
-    : options;
-
-  const displayText = multiple
-    ? (props.value as string[]).length > 0
-      ? (props.value as string[]).join(", ")
-      : ""
-    : (props.value as string);
-
-  const triggerRef = useRef<HTMLDivElement>(null);
-  // Initial panel style MUST carry `position: fixed` so the closed panel is
-  // positioned relative to the viewport (not the document) and therefore
-  // does NOT contribute to document scroll height. Without this, a freshly
-  // mounted (never-opened) dropdown's portal panel sits at its static
-  // position at the bottom of <body> and creates dead space below the
-  // footer equal to its rendered height. `visibility: hidden` keeps it
-  // invisible; `top/left: -9999px` guarantees it never paints anywhere
-  // visible until `updatePanelPosition()` supplies real coordinates.
-  const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({
-    position: "fixed",
-    top: -9999,
-    left: -9999,
-    visibility: "hidden",
-  });
-
-  const HIDDEN_PANEL_STYLE: React.CSSProperties = {
-    position: "fixed",
-    top: -9999,
-    left: -9999,
-    visibility: "hidden",
-    pointerEvents: "none",
-  };
-
-  const updatePanelPosition = useCallback(() => {
-    const el = triggerRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const resolvedDir = dir ?? (getComputedStyle(el).direction as "ltr" | "rtl");
-    setPanelStyle({
-      position: "fixed",
-      top: rect.bottom + 6,
-      left: rect.left,
-      width: rect.width,
-      zIndex: 9999,
-      direction: resolvedDir,
-      textAlign: "start",
-      visibility: "visible",
-      pointerEvents: "auto",
-    });
-  }, [dir]);
-
-  useEffect(() => {
-    if (!open) {
-      // Reset panel to hidden position so it never intercepts pointer events
-      // while visually closed. This is the fix for phantom clicks on the panel
-      // after it has been opened and positioned at real coordinates once.
-      setPanelStyle(HIDDEN_PANEL_STYLE);
-      return;
+    const show = (last = false) => {
+      const trigger = triggerRef.current
+      if (!trigger || disabled) return
+      const available = options.filter((option) => !option.disabled)
+      setSearch("")
+      setActiveValue((available.find((option) => selectedValues.includes(option.value)) ?? available.at(last ? -1 : 0))?.value)
+      setRtl(getComputedStyle(trigger).direction === "rtl")
+      setPortalContainer(trigger.closest('[role="dialog"]') ?? document.body)
     }
-    updatePanelPosition();
-    window.addEventListener("scroll", updatePanelPosition, true);
-    window.addEventListener("resize", updatePanelPosition);
-    return () => {
-      window.removeEventListener("scroll", updatePanelPosition, true);
-      window.removeEventListener("resize", updatePanelPosition);
-    };
-  }, [open, updatePanelPosition]);
 
-  // React 18 attaches event listeners to the root container (#root).
-  // If the portal target is outside #root, synthetic events (like onClick)
-  // on portaled children will not fire. We ensure #ui-dropdown-portals is
-  // created inside #root dynamically to fix this without requiring manual
-  // index.html changes.
-  const portalRoot = React.useMemo(() => {
-    if (typeof document === "undefined") return null;
-    const reactRoot = document.getElementById("root");
-    if (!reactRoot) return document.body;
-    let root = document.getElementById("ui-dropdown-portals");
-    if (!root) {
-      root = document.createElement("div");
-      root.id = "ui-dropdown-portals";
-      reactRoot.appendChild(root);
-    } else if (root.parentElement !== reactRoot) {
-      reactRoot.appendChild(root);
+    const select = (option: DropdownOption) => {
+      if (option.disabled) return
+      if (props.multiple) {
+        props.onChange(selectedValues.includes(option.value)
+          ? selectedValues.filter((value) => value !== option.value)
+          : [...selectedValues, option.value])
+      } else {
+        close(true)
+        props.onChange(option.value)
+      }
     }
-    return root;
-  }, []);
 
-  const resolvedDir = (panelStyle.direction as "ltr" | "rtl") ?? "ltr";
+    const handlePanelKey = (event: KeyboardEvent) => {
+      if (event.key === "Tab") {
+        close(true)
+        return
+      }
+      if (event.key === "Escape") {
+        event.preventDefault()
+        event.stopPropagation()
+        close(true)
+        return
+      }
+      if (event.key === "Enter" || (event.key === " " && event.target === listRef.current)) {
+        event.preventDefault()
+        if (activeIndex >= 0) select(filtered[activeIndex])
+        return
+      }
+      const searchableField = event.target === searchRef.current
+      if (event.key !== "ArrowDown" && event.key !== "ArrowUp" && (searchableField || !["Home", "End"].includes(event.key))) return
+      event.preventDefault()
+      const available = filtered.filter((option) => !option.disabled)
+      const current = available.findIndex((option) => option.value === activeValue)
+      let nextIndex = 0
+      if (event.key === "ArrowDown") nextIndex = Math.min(current + 1, available.length - 1)
+      if (event.key === "ArrowUp") nextIndex = current < 0 ? available.length - 1 : Math.max(current - 1, 0)
+      if (event.key === "End") nextIndex = available.length - 1
+      const next = available[nextIndex]
+      if (!next) return
+      setActiveValue(next.value)
+      const list = listRef.current
+      const element = list?.children[filtered.indexOf(next)] as HTMLElement | undefined
+      if (list && element) {
+        const top = element.offsetTop
+        const bottom = top + element.offsetHeight
+        if (top < list.scrollTop) list.scrollTop = top
+        else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight
+      }
+    }
 
-  const panel = (
-    <div
-      ref={panelRef}
-      dir={resolvedDir}
-      className={`ui-dropdown__panel${open ? " is-open" : ""}`}
-      style={panelStyle}
-    >
-      {searchable && (
-        <div className="ui-input-shell ui-dropdown__search-shell">
-          <input
-            ref={searchRef}
-            className="ui-input-field"
-            type="text"
-            placeholder={panelStyle.direction === "rtl" ? "جست و جو" : "Search..."}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
-      <div className="ui-dropdown__list">
-        {filteredOptions.map((opt) => (
-          <div
-            key={opt}
-            className={`ui-dropdown__item${
-              isSelected(opt)
-                ? " is-selected blue-glass"
-                : hoveredOption === opt
-                  ? " glass"
-                  : ""
-            }`}
-            role="option"
-            aria-selected={isSelected(opt)}
-            onMouseEnter={() => setHoveredOption(opt)}
-            onMouseLeave={() => setHoveredOption(null)}
-            onClick={() => handleSelect(opt)}
-          >
-            {multiple && (
-              <span className="ui-dropdown__check">
-                {isSelected(opt) ? "✓" : ""}
-              </span>
+    const searchLabel = rtl ? "جست و جو" : "Search"
+
+    return (
+      <div className={`ui-dropdown ${className}`} dir={dir} onBlur={(event) => {
+        if (triggerRef.current?.contains(event.relatedTarget) || panelRef.current?.contains(event.relatedTarget)) return
+        close()
+        props.onBlur?.()
+      }}>
+        <button
+          ref={setTriggerRef}
+          id={triggerId}
+          type="button"
+          className="ui-input-shell ui-dropdown__trigger"
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={open ? listId : undefined}
+          aria-label={props["aria-label"]}
+          aria-describedby={props["aria-describedby"]}
+          aria-invalid={props["aria-invalid"]}
+          disabled={disabled}
+          onClick={() => open ? close() : show()}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+              event.preventDefault()
+              show(event.key === "ArrowUp")
+            }
+          }}
+        >
+          <span className={`ui-dropdown__text${displayText ? "" : " ui-dropdown__text--placeholder"}`}>{displayText || placeholder}</span>
+          <span className="glass ui-dropdown__chevron" aria-hidden="true">
+            {chevronIcon ? cloneElement(chevronIcon, { className: chevronClass }) : (
+              <svg className={chevronClass} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
             )}
-            {opt}
-          </div>
-        ))}
-        {filteredOptions.length === 0 && (
-          <div className="ui-dropdown__item ui-dropdown__item--empty">No results</div>
+          </span>
+        </button>
+        {portalContainer && createPortal(
+          <div className="ui-dropdown__panel" dir={rtl ? "rtl" : "ltr"} ref={panelRef} onKeyDown={handlePanelKey}>
+            {searchable && (
+              <div className="ui-input-shell ui-dropdown__search-shell">
+                <input
+                  ref={searchRef}
+                  className="ui-input-field"
+                  type="text"
+                  role="combobox"
+                  aria-expanded="true"
+                  aria-label={searchLabel}
+                  aria-controls={listId}
+                  aria-activedescendant={activeId}
+                  aria-autocomplete="list"
+                  placeholder={searchLabel}
+                  value={search}
+                  onChange={(event) => {
+                    const value = event.target.value
+                    const term = value.trim().toLocaleLowerCase()
+                    setSearch(value)
+                    setActiveValue(options.find((option) => !option.disabled && option.label.toLocaleLowerCase().includes(term))?.value)
+                    if (listRef.current) listRef.current.scrollTop = 0
+                  }}
+                />
+              </div>
+            )}
+            <div className="ui-dropdown__list" id={listId} ref={listRef} role="listbox" aria-labelledby={triggerId}
+              tabIndex={searchable ? -1 : 0} aria-required={required} aria-multiselectable={props.multiple || undefined}
+              aria-activedescendant={searchable ? undefined : activeId}>
+              {filtered.map((option, index) => {
+                const selected = selectedValues.includes(option.value)
+                const style = selected ? " is-selected blue-glass" : index === activeIndex ? " glass" : ""
+                return (
+                  <div key={option.value} id={`${listId}-${index}`} role="option" aria-selected={selected} aria-disabled={option.disabled}
+                    className={`ui-dropdown__item${style}`} onMouseEnter={() => !option.disabled && setActiveValue(option.value)}
+                    onMouseDown={(event) => event.preventDefault()} onClick={() => select(option)}>
+                    {props.multiple && <span className="ui-dropdown__check" aria-hidden="true">{selected ? "✓" : ""}</span>}
+                    {option.label}
+                  </div>
+                )
+              })}
+            </div>
+            {filtered.length === 0 && <p role="status" className="ui-dropdown__item ui-dropdown__item--empty">{rtl ? "نتیجه‌ای یافت نشد." : "No results found."}</p>}
+          </div>,
+          portalContainer,
         )}
       </div>
-    </div>
-  );
-
-  return (
-    <div className={`ui-dropdown ${className}`} ref={ref}>
-      <div
-        ref={triggerRef}
-        className={`ui-input-shell${open ? " ui-input-shell--open" : ""}`}
-        role="button"
-        tabIndex={0}
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") setOpen((o) => !o);
-          if (e.key === "Escape") setOpen(false);
-        }}
-        style={{ cursor: "pointer" }}
-      >
-        <span className={`ui-dropdown__text${!displayText ? " ui-dropdown__text--placeholder" : ""}`}>
-          {displayText || placeholder}
-        </span>
-        <button
-          className="glass dz-icon-btn"
-          type="button"
-          tabIndex={-1}
-          aria-hidden="true"
-        >
-          {React.cloneElement(chevronIcon as React.ReactElement, {
-            className: `dz-icon-btn__icon ui-chevron-icon${open ? " ui-chevron-icon--open" : ""}`,
-          })}
-        </button>
-      </div>
-
-      {portalRoot && ReactDOM.createPortal(panel, portalRoot)}
-    </div>
-  );
-};
+    )
+  },
+)

@@ -1,59 +1,25 @@
-import React from "react"
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from "@heroui/react"
-import "./modal.css"
+import { useEffect, useState } from "react"
+import { ProfileModal } from "./shared/ProfileModal"
+import { GlassButton } from "@/components/ui/GlassButton"
 
-const ImageCropModal = ({ isOpen, onClose, image, onSave }) => {
-  // A proper implementation would use a library like react-image-crop
-  // to provide cropping functionality. For now, we'll just show the image
-  // and provide a "Save" button.
+export default function ImageCropModal({ isOpen, onClose, image, onSave }) {
+  const [preview, setPreview] = useState("")
 
-  const handleSave = () => {
-    // In a real implementation, we would pass the cropped image data
-    // to the onSave callback. Here, we'll just pass the original image file.
-    if (image) {
-      onSave(image)
-    }
-  }
+  useEffect(() => {
+    if (!image || !isOpen) return
+    const url = URL.createObjectURL(image)
+    setPreview(url)
+    return () => URL.revokeObjectURL(url)
+  }, [image, isOpen])
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      className={`modal-container ${isOpen ? "active" : ""}`}
-    >
-      <ModalContent>
-        <ModalHeader>Crop Profile Picture</ModalHeader>
-        <ModalBody>
-          <p>
-            Image cropping functionality would be implemented here. For now,
-            we'll just save the original image.
-          </p>
-          {image && (
-            <img
-              src={URL.createObjectURL(image)}
-              alt="Profile Preview"
-              style={{ maxWidth: "100%" }}
-            />
-          )}
-        </ModalBody>
-        <ModalFooter>
-          <Button variant="flat" onPress={onClose}>
-            Cancel
-          </Button>
-          <Button color="primary" onPress={handleSave}>
-            Save
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+    <ProfileModal isOpen={isOpen} onClose={onClose} title="تصویر پروفایل" footer={(
+      <>
+        <GlassButton onPress={onClose}>لغو</GlassButton>
+        <GlassButton color="primary" isDisabled={!image} onPress={() => onSave(image)}>ذخیره</GlassButton>
+      </>
+    )}>
+      {preview && <img src={preview} alt="پیش‌نمایش عکس پروفایل" className="account-workspace__picture" />}
+    </ProfileModal>
   )
 }
-
-export default ImageCropModal

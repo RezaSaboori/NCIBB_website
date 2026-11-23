@@ -1,6 +1,5 @@
 import { HeaderProps, NavigationItem } from "./types"
 import { useActiveIndicator } from "./hooks/useActiveIndicator"
-import { BeatCoinButton } from "./components/BeatCoinButton"
 import { HomeButton } from "./components/HomeButton"
 import { ProfileButton } from "./components/ProfileButton"
 import { ThemeToggle } from "./components/ThemeToggle"
@@ -31,7 +30,6 @@ export const Header = ({ className }: HeaderProps) => {
 
       <ProfileButton ariaLabel="پروفایل" title="پروفایل کاربر" />
 
-      <BeatCoinButton />
       <ThemeToggle />
     </div>
   )
