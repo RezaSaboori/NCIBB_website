@@ -229,7 +229,9 @@
 }
 
 .holistic-input-container.fade-in-up {
-  animation: fadeInUp 0.5s ease-out forwards;
+  opacity: 1;
+  /* Release the animated opacity so the controls can sample the page backdrop. */
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .search-controls {

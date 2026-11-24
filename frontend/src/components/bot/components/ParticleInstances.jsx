@@ -1,17 +1,23 @@
-import React, { useMemo, useRef, memo } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, memo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { CONFIG } from '../config/sceneConfig';
 
+const FULL_TURN = Math.PI * 2;
+const MAX_PARTICLE_SCALE = 2;
+// Each particle occupies only a few pixels at the orbit camera's distance.
+const PARTICLE_GEOMETRY = [CONFIG.baseParticleSize, 12, 10];
+
 export const ParticleInstances = memo(({ orbits, theme, ignition, rippleOffsets, intro }) => {
     const meshRef = useRef();
-    const dummy = useMemo(() => new THREE.Object3D(), []);
+    const position = useMemo(() => new THREE.Vector3(), []);
+    const matrix = useMemo(() => new THREE.Matrix4(), []);
     const { active: introActive, progressRef: introProgressRef } = intro;
     
     const particles = useMemo(() => {
         const data = [];
         orbits.forEach((orbit) => {
-            const count = Math.floor(2 * Math.PI * orbit.radius * CONFIG.particleDensity);
+            const count = Math.floor(FULL_TURN * orbit.radius * CONFIG.particleDensity);
             const occupiedSegments = [];
             const orbitSpeed = (CONFIG.speed / orbit.radius) * 5;
 
@@ -23,15 +29,15 @@ export const ParticleInstances = memo(({ orbits, theme, ignition, rippleOffsets,
                 let angularRadius = 0;
                 
                 while (!valid && attempts < 20) {
-                    angle = Math.random() * Math.PI * 2;
-                    scale = 0.5 + Math.random() * 1.5;
+                    angle = Math.random() * FULL_TURN;
+                    scale = 0.5 + Math.random() * (MAX_PARTICLE_SCALE - 0.5);
                     const physicalWidth = (CONFIG.baseParticleSize * scale) * CONFIG.spacingBuffer;
                     angularRadius = physicalWidth / orbit.radius;
                     valid = true;
                     for (let k = 0; k < occupiedSegments.length; k++) {
                         const other = occupiedSegments[k];
                         let diff = Math.abs(angle - other.angle);
-                        if (diff > Math.PI) diff = (Math.PI * 2) - diff;
+                        if (diff > Math.PI) diff = FULL_TURN - diff;
                         if (diff < (angularRadius + other.angularRadius)) {
                             valid = false;
                             break;
@@ -44,11 +50,9 @@ export const ParticleInstances = memo(({ orbits, theme, ignition, rippleOffsets,
                     occupiedSegments.push({ angle, angularRadius });
                     data.push({
                         orbitIndex: orbit.index,
-                        baseAngle: angle,
-                        currentAngle: angle,
+                        angle,
                         speed: orbitSpeed,
-                        scale: scale,
-                        currentScale: 0,
+                        scale,
                         ignitionRandom: Math.random()
                     });
                 }
@@ -105,46 +109,52 @@ export const ParticleInstances = memo(({ orbits, theme, ignition, rippleOffsets,
         return mat;
     }, [theme.currentTheme.particleColor, ignitionColor]);
 
-    const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4);
+    useLayoutEffect(() => {
+        const mesh = meshRef.current;
+        mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+        const outerRadius = Math.max(0, ...orbits.map((orbit) => orbit.radius));
+        const padding = CONFIG.orbitShapeAmplitude + CONFIG.waveHeight + CONFIG.baseParticleSize * MAX_PARTICLE_SCALE;
+        // Cover every orbit, including particles that have yet to appear.
+        mesh.boundingSphere = new THREE.Sphere(new THREE.Vector3(), outerRadius + padding);
+    }, [orbits, particles.length]);
 
-    useFrame(() => {
-        if (!meshRef.current) return;
+    useFrame(({ clock }) => {
+        const mesh = meshRef.current;
+        if (!mesh) return;
         if (material.userData.shader) {
             material.userData.shader.uniforms.ignitionThreshold.value = ignition;
             material.userData.shader.uniforms.ignitionColor.value = ignitionColor;
         }
 
-        let particleProgress = 0;
-        if (introActive) {
-            const start = 0.1;
-            const end = 0.5;
-            const progress = introProgressRef.current;
-            if (progress >= start) {
-                particleProgress = Math.min((progress - start) / (end - start), 1.0);
+        const particleProgress = introActive
+            ? THREE.MathUtils.clamp((introProgressRef.current - 0.1) / 0.4, 0, 1)
+            : 1;
+        const time = clock.elapsedTime;
+        let visibleCount = 0;
+        let orbitIndex = -1;
+        let growth = 1;
+
+        for (const particle of particles) {
+            if (particle.orbitIndex !== orbitIndex) {
+                orbitIndex = particle.orbitIndex;
+                const delay = (orbitIndex / CONFIG.orbitCount) * 0.5;
+                // Particles are ordered by orbit, so all later orbits are still hidden too.
+                if (particleProgress <= delay) break;
+                const progress = (particleProgress - delay) / (1 - delay);
+                growth = 1 - Math.pow(1 - progress, 4);
             }
+
+            const angle = particle.angle + particle.speed * time;
+            orbits[orbitIndex].curve.getPoint((angle % FULL_TURN) / FULL_TURN, position);
+            position.y += rippleOffsets.current[orbitIndex];
+            const scale = particle.scale * growth;
+            matrix.makeScale(scale, scale, scale).setPosition(position);
+            mesh.setMatrixAt(visibleCount, matrix);
+            visibleCount++;
         }
 
-        particles.forEach((p, i) => {
-            const curve = orbits[p.orbitIndex].curve;
-            p.currentAngle += p.speed * 0.016;
-            const t = (p.currentAngle / (Math.PI * 2)) % 1;
-            const pos = curve.getPoint(t);
-            pos.y += rippleOffsets.current[p.orbitIndex];
-
-            if (introActive) {
-                const spawnDelay = (p.orbitIndex / CONFIG.orbitCount) * 0.5;
-                const individualP = Math.max(0, Math.min(1, (particleProgress - spawnDelay) / (1 - spawnDelay)));
-                p.currentScale = p.scale * easeOutQuart(individualP);
-            } else {
-                p.currentScale = p.scale;
-            }
-
-            dummy.position.copy(pos);
-            dummy.scale.setScalar(p.currentScale);
-            dummy.updateMatrix();
-            meshRef.current.setMatrixAt(i, dummy.matrix);
-        });
-        meshRef.current.instanceMatrix.needsUpdate = true;
+        mesh.count = visibleCount;
+        if (visibleCount > 0) mesh.instanceMatrix.needsUpdate = true;
     });
 
     const ignitionRandomAttr = useMemo(() => {
@@ -157,9 +167,8 @@ export const ParticleInstances = memo(({ orbits, theme, ignition, rippleOffsets,
         <instancedMesh 
             ref={meshRef} 
             args={[null, null, particles.length]} 
-            frustumCulled={!introActive}
         >
-            <sphereGeometry args={[CONFIG.baseParticleSize, 32, 32]}>
+            <sphereGeometry args={PARTICLE_GEOMETRY}>
                 <instancedBufferAttribute attach="attributes-aIgnitionRandom" args={[ignitionRandomAttr, 1]} />
             </sphereGeometry>
             <primitive object={material} attach="material" />

@@ -1,10 +1,17 @@
 .glass-avatar {
+  --glass-avatar-edge: radial-gradient(
+    circle closest-side,
+    #000 calc(100% - 1px),
+    transparent
+  );
   position: absolute;
   inset: 0;
   overflow: hidden;
   border-radius: inherit;
   -webkit-backdrop-filter: var(--glass-backdrop-filter);
   backdrop-filter: var(--glass-backdrop-filter);
+  -webkit-mask-image: var(--glass-avatar-edge);
+  mask-image: var(--glass-avatar-edge);
   pointer-events: none;
 }
 
@@ -57,7 +64,9 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .glass-avatar {
-    transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    transition:
+      inset 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .glass-avatar__eyes {
@@ -73,10 +82,12 @@
   }
 
   .glass-avatar[data-hovered] {
-    transform: translateY(-3%) scale(1.06);
+    /* Grow the clip at display resolution as the orb lifts. */
+    inset: -6% -3% 0;
   }
 
   :is(a, button):active > .user-avatar > .glass-avatar {
+    inset: 0;
     transform: scale(1.07, 0.87);
     transition-duration: 90ms;
   }

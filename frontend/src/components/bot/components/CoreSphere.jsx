@@ -89,7 +89,13 @@ gl_FragColor.rgb = mix(gl_FragColor.rgb, gl_FragColor.rgb * (1.0 + uGlassBrightn
         const hide = hideAnimRef?.current ?? { coreScale: 1, coreOpacity: 1, coreBlur: 0, isActive: false, isFullyHidden: false };
         const { coreScale, coreOpacity, coreBlur, isActive: isHideActive, isFullyHidden } = hide;
 
-        if (isHideActive || isFullyHidden) {
+        meshRef.current.visible = !isFullyHidden;
+        if (isFullyHidden) {
+            if (lightRef.current) lightRef.current.intensity = 0;
+            return;
+        }
+
+        if (isHideActive) {
             meshRef.current.scale.setScalar(coreScale);
             if (isGlass) {
                 meshRef.current.material = glassMaterial;

@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import { CONFIG } from '../config/sceneConfig.js';
 
-export const PostProcessing = memo(({ theme, introActive }) => {
+export const PostProcessing = memo(({ theme }) => {
     return (
         <EffectComposer
             disableNormalPass

@@ -1,5 +1,12 @@
 import * as THREE from 'three';
 
+export const INTRO_CAMERA = {
+    fov: 45,
+    near: 0.1,
+    far: 1000,
+    position: [35, 15, 35],
+};
+
 export const CONFIG = {
     orbitCount: 25,
     baseRadius: 3,
