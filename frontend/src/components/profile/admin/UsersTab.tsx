@@ -1,6 +1,6 @@
 import { SingleLineInput, SelectInput } from "@/components/ui/inputs"
 import { GlassButton } from "@/components/ui/GlassButton"
-import { useCallback, useState } from "react"
+import { useCallback, useId, useState } from "react"
 import { GlassTable, type GlassTableColumn } from "@/components/ui/tables/GlassTable"
 import type { DirectoryUser } from "@/types/account"
 import { accountApi } from "@/dataset_services/accountApi"
@@ -13,11 +13,12 @@ import { UserDetailDialog } from "./UserDetailDialog"
 export function UsersTab({ viewerId, initialStatus = "", onAccessChanged }: {
   viewerId: number; initialStatus?: string; onAccessChanged: () => void
 }) {
+  const filterId = useId()
   const [search, setSearch] = useState("")
   const [role, setRole] = useState("")
   const [status, setStatus] = useState(initialStatus)
   const [page, setPage] = useState(1)
-  const [userId, setUserId] = useState<number>()
+  const [detail, setDetail] = useState<{ id: number; title: string; isOpen: boolean; visit: number }>()
   const users = useAccountQuery(useCallback(() => accountApi.users(page, search, role, status), [page, search, role, status]))
   const roles = useAccountQuery(accountApi.allRoles)
   const columns: GlassTableColumn<DirectoryUser>[] = [
@@ -27,7 +28,8 @@ export function UsersTab({ viewerId, initialStatus = "", onAccessChanged }: {
     { key: "status", label: "وضعیت", render: (user) => user.is_active ? "فعال" : "غیرفعال" },
     { key: "credit", label: "Beat Coin", render: (user) => formatCoins(user.balance) },
     { key: "action", label: "جزئیات", render: (user) => (
-      <GlassButton size="sm" aria-label={`جزئیات ${accountName(user)}`} onPress={() => setUserId(user.id)}>مشاهده</GlassButton>
+      <GlassButton size="sm" aria-label={`جزئیات ${accountName(user)}`}
+        onPress={() => setDetail((current) => ({ id: user.id, title: accountName(user), isOpen: true, visit: (current?.visit ?? 0) + 1 }))}>مشاهده</GlassButton>
     ) },
   ]
   return (
@@ -36,12 +38,12 @@ export function UsersTab({ viewerId, initialStatus = "", onAccessChanged }: {
       <GlassTable label="کاربران" rows={users.data?.results ?? []} columns={columns} rowKey={(user) => user.id}
         controls={<>
           <div className="account-workspace__form account-workspace__fields">
-            <label>جستجو<SingleLineInput type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} placeholder="نام، ایمیل یا نام کاربری" /></label>
-            <label>نقش<SelectInput value={role} onChange={(value) => { setRole(value); setPage(1) }} options={[
+            <label htmlFor={`${filterId}-search`}>جستجو<SingleLineInput id={`${filterId}-search`} type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} placeholder="نام، ایمیل یا نام کاربری" /></label>
+            <label htmlFor={`${filterId}-role`}>نقش<SelectInput id={`${filterId}-role`} value={role} onChange={(value) => { setRole(value); setPage(1) }} options={[
               { value: "", label: "همه نقش‌ها" },
               ...(roles.data ?? []).filter((item) => item.scope === "platform").map((item) => ({ value: item.code, label: item.label })),
             ]} /></label>
-            <label>وضعیت<SelectInput value={status} onChange={(value) => { setStatus(value); setPage(1) }} options={[
+            <label htmlFor={`${filterId}-status`}>وضعیت<SelectInput id={`${filterId}-status`} value={status} onChange={(value) => { setStatus(value); setPage(1) }} options={[
               { value: "", label: "همه حساب‌ها" }, { value: "true", label: "فعال" }, { value: "false", label: "غیرفعال" },
             ]} /></label>
           </div>
@@ -50,10 +52,12 @@ export function UsersTab({ viewerId, initialStatus = "", onAccessChanged }: {
         footer={<PageControls data={users.data} page={page} onPage={setPage} />}
         empty={users.data && <p>کاربری یافت نشد.</p>}
       />
-      {userId && <UserDetailDialog key={userId} id={userId} viewerId={viewerId} onClose={() => setUserId(undefined)} onUpdated={() => {
-        void users.refresh()
-        if (viewerId === userId) onAccessChanged()
-      }} />}
+      {detail && <UserDetailDialog key={detail.visit} id={detail.id} initialTitle={detail.title} roles={roles} viewerId={viewerId} isOpen={detail.isOpen}
+        onClose={() => setDetail((current) => current && { ...current, isOpen: false })}
+        onUpdated={() => {
+          void users.refresh()
+          if (viewerId === detail.id) onAccessChanged()
+        }} />}
     </div>
   )
 }

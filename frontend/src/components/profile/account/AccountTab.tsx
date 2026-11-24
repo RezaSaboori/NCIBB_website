@@ -1,18 +1,17 @@
 import React from "react"
+import type { AccountProfile } from "@/types/account"
 import ProfileForm from "../ProfileForm"
 
 interface AccountTabProps {
-  profileData: any
-  onUpdate: (data: any) => Promise<any>
-  saving: boolean
-  onRefresh: () => void
+  profileData: AccountProfile
+  onUpdate: (data: Record<string, unknown>) => Promise<AccountProfile>
+  onRefresh: () => Promise<void>
 }
 
-const AccountTab: React.FC<AccountTabProps> = ({ profileData, onUpdate, saving, onRefresh }) => (
+const AccountTab: React.FC<AccountTabProps> = ({ profileData, onUpdate, onRefresh }) => (
   <ProfileForm
     profileData={profileData}
     onUpdate={onUpdate}
-    saving={saving}
     onRefresh={onRefresh}
   />
 )

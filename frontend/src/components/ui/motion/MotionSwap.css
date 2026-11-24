@@ -1,0 +1,19 @@
+.ui-motion-swap {
+  position: relative;
+  display: inline-flex;
+  max-inline-size: 100%;
+}
+
+.ui-motion-swap__face {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  min-inline-size: 0;
+}
+
+.ui-motion-swap__face[aria-hidden="true"] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}

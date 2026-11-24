@@ -1,11 +1,12 @@
 import { GlassCard } from "@/components/ui/GlassCard"
 import { GlassTabs } from "@/components/ui/GlassTabs"
-import { useCallback, useEffect, useState, type FormEvent } from "react"
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import { Tab } from "@heroui/react"
 import { useDispatch } from "react-redux"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
 import type { AppDispatch } from "@/store/store"
 import { fetchWallet } from "@/store/walletSlice"
+import type { Role } from "@/types/account"
 import { accountName } from "../shared/accountFormat"
 import { AccountStatus } from "../shared/AccountStatus"
 import { useAccountQuery } from "../shared/useAccountQuery"
@@ -15,15 +16,17 @@ import { ProfileModal } from "../shared/ProfileModal"
 import { UserAccountSection } from "./UserAccountSection"
 import { UserAuditSection, UserLedgerSection, UserMessagesSection, UserProjectsSection } from "./UserDetailSections"
 
-export function UserDetailDialog({ id, viewerId, onClose, onUpdated }: {
+export function UserDetailDialog({ id, initialTitle, roles, viewerId, isOpen, onClose, onUpdated }: {
   id: number
+  initialTitle: string
+  roles: Pick<ReturnType<typeof useAccountQuery<Role[]>>, "data" | "loading" | "error" | "refresh">
   viewerId: number
+  isOpen: boolean
   onClose: () => void
   onUpdated: () => void
 }) {
   const dispatch = useDispatch<AppDispatch>()
   const detail = useAccountQuery(useCallback(() => accountApi.user(id), [id]))
-  const roles = useAccountQuery(accountApi.allRoles)
   const [roleIds, setRoleIds] = useState<number[]>([])
   const [active, setActive] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -31,13 +34,20 @@ export function UserDetailDialog({ id, viewerId, onClose, onUpdated }: {
   const [status, setStatus] = useState("")
   const [ledgerRevision, setLedgerRevision] = useState(0)
   const [tabRail, setTabRail] = useState<HTMLDivElement | null>(null)
+  const [selectedTab, setSelectedTab] = useState("account")
   const user = detail.data
+  const detailsShown = useRef(false)
+  const preparing = (!user && detail.loading) || (!!user && roles.loading && !detailsShown.current)
 
   useEffect(() => {
     if (!user) return
     setActive(user.is_active)
     setRoleIds(user.roles.flatMap((role) => role.id ? [role.id] : []))
   }, [user])
+
+  useEffect(() => {
+    if (user && !preparing) detailsShown.current = true
+  }, [preparing, user])
 
   const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -57,11 +67,12 @@ export function UserDetailDialog({ id, viewerId, onClose, onUpdated }: {
     }
   }
   return (
-    <ProfileModal isOpen size="4xl" animateSize title={user ? accountName(user) : "جزئیات کاربر"}
-      headerNavigationRef={user ? setTabRail : undefined} onClose={onClose}>
-      <AccountStatus loading={detail.loading} error={detail.error} retry={detail.refresh} />
-      {user && tabRail && (
-        <GlassTabs aria-label="جزئیات کاربر" railTarget={tabRail}>
+    <ProfileModal isOpen={isOpen} size="4xl" animateSize bodyKey={selectedTab} title={user ? accountName(user) : initialTitle}
+      contentPending={preparing} estimatedBodySize="min(32rem, 57dvh)" headerNavigationRef={setTabRail} onClose={onClose}>
+      <AccountStatus loading={preparing} error={detail.error} retry={detail.refresh} />
+      {user && tabRail && !preparing && (
+        <GlassTabs aria-label="جزئیات کاربر" railTarget={tabRail} animatePanel
+          selectedKey={selectedTab} onSelectionChange={(key) => setSelectedTab(String(key))}>
           <Tab key="account" title="حساب">
             <UserAccountSection user={user} roles={roles.data?.filter((role) => role.scope === "platform" && role.code !== "user")}
               active={active} selectedRoles={roleIds} saving={saving} onActiveChange={setActive}

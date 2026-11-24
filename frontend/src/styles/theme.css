@@ -172,6 +172,7 @@
   --motion-easing-easeOut: cubic-bezier(0.4, 0, 0.2, 1);
   --motion-easing-easeIn: cubic-bezier(0.4, 0, 1, 1);
   --motion-easing-easeInOut: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-easing-settle: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .dark {

@@ -32,7 +32,6 @@ export default function ProfileManager() {
   const [params] = useSearchParams()
   const activeTab = params.get("tab") ?? "dashboard"
   const [collapsed, setCollapsed] = useState(false)
-  const [saving, setSaving] = useState(false)
   const { isAuthenticated } = useSelector((state: RootState) => state.auth)
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
@@ -68,14 +67,9 @@ export default function ProfileManager() {
   }, [isAuthenticated, refresh])
 
   const update = async (data: Record<string, unknown>) => {
-    setSaving(true)
-    try {
-      const response = await accountApi.updateProfile(data)
-      query.setData(response)
-      return response
-    } finally {
-      setSaving(false)
-    }
+    const response = await accountApi.updateProfile(data)
+    query.setData(response)
+    return response
   }
 
   if (!isAuthenticated) return <SessionExpiredBanner message="برای مشاهده پروفایل وارد شوید." />
@@ -96,7 +90,7 @@ export default function ProfileManager() {
       case "dashboard": return <DashboardTab profile={profile} />
       case "account": return <div className="account-workspace__stack">
         <EmailVerificationCard key={profile.email} email={profile.email} verified={profile.is_email_verified} />
-        <AccountTab profileData={profile} onUpdate={update} saving={saving} onRefresh={refresh} />
+        <AccountTab profileData={profile} onUpdate={update} onRefresh={refresh} />
       </div>
       case "wallet": return <WalletTab />
       case "messages": return <MessagesTab key="messages" userId={profile.id} />
@@ -111,5 +105,5 @@ export default function ProfileManager() {
     }
   }
 
-  return <div className="page-content account-workspace" dir="rtl">{renderTab()}</div>
+  return <div key={activeTab} className="page-content account-workspace ui-fade-in" dir="rtl">{renderTab()}</div>
 }

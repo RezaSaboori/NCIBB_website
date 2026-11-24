@@ -1,0 +1,38 @@
+.ui-state-button[aria-disabled="true"] { cursor: default; }
+.ui-state-button[aria-disabled="true"]:not([aria-busy="true"]):not(.ui-state-button--success) { opacity: 0.55; }
+
+.ui-state-button__surfaces,
+.ui-state-button .ui-state-button__surfaces > span {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ui-state-button__surfaces > span {
+  opacity: 0;
+  transition: opacity var(--motion-duration-normal) var(--motion-easing-settle);
+}
+
+.ui-state-button__surfaces > [data-active="true"] { opacity: 0.7; }
+.dark .ui-state-button__surfaces > [data-active="true"] { opacity: 0.62; }
+
+.ui-state-button__size {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.ui-state-button__content {
+  flex: none;
+  max-inline-size: none;
+  inline-size: max-content;
+}
+
+.ui-state-button__content svg { inline-size: 1rem; block-size: 1rem; flex: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-state-button__surfaces > span { transition-duration: var(--motion-duration-fast); }
+}

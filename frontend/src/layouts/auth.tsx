@@ -1,10 +1,14 @@
-import { Outlet } from "react-router-dom"
+import { Outlet, useLocation } from "react-router-dom"
+import { useNavigationFade } from "@/components/ui/motion/useNavigationFade"
 import "./auth.css"
 
 export default function AuthLayout() {
+  const { pathname } = useLocation()
+  const routeRef = useNavigationFade(pathname)
+
   return (
-    <div className="auth-layout-root">
+    <main ref={routeRef} className="auth-layout-root">
       <Outlet />
-    </div>
+    </main>
   )
 }

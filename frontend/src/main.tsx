@@ -6,8 +6,10 @@ import { store } from "./store/store.ts"
 import App from "./App.tsx"
 import { Provider } from "./provider.tsx"
 import { ThemeProvider } from "./components/theme/ThemeProvider.tsx"
+import { ToastProvider } from "./components/ui/motion/ToastProvider.tsx"
 import "@/styles/globals.css"
 import "@/styles/theme.css"
+import "@/styles/motion.css"
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -15,7 +17,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Provider>
           <ThemeProvider>
-            <App />
+            <ToastProvider>
+              <App />
+            </ToastProvider>
           </ThemeProvider>
         </Provider>
       </BrowserRouter>

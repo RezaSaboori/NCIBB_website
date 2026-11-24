@@ -1,7 +1,9 @@
 import { GlassCard } from "@/components/ui/GlassCard"
 import { SingleLineInput, MessageInput } from "@/components/ui/inputs"
 import { GlassButton } from "@/components/ui/GlassButton"
-import { useCallback, useEffect, useState, type FormEvent } from "react"
+import { StatefulGlassButton } from "@/components/ui/StatefulGlassButton"
+import { useToast } from "@/components/ui/motion/useToast"
+import { useCallback, useEffect, useId, useState, type FormEvent } from "react"
 import { Icon } from "@iconify/react"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
 import type { Thread, ThreadMessage } from "@/types/account"
@@ -13,21 +15,35 @@ import { ComposeDialog } from "./ComposeDialog"
 import { MessageHistory } from "./MessageHistory"
 
 export default function MessagesTab({ userId, queue = false }: { userId: number; queue?: boolean }) {
+  const inputId = useId()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
   const [active, setActive] = useState<Thread>()
   const [messagePage, setMessagePage] = useState(1)
-  const [composeMode, setComposeMode] = useState<"compose" | "forward">()
+  const [composer, setComposer] = useState<{ mode: "compose" | "forward"; open: boolean; key: number }>()
   const [selected, setSelected] = useState<ThreadMessage[]>([])
   const [draft, setDraft] = useState("")
   const [sending, setSending] = useState(false)
   const [error, setError] = useState("")
+  const announce = useToast()
+
+  const showComposer = (mode: "compose" | "forward") => {
+    setComposer((current) => ({ mode, open: true, key: (current?.key ?? 0) + 1 }))
+  }
+
+  const hideComposer = () => {
+    setComposer((current) => current && { ...current, open: false })
+  }
 
   const list = useAccountQuery(useCallback(() => accountApi.threads(page, queue ? "support_queue" : undefined, search), [page, queue, search]))
   const activeId = active?.id
-  const messages = useAccountQuery(useCallback(() => activeId ? accountApi.threadMessages(activeId, messagePage) : null, [activeId, messagePage]))
+  const messages = useAccountQuery(useCallback(() => activeId
+    ? accountApi.threadMessages(activeId, messagePage).then((data) => ({ activeId, messagePage, data }))
+    : null, [activeId, messagePage]))
   const thread = useAccountQuery(useCallback(() => activeId ? accountApi.thread(activeId) : null, [activeId]))
-  const latest = messagePage === 1 ? messages.data?.results[0]?.id : undefined
+  const messageData = messages.data?.activeId === activeId && messages.data?.messagePage === messagePage
+    ? messages.data?.data : undefined
+  const latest = messagePage === 1 ? messageData?.results[0]?.id : undefined
   const refreshList = list.refresh
 
   useEffect(() => {
@@ -45,11 +61,12 @@ export default function MessagesTab({ userId, queue = false }: { userId: number;
 
   const reply = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!activeId || !draft.trim()) return
+    if (!activeId || !draft.trim() || sending) return
     setSending(true)
     setError("")
     try {
       await accountApi.reply(activeId, draft.trim())
+      announce({ tone: "success", message: "پاسخ ارسال شد." })
       setDraft("")
       if (messagePage === 1) void messages.refresh()
       else setMessagePage(1)
@@ -71,13 +88,13 @@ export default function MessagesTab({ userId, queue = false }: { userId: number;
     <div className="account-workspace__stack">
       <div className="account-workspace__toolbar">
         <h1>{queue ? "صف پشتیبانی" : "پیام‌ها"}</h1>
-        <GlassButton color="primary" onPress={() => setComposeMode("compose")} startContent={<Icon icon="tabler:message-plus" />}>گفتگوی جدید</GlassButton>
+        <GlassButton color="primary" onPress={() => showComposer("compose")} startContent={<Icon icon="tabler:message-plus" />}>گفتگوی جدید</GlassButton>
       </div>
       <div className={`account-messages${active ? " account-messages--active" : ""}`}>
         <GlassCard size="sm" className="account-messages__list"
           footer={<PageControls data={list.data} page={page} onPage={setPage} />}>
-          <label className="account-workspace__form">جستجو در موضوع گفتگو
-            <SingleLineInput type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} />
+          <label htmlFor={`${inputId}-search`} className="account-workspace__form">جستجو در موضوع گفتگو
+            <SingleLineInput id={`${inputId}-search`} type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} />
           </label>
           <AccountStatus loading={list.loading} error={list.error} retry={list.refresh} />
           {list.data?.results.length === 0 && <p className="account-workspace__muted">گفتگویی یافت نشد.</p>}
@@ -92,32 +109,36 @@ export default function MessagesTab({ userId, queue = false }: { userId: number;
             </button>
           ))}
         </GlassCard>
-        <GlassCard size="md" className="account-messages__detail"
-          footer={active && <PageControls data={messages.data} page={messagePage} onPage={setMessagePage} />}>
+        <GlassCard key={activeId ?? "empty"} size="md" className="account-messages__detail ui-fade-in"
+          footer={active && <PageControls data={messageData} page={messagePage} onPage={setMessagePage} />}>
           {!active ? <p className="account-workspace__muted">یک گفتگو را از فهرست انتخاب کنید.</p> : (
             <>
               <GlassButton className="account-messages__back" size="sm" variant="flat" onPress={() => open()}>بازگشت به گفتگوها</GlassButton>
               <div className="account-workspace__toolbar">
                 <div><h2>{active.subject}</h2><span className="account-workspace__muted">{active.counterpart}</span></div>
                 {!!selected.length && (
-                  <GlassButton size="sm" variant="flat" onPress={() => setComposeMode("forward")}>ارسال مجدد ({formatCoins(selected.length)})</GlassButton>
+                  <GlassButton size="sm" variant="flat" onPress={() => showComposer("forward")}>ارسال مجدد ({formatCoins(selected.length)})</GlassButton>
                 )}
               </div>
-              <AccountStatus loading={messages.loading} error={messages.error || thread.error} retry={messages.refresh} />
-              {messages.data && <MessageHistory messages={messages.data.results} userId={userId} selected={selected} toggle={toggleMessage} />}
-              {thread.data?.can_reply && <form className="account-workspace__form" onSubmit={reply}>
-                <label>پاسخ<MessageInput maxLength={6000} rows={3} value={draft} onChange={(event) => setDraft(event.target.value)} /></label>
+              <AccountStatus loading={messages.loading && !messageData} error={messages.error || thread.error} retry={messages.refresh} />
+              {messageData && <MessageHistory messages={messageData.results} userId={userId} selected={selected} toggle={toggleMessage} />}
+              {thread.data?.id === activeId && thread.data?.can_reply && <form className="account-workspace__form" onSubmit={reply}>
+                <label htmlFor={`${inputId}-reply`}>پاسخ<MessageInput id={`${inputId}-reply`} maxLength={6000} rows={3} value={draft} onChange={(event) => setDraft(event.target.value)} /></label>
                 <AccountStatus error={error} />
-                <GlassButton className="account-workspace__submit" type="submit" color="primary" isDisabled={!draft.trim()} isLoading={sending}>ارسال پاسخ</GlassButton>
+                <StatefulGlassButton className="account-workspace__submit" type="submit"
+                  color={sending ? "pending" : "primary"} state={sending ? "sending" : "ready"}
+                  label={sending ? "در حال ارسال…" : "ارسال پاسخ"} disabled={!draft.trim()} busy={sending} />
               </form>}
             </>
           )}
         </GlassCard>
       </div>
-      {composeMode && (
-        <ComposeDialog source={composeMode === "forward" ? active : undefined} selected={selected}
-          onClose={() => setComposeMode(undefined)} onSent={(item) => {
-            setComposeMode(undefined)
+      {composer && (
+        <ComposeDialog key={composer.key} isOpen={composer.open}
+          source={composer.mode === "forward" ? active : undefined} selected={selected}
+          onClose={hideComposer} onSent={(item) => {
+            hideComposer()
+            announce({ tone: "success", message: composer.mode === "forward" ? "پیام‌ها ارسال شد." : "گفتگو ایجاد شد." })
             if (queue && item.route !== "support_queue") {
               open()
             } else open(item)

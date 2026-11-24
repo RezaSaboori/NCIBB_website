@@ -6,6 +6,7 @@ import {
   ReactNode,
 } from "react"
 import { applyThemeVariables } from "../../utils/theme/themePreloader"
+import { useReducedMotionPreference } from "../ui/motion/useReducedMotionPreference"
 
 interface ThemeContextType {
   theme: "light" | "dark"
@@ -22,6 +23,7 @@ interface ThemeContextProviderProps {
 export const ThemeContextProvider = ({
   children,
 }: ThemeContextProviderProps) => {
+  const reducedMotion = useReducedMotionPreference()
   const [theme, setThemeState] = useState<"light" | "dark">(() => {
     // Check localStorage for saved theme
     const savedTheme = localStorage.getItem("theme") as "light" | "dark"
@@ -30,8 +32,7 @@ export const ThemeContextProvider = ({
 
   const setTheme = (newTheme: "light" | "dark") => {
     // Check if the View Transition API is supported
-    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
-      // @ts-ignore - document.startViewTransition is still new
+    if (!reducedMotion && typeof document.startViewTransition === "function") {
       document.startViewTransition(() => {
         setThemeState(newTheme)
         localStorage.setItem("theme", newTheme)
@@ -59,14 +60,18 @@ export const ThemeContextProvider = ({
     // Apply preloaded CSS variables for instant update
     applyThemeVariables(theme)
 
+    if (reducedMotion) return
     // Add a temporary class to enable smooth transitions
     root.classList.add("theme-transition")
     const timeout = setTimeout(() => {
       root.classList.remove("theme-transition")
     }, 1000)
 
-    return () => clearTimeout(timeout)
-  }, [theme])
+    return () => {
+      clearTimeout(timeout)
+      root.classList.remove("theme-transition")
+    }
+  }, [reducedMotion, theme])
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>

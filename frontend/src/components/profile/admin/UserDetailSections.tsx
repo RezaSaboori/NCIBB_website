@@ -46,7 +46,7 @@ export function UserProjectsSection({ id }: { id: number }) {
   const query = useDetailPage(useCallback((page) => accountApi.projects(id, page), [id]))
   return (
     <GlassTable label="پروژه‌های کاربر" columns={projectColumns} rows={query.data?.results ?? []} rowKey={(project) => `${project.service}:${project.pk}`}
-      controls={<AccountStatus loading={query.loading} error={query.error} retry={query.refresh} />}
+      controls={<AccountStatus loading={query.loading && !query.data} error={query.error} retry={query.refresh} holdsReveal />}
       footer={<PageControls data={query.data} page={query.page} onPage={query.setPage} />}
       empty={query.data && <p>پروژه‌ای ثبت نشده است.</p>} />
   )
@@ -57,7 +57,7 @@ function ReviewThread({ id, thread, close }: { id: number; thread: Thread; close
   return (
     <div className="account-workspace__stack">
       <div className="account-workspace__toolbar"><h3>{thread.subject}</h3><GlassButton size="sm" variant="flat" onPress={close}>فهرست گفتگوها</GlassButton></div>
-      <AccountStatus loading={query.loading} error={query.error} retry={query.refresh} />
+      <AccountStatus loading={query.loading && !query.data} error={query.error} retry={query.refresh} holdsReveal />
       {query.data && <MessageHistory messages={query.data.results} userId={id} />}
       <PageControls data={query.data} page={query.page} onPage={query.setPage} />
     </div>
@@ -70,7 +70,7 @@ export function UserMessagesSection({ id }: { id: number }) {
   if (thread) return <ReviewThread id={id} thread={thread} close={() => setThread(undefined)} />
   return (
     <div className="account-workspace__stack">
-      <AccountStatus loading={query.loading} error={query.error} retry={query.refresh} />
+      <AccountStatus loading={query.loading && !query.data} error={query.error} retry={query.refresh} holdsReveal />
       {query.data?.results.length === 0 && <p>گفتگویی ثبت نشده است.</p>}
       {query.data?.results.map((item) => <button key={item.id} type="button" className="glass account-messages__thread" onClick={() => setThread(item)}>
         <strong>{item.subject}</strong><span>{item.counterpart} · {formatAccountDate(item.updated_at)}</span>
@@ -90,7 +90,7 @@ function UserLedgerPage({ load }: { load: (page: number) => Promise<Page<LedgerE
   return (
     <div className="account-workspace__stack">
       <CreditLedger entries={query.data?.results ?? []}
-        controls={<AccountStatus loading={query.loading} error={query.error} retry={query.refresh} />}
+        controls={<AccountStatus loading={query.loading && !query.data} error={query.error} retry={query.refresh} holdsReveal />}
         footer={<PageControls data={query.data} page={query.page} onPage={query.setPage} />}
         showEmpty={!!query.data} />
     </div>
@@ -101,7 +101,7 @@ export function UserAuditSection({ id }: { id: number }) {
   const query = useDetailPage(useCallback((page) => accountApi.userAudit(id, page), [id]))
   return (
     <GlassTable label="رویدادهای کاربر" columns={auditColumns} rows={query.data?.results ?? []} rowKey={(entry) => entry.id}
-      controls={<AccountStatus loading={query.loading} error={query.error} retry={query.refresh} />}
+      controls={<AccountStatus loading={query.loading && !query.data} error={query.error} retry={query.refresh} holdsReveal />}
       footer={<PageControls data={query.data} page={query.page} onPage={query.setPage} />}
       empty={query.data && <p>رویدادی ثبت نشده است.</p>} />
   )

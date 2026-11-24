@@ -1,0 +1,73 @@
+.ui-fade-in {
+  animation: ui-fade-in var(--motion-duration-normal) var(--motion-easing-settle);
+}
+
+.ui-panel-reveal[role="tabpanel"]:not(.ui-optical-content *) {
+  animation: ui-panel-reveal var(--motion-duration-panel, var(--motion-duration-normal)) var(--motion-easing-settle);
+}
+
+.ui-surface-enter {
+  --motion-surface-start: translateY(6px) scale(0.975);
+  animation: ui-surface-enter var(--motion-duration-surface, var(--motion-duration-normal)) var(--motion-easing-settle);
+}
+
+.ui-surface-enter[data-estimated-size="true"] { --motion-surface-start: none; }
+
+.ui-optical-content {
+  --motion-optical-blur: 15px;
+  --motion-optical-exposure: 4;
+  --motion-optical-opacity: 0.6;
+}
+
+.ui-optical-content[data-motion-reveal="hold"] {
+  filter: blur(var(--motion-optical-blur)) brightness(var(--motion-optical-exposure));
+  opacity: var(--motion-optical-opacity);
+}
+
+.ui-optical-content[data-motion-reveal="reveal"] {
+  animation: ui-optical-reveal var(--motion-duration-optics, 480ms) cubic-bezier(0.35, 0, 0.3, 1);
+}
+
+.ui-measured-inline {
+  inline-size: var(--motion-measured-size, max-content);
+  transition: inline-size var(--motion-duration-slow) var(--motion-easing-settle);
+}
+
+.ui-measured-block {
+  block-size: var(--motion-measured-size, auto);
+  transition: block-size var(--motion-duration-slow) var(--motion-easing-settle);
+}
+
+@keyframes ui-fade-in {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}
+
+@keyframes ui-panel-reveal {
+  from { opacity: 0.45; filter: blur(4px) brightness(1.25); }
+  to { opacity: 1; filter: blur(0) brightness(1); }
+}
+
+@keyframes ui-surface-enter {
+  from { opacity: 0; transform: var(--motion-surface-start); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes ui-optical-reveal {
+  from { opacity: var(--motion-optical-opacity); filter: blur(var(--motion-optical-blur)) brightness(var(--motion-optical-exposure)); }
+  27% { opacity: var(--motion-optical-opacity); filter: blur(var(--motion-optical-blur)) brightness(1); }
+  75% { opacity: var(--motion-optical-opacity); filter: blur(0) brightness(1); }
+  to { opacity: 1; filter: blur(0) brightness(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-fade-in { animation-duration: var(--motion-duration-fast); }
+  .ui-surface-enter,
+  .ui-panel-reveal[role="tabpanel"]:not(.ui-optical-content *),
+  .ui-optical-content[data-motion-reveal="reveal"] {
+    animation-name: ui-fade-in;
+    animation-duration: var(--motion-duration-fast);
+  }
+  .ui-optical-content[data-motion-reveal="hold"] { opacity: 1; filter: none; }
+  .ui-measured-inline, .ui-measured-block { transition: none; }
+}

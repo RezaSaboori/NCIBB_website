@@ -11,16 +11,35 @@
   white-space: nowrap;
   color: var(--color-gray12);
   text-decoration: none;
+  transition:
+    scale var(--motion-duration-normal) var(--motion-easing-settle),
+    box-shadow var(--motion-duration-slow) var(--motion-easing-settle),
+    color var(--motion-duration-fast) ease-out,
+    opacity var(--motion-duration-fast) ease-out;
 }
 
 .ui-glass-button[data-size="sm"] { min-block-size: 2rem; padding-inline: var(--spacing-sm); }
 .ui-glass-button.ui-glass-button--icon { min-block-size: 0; padding-inline: 0; }
-.ui-glass-button.blue-glass { color: var(--color-gray1); }
-.dark .ui-glass-button.blue-glass { color: var(--color-gray12); }
+.ui-glass-button:is(.blue-glass, .indigo-glass, .green-glass) { color: var(--color-gray1); }
+.dark .ui-glass-button:is(.blue-glass, .indigo-glass, .green-glass) { color: var(--color-gray12); }
 .ui-glass-button.red-glass { color: var(--color-gray1); }
 .dark .ui-glass-button.red-glass { color: var(--color-gray12); }
 
 .ui-glass-button:focus-visible {
   outline: var(--border-width-thin) solid var(--color-blue);
   outline-offset: var(--spacing-xs);
+}
+
+.ui-glass-button[data-pressed="true"]:not([aria-disabled="true"]) {
+  scale: 0.98;
+  opacity: 0.88;
+  transition-duration: 70ms;
+}
+
+@media (pointer: coarse) {
+  .ui-glass-button[data-pressed="true"]:not([aria-disabled="true"]) { scale: 0.96; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-glass-button[data-pressed="true"]:not([aria-disabled="true"]) { scale: 1; }
 }

@@ -2,6 +2,7 @@ import { useState, type CSSProperties, type Dispatch, type ReactNode, type SetSt
 import { Outlet, useLocation } from "react-router-dom"
 import { Header } from "../components/header"
 import { Footer } from "../components/global/Footer"
+import { useNavigationFade } from "@/components/ui/motion/useNavigationFade"
 import "./default.css"
 
 export interface LayoutContext {
@@ -12,7 +13,9 @@ export interface LayoutContext {
 export default function DefaultLayout() {
   const [sidebar, setSidebar] = useState<ReactNode>(null)
   const [sidebarWidth, setSidebarWidth] = useState(260)
-  const isHomePage = useLocation().pathname === "/"
+  const { pathname } = useLocation()
+  const isHomePage = pathname === "/"
+  const routeRef = useNavigationFade(pathname, !isHomePage)
   const style = { "--layout-sidebar-width": sidebar ? `${sidebarWidth}px` : "0px" } as CSSProperties
 
   return (
@@ -20,7 +23,7 @@ export default function DefaultLayout() {
       <Header className={isHomePage ? "bg-transparent" : ""} />
       <div className="ncibb-layout__body">
         {sidebar}
-        <main className={`ncibb-main flex-grow w-full max-w-none${isHomePage ? " ncibb-main--home" : ""}`}>
+        <main ref={routeRef} className={`ncibb-main flex-grow w-full max-w-none${isHomePage ? " ncibb-main--home" : ""}`}>
           <Outlet context={{ setSidebar, setSidebarWidth } satisfies LayoutContext} />
         </main>
       </div>

@@ -1,3 +1,5 @@
+import { motion } from "framer-motion"
+import { useMotionVariants } from "@/components/ui/motion/useMotionVariants"
 import type { ThreadMessage } from "@/types/account"
 import { formatAccountDate } from "../shared/accountFormat"
 
@@ -7,11 +9,14 @@ export function MessageHistory({ messages, userId, selected, toggle }: {
   selected?: ThreadMessage[]
   toggle?: (message: ThreadMessage) => void
 }) {
+  const variants = useMotionVariants("surface")
   if (!messages.length) return <p className="account-workspace__muted">پیامی در این گفتگو ثبت نشده است.</p>
   return (
     <ol className="account-messages__history" aria-label="پیام‌های گفتگو">
-      {[...messages].reverse().map((message) => (
-        <li key={message.id} className={`glass account-messages__bubble${message.sender === userId ? " account-messages__bubble--mine" : ""}`}>
+      {[...messages].reverse().map((message, index) => (
+        <motion.li key={message.id} className={`glass account-messages__bubble${message.sender === userId ? " account-messages__bubble--mine" : ""}`}
+          initial={index >= messages.length - 3 ? "exit" : false} animate="enter"
+          variants={variants}>
           <div className="account-messages__meta">
             <b>{message.sender_name}</b>
             <time dateTime={message.created_at}>{formatAccountDate(message.created_at)}</time>
@@ -24,7 +29,7 @@ export function MessageHistory({ messages, userId, selected, toggle }: {
           </div>
           {message.forwarded && <small>ارسال‌شده از گفتگوی دیگر</small>}
           <p dir="auto">{message.content}</p>
-        </li>
+        </motion.li>
       ))}
     </ol>
   )

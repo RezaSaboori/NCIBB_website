@@ -12,6 +12,7 @@ import ImageCropModal from "./ImageCropModal"
 import UserAvatar from "../common/UserAvatar"
 import CompletionCard from "./CompletionCard"
 import AccountFields from "./account/AccountFields"
+import { useProfileSaveFeedback } from "./account/useProfileSaveFeedback"
 
 const profileSchema = yup.object({
   first_name: yup
@@ -33,12 +34,14 @@ const profileSchema = yup.object({
   company: yup.string().max(200, "نام شرکت باید کمتر از ۲۰۰ کاراکتر باشد"),
 })
 
-const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
+const ProfileForm = ({ profileData, onUpdate, onRefresh }) => {
   const [basicEditMode, setBasicEditMode] = useState(false)
   const [professionalEditMode, setProfessionalEditMode] = useState(false)
   const [completionData, setCompletionData] = useState(null)
   const [imageFile, setImageFile] = useState(null)
   const fileInputRef = useRef(null)
+  const { feedback, save, clearFailure } = useProfileSaveFeedback()
+  const saving = feedback?.phase === "saving"
   const {
     isOpen: isCropOpen,
     onOpen: onCropOpen,
@@ -64,7 +67,7 @@ const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
     gender: profileData?.profile?.gender || "",
   }), [profileData])
   const lastSavedValues = useRef(savedValues)
-  const { control, handleSubmit, reset, formState: { errors, isValid, isDirty } } = useForm({
+  const { control, handleSubmit, reset, formState: { dirtyFields, errors, isValid } } = useForm({
     resolver: yupResolver(profileSchema),
     defaultValues: savedValues,
     mode: "onChange",
@@ -90,39 +93,24 @@ const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
   }
 
   const onSubmitBasic = async (formData) => {
-    try {
-      const basicPayload = {
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        email: formData.email,
-        phone: formData.phone,
-        gender: formData.gender,
-        city: formData.city,
-        state_province: formData.state_province,
-        country: formData.country,
-      }
-      await onUpdate(basicPayload)
+    const { first_name, last_name, email, phone, gender, city, state_province, country } = formData
+    const saved = await save("basic", () => onUpdate({
+      first_name, last_name, email, phone, gender, city, state_province, country,
+    }))
+    if (saved) {
       setBasicEditMode(false)
       await onRefresh()
       await loadCompletionData()
-    } catch (error) {
-      console.error("Failed to update basic info:", error)
     }
   }
 
   const onSubmitProfessional = async (formData) => {
-    try {
-      const professionalPayload = {
-        job_title: formData.job_title,
-        company: formData.company,
-        department: formData.department,
-      }
-      await onUpdate(professionalPayload)
+    const { job_title, company, department } = formData
+    const saved = await save("professional", () => onUpdate({ job_title, company, department }))
+    if (saved) {
       setProfessionalEditMode(false)
       await onRefresh()
       await loadCompletionData()
-    } catch (error) {
-      console.error("Failed to update professional info:", error)
     }
   }
 
@@ -194,12 +182,16 @@ const ProfileForm = ({ profileData, onUpdate, saving, onRefresh }) => {
 
       {completionData && <CompletionCard data={completionData} />}
 
-      <AccountFields kind="basic" control={control} errors={errors} editing={basicEditMode}
-        onEdit={() => setBasicEditMode(true)} onCancel={() => { setBasicEditMode(false); reset() }}
-        onSubmit={handleSubmit(onSubmitBasic)} saving={saving} canSave={isValid && isDirty} />
-      <AccountFields kind="professional" control={control} errors={errors} editing={professionalEditMode}
-        onEdit={() => setProfessionalEditMode(true)} onCancel={() => { setProfessionalEditMode(false); reset() }}
-        onSubmit={handleSubmit(onSubmitProfessional)} saving={saving} canSave={isValid && isDirty} />
+      <AccountFields kind="basic" control={control} dirtyFields={dirtyFields} errors={errors} editing={basicEditMode}
+        onEdit={() => { clearFailure("basic"); setBasicEditMode(true) }}
+        onCancel={() => { setBasicEditMode(false); reset() }}
+        onSubmit={handleSubmit(onSubmitBasic)} saving={saving} isValid={isValid}
+        phase={feedback?.section === "basic" ? feedback.phase : undefined} />
+      <AccountFields kind="professional" control={control} dirtyFields={dirtyFields} errors={errors} editing={professionalEditMode}
+        onEdit={() => { clearFailure("professional"); setProfessionalEditMode(true) }}
+        onCancel={() => { setProfessionalEditMode(false); reset() }}
+        onSubmit={handleSubmit(onSubmitProfessional)} saving={saving} isValid={isValid}
+        phase={feedback?.section === "professional" ? feedback.phase : undefined} />
 
       <ImageCropModal isOpen={isCropOpen} image={imageFile} onSave={handleImageUpload} onClose={onCropClose} />
       <ProfileModal isOpen={isDeleteOpen} onClose={onDeleteClose} title="حذف عکس پروفایل" footer={(

@@ -1,7 +1,9 @@
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, type ModalProps } from "@heroui/react"
-import type { ReactNode, Ref } from "react"
+import { Modal, ModalContent, ModalFooter, ModalHeader, type ModalProps } from "@heroui/react"
+import type { CSSProperties, Key, ReactNode, Ref } from "react"
 import { GlassButton } from "@/components/ui/GlassButton"
-import { useModalContentSize } from "./useModalContentSize"
+import { dialogResizeDuration } from "@/components/ui/motion/motionPresets"
+import { useMotionVariants } from "@/components/ui/motion/useMotionVariants"
+import { ProfileModalBody } from "./ProfileModalBody"
 import "./ProfileModal.css"
 
 type ProfileModalProps = Pick<ModalProps, "isOpen" | "onOpenChange" | "onClose" | "size"> & {
@@ -9,22 +11,24 @@ type ProfileModalProps = Pick<ModalProps, "isOpen" | "onOpenChange" | "onClose" 
   children: ReactNode
   footer?: ReactNode
   animateSize?: boolean
+  bodyKey?: Key
+  contentPending?: boolean
+  estimatedBodySize?: string
   headerNavigationRef?: Ref<HTMLDivElement>
 }
 
-function AnimatedBody({ children }: { children: ReactNode }) {
-  const { wrapperRef, contentRef } = useModalContentSize()
+const dialogTimingStyle = {
+  "--motion-duration-surface": `${dialogResizeDuration}s`,
+} as CSSProperties
+
+export function ProfileModal({
+  title, children, footer, animateSize = false, bodyKey, contentPending = false, estimatedBodySize, headerNavigationRef, ...props
+}: ProfileModalProps) {
+  const variants = useMotionVariants("dialog")
 
   return (
-    <div className="profile-modal__size" ref={wrapperRef}>
-      <div className="profile-modal__content" ref={contentRef}>{children}</div>
-    </div>
-  )
-}
-
-export function ProfileModal({ title, children, footer, animateSize, headerNavigationRef, ...props }: ProfileModalProps) {
-  return (
-    <Modal {...props} backdrop="blur" placement="center" scrollBehavior="inside" hideCloseButton
+    <Modal {...props} backdrop="opaque" placement="center" scrollBehavior="inside" hideCloseButton
+      motionProps={{ variants, initial: false }}
       classNames={{
         wrapper: "profile-modal__viewport",
         backdrop: "profile-modal__backdrop",
@@ -33,7 +37,8 @@ export function ProfileModal({ title, children, footer, animateSize, headerNavig
         body: "profile-modal__body",
         footer: "profile-modal__footer",
       }}>
-      <ModalContent dir="rtl" className={headerNavigationRef ? "profile-modal--with-navigation" : undefined}>
+      <ModalContent dir="rtl" data-motion-surface data-estimated-size={estimatedBodySize ? "true" : undefined}
+        style={dialogTimingStyle} className={`ui-surface-enter${headerNavigationRef ? " profile-modal--with-navigation" : ""}`}>
         {(onClose) => (
           <>
             <div className="profile-modal__header">
@@ -45,7 +50,9 @@ export function ProfileModal({ title, children, footer, animateSize, headerNavig
               </GlassButton>
               {headerNavigationRef && <div className="profile-modal__navigation" ref={headerNavigationRef} />}
             </div>
-            <ModalBody>{animateSize ? <AnimatedBody>{children}</AnimatedBody> : children}</ModalBody>
+            <ProfileModalBody resize={animateSize} pending={contentPending} contentKey={bodyKey} estimatedBodySize={estimatedBodySize}>
+              {children}
+            </ProfileModalBody>
             {footer && <ModalFooter>{footer}</ModalFooter>}
           </>
         )}

@@ -152,6 +152,7 @@
   inset-block: var(--ui-glass-tabs-inset);
   height: auto;
 }
+.ui-glass-tabs__list--animated::after { transition-timing-function: var(--motion-easing-settle); }
 .datasaz-step-tab.ui-glass-tabs__tab {
   border-radius: var(--border-radius-pill);
   flex: 0 0 auto;
