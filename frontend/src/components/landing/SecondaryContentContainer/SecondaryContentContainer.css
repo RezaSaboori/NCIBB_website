@@ -103,7 +103,8 @@
 .landing-container--flow :is(.secondary-content-wrapper, .secondary-content-container) {
   inline-size: 100%;
   min-block-size: 0;
-  border-radius: var(--mobile-radius-card);
+  border-radius: var(--border-radius-container-lg);
+  padding: var(--spacing-sm);
 }
 
 .landing-container--flow .secondary-content-wrapper {

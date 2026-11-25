@@ -160,14 +160,14 @@
   inline-size: 100%;
   gap: var(--spacing-md);
   padding: clamp(var(--mobile-card-padding), 5vw, var(--spacing-2xl));
-  border-radius: var(--mobile-radius-card);
+  border-radius: var(--border-radius-container-lg);
 }
 
 .landing-container--flow .services-header {
-  flex-direction: column;
-  align-items: stretch;
+  flex-wrap: wrap;
   gap: var(--spacing-sm);
   margin: 0;
+  padding: var(--spacing-xs);
 }
 
 .landing-container--flow .services-title {
@@ -180,13 +180,13 @@
 }
 
 .landing-container--flow .services-nav__menu {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  inline-size: 100%;
+  flex: 1;
 }
 
 .landing-container--flow .services-nav__item {
+  flex: 1;
   block-size: var(--mobile-touch-target);
+  min-inline-size: var(--mobile-touch-target);
   padding-inline: var(--spacing-xs);
 }
 

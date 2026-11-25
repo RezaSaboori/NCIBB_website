@@ -184,7 +184,7 @@
   --mobile-toolbar-height: var(--spacing-4xl);
   --mobile-dialog-inset: var(--spacing-sm);
   --mobile-radius-compact: var(--border-radius-item-xl);
-  --mobile-radius-card: var(--border-radius-container-xs);
+  --mobile-radius-card: var(--border-radius-container-sm);
   --mobile-radius-dialog: var(--border-radius-container-sm);
   --mobile-icon-face: 35px;
   --mobile-icon-compact: 18px;

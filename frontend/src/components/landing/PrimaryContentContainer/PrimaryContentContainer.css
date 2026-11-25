@@ -185,7 +185,8 @@
   inline-size: 100%;
   min-block-size: 0;
   max-block-size: none;
-  border-radius: var(--mobile-radius-card);
+  border-radius: var(--border-radius-container-lg);
+  padding: var(--spacing-sm);
 }
 
 .landing-container--flow .primary-content-wrapper {
@@ -209,10 +210,12 @@
 .landing-container--flow .primary-content-title {
   font-size: clamp(var(--font-size-xl), 7vw, var(--font-size-4xl));
   line-height: var(--line-height-tight);
+  text-align: center;
 }
 
 .landing-container--flow .justified-title {
   display: block;
+  text-align: inherit;
   white-space: normal;
 }
 
