@@ -14,7 +14,13 @@
 
 @media (max-width: 768px) {
   .s1-two-col-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--mobile-section-gap, 20px);
+  }
+
+  .s1-two-col-grid > .dz-glass-container {
+    padding: var(--mobile-card-padding, 16px);
+    border-radius: var(--mobile-radius-card, 24px);
   }
 }
 
@@ -152,8 +158,7 @@
 
 /* — Focus ring — */
 .s1-create-btn:focus-visible {
-  outline: var(--border-width-normal) solid
-    color-mix(in srgb, var(--color-cyan) 80%, transparent);
+  outline: var(--border-width-normal) solid var(--color-blue);
   outline-offset: var(--spacing-xs);
 }
 
@@ -250,47 +255,23 @@
 
 /* Compact sizing for the toggle when placed inside a card header */
 .s1-mode-toggle {
-  height: 2rem;
-  padding: 0 var(--spacing-xs);
+  block-size: var(--spacing-xl);
+  padding: var(--spacing-xs);
 }
 .s1-mode-toggle .data-finder-mode {
-  height: 1.55rem;
+  block-size: var(--spacing-lg);
   padding: 0 var(--spacing-sm);
   font-size: var(--font-size-xs);
 }
 
-/* ── Blue-glass active indicator ─────────────────────────────────── */
-/* Mirrors .data-finder-modes-container::after from pages/portal/styles.css.
-   .s1-mode-toggle already inherits position:relative + isolation:isolate
-   from .data-finder-modes-container (dataset/styles.css), so the z-index:-1
-   pill is trapped behind the buttons. Width/left/opacity are driven by the
-   useDataFinderModeIndicator hook via CSS custom properties. */
-.s1-mode-toggle::after {
-  content: "";
-  position: absolute;
-  top: 10%;
-  height: 80%;
-  left: 0;
-  width: var(--active-indicator-width, 0px);
-  transform: translateX(var(--active-indicator-left, 0px));
-  opacity: var(--active-indicator-opacity, 0);
-  transition:
-    transform var(--motion-duration-slow) var(--motion-easing-easeInOut),
-    width var(--motion-duration-slow) var(--motion-easing-easeInOut),
-    opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
-  display: block;
-  border-radius: var(--border-radius-pill);
-  background-color: color-mix(in srgb, var(--color-blue) 80%, transparent);
-  z-index: -1;
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, #01eeff 20%, transparent),
-    inset 2px 1px 0px -1px color-mix(in srgb, #01eeff 90%, transparent),
-    inset -1.5px -1px 0px -1px color-mix(in srgb, #01eeff 80%, transparent),
-    inset -2px -6px 1px -5px color-mix(in srgb, #01eeff 60%, transparent),
-    inset -1px 2px 3px -1px color-mix(in srgb, #001130 25%, transparent),
-    inset 0px -4px 1px -2px color-mix(in srgb, #000820 15%, transparent),
-    inset 0px 3px 6px 0px color-mix(in srgb, #000820 10%, transparent);
+@media (max-width: 768px) {
+  .s1-create-btn {
+    min-block-size: var(--mobile-primary-action, 48px);
+    padding: var(--spacing-sm) var(--spacing-md);
+    margin-block-start: var(--mobile-control-gap, 8px);
+    white-space: normal;
+  }
+
 }
-.dark .s1-mode-toggle::after {
-  background-color: color-mix(in srgb, var(--color-blue) 90%, transparent);
-}
+
+.s1-form-error { color: var(--color-gray12); font-size: var(--font-size-sm); }

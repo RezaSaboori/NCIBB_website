@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react"
+import React, { useLayoutEffect, useRef, useState } from "react"
 import "./ServicesSection.css"
 
 const servicesData = {
@@ -83,20 +83,26 @@ const servicesData = {
 
 const ServicesSection = ({ isVisible }) => {
   const [activeTab, setActiveTab] = useState("داده")
-  const [indicatorStyle, setIndicatorStyle] = useState({})
-  const tabsRef = useRef({})
+  const railRef = useRef(null)
 
-  const tabs = ["منابع", "پردازش", "داده"] // Reverse order for RTL slider
+  const tabs = ["داده", "پردازش", "منابع"]
 
-  useEffect(() => {
-    const activeElement = tabsRef.current[activeTab]
-    if (activeElement) {
-      setIndicatorStyle({
-        width: `${activeElement.offsetWidth}px`,
-        transform: `translateX(${activeElement.offsetLeft}px)`,
-        opacity: 1,
-      })
+  useLayoutEffect(() => {
+    const rail = railRef.current
+    const activeElement = rail?.querySelector('[aria-pressed="true"]')
+    if (!activeElement) return
+
+    const measureIndicator = () => {
+      rail.style.setProperty("--active-indicator-width", `${activeElement.offsetWidth}px`)
+      rail.style.setProperty("--active-indicator-left", `${activeElement.offsetLeft}px`)
+      rail.style.setProperty("--active-indicator-opacity", "1")
     }
+
+    measureIndicator()
+    const resize = new ResizeObserver(measureIndicator)
+    resize.observe(rail)
+    for (const button of rail.children) resize.observe(button)
+    return () => resize.disconnect()
   }, [activeTab])
 
   return (
@@ -108,22 +114,19 @@ const ServicesSection = ({ isVisible }) => {
           <h2 className="services-title">خدمات</h2>
 
           <div className="services-tabs-container">
-            <div className="services-nav glass-transparent">
-              <div className="services-nav__menu">
+            <div className="services-nav glass-navigation glass-transparent">
+              <div ref={railRef} className="services-nav__menu glass-navigation__indicator" role="group" aria-label="دسته‌بندی خدمات">
                 {tabs.map((tab) => (
-                  <div
+                  <button
                     key={tab}
-                    ref={(el) => (tabsRef.current[tab] = el)}
-                    className={`services-nav__item ${activeTab === tab ? "active" : ""}`}
+                    type="button"
+                    className="services-nav__item glass-navigation__item"
+                    aria-pressed={activeTab === tab}
                     onClick={() => setActiveTab(tab)}
                   >
                     {tab}
-                  </div>
+                  </button>
                 ))}
-                <div
-                  className="services-nav__indicator"
-                  style={indicatorStyle}
-                />
               </div>
             </div>
           </div>
@@ -136,7 +139,7 @@ const ServicesSection = ({ isVisible }) => {
               className={`service-card glass ${isVisible ? "reveal" : ""}`}
               style={{
                 animationDelay: `${index * 150}ms`,
-                gridColumn: `span ${card.span || 1}`,
+                "--service-card-span": card.span || 1,
               }}
             >
               <h3 className="service-card-title">{card.title}</h3>

@@ -74,8 +74,13 @@ export function computeBoundingBox(positions, vertexCount) {
   };
 }
 
-export function resize(canvas) {
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = Math.round(canvas.clientWidth * dpr);
-  canvas.height = Math.round(canvas.clientHeight * dpr);
+export function resize(canvas, maxPixelRatio = Infinity) {
+  const dpr = Math.min(window.devicePixelRatio || 1, maxPixelRatio);
+  const width = Math.round(canvas.clientWidth * dpr);
+  const height = Math.round(canvas.clientHeight * dpr);
+
+  if (canvas.width !== width || canvas.height !== height) {
+    canvas.width = width;
+    canvas.height = height;
+  }
 }

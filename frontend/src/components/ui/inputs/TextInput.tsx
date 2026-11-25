@@ -9,6 +9,7 @@ interface TextInputProps {
   icon?: React.ReactNode;
   dir?: "rtl" | "ltr";
   id?: string;
+  ariaLabel?: string;
   multiline?: boolean;
 }
 
@@ -20,6 +21,7 @@ export const TextInput: React.FC<TextInputProps> = ({
   icon,
   dir,
   id,
+  ariaLabel,
   multiline = false,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -41,6 +43,7 @@ export const TextInput: React.FC<TextInputProps> = ({
         <textarea
           ref={textareaRef}
           id={id}
+          aria-label={ariaLabel}
           className="ui-input-field ui-input-field--textarea"
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -51,6 +54,7 @@ export const TextInput: React.FC<TextInputProps> = ({
       ) : (
         <input
           id={id}
+          aria-label={ariaLabel}
           className="ui-input-field"
           type="text"
           value={value}

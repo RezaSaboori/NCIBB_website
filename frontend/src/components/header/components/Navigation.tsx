@@ -1,34 +1,29 @@
-import { Link, useLocation } from "react-router-dom"
-import { NavigationProps } from "../types"
+import { useRef } from "react"
+import { useLocation } from "react-router-dom"
+import { useActiveIndicator } from "../hooks/useActiveIndicator"
+import type { NavigationProps } from "../types"
+import { MobileNavigation } from "./MobileNavigation"
+import { NavigationLinks } from "./NavigationLinks"
 
-export const Navigation = ({ items, className }: NavigationProps) => {
-  const location = useLocation()
+export const Navigation = ({ items, className, onItemChange, onProfileSignIn }: NavigationProps) => {
+  const { pathname, key } = useLocation()
+  const menu = useRef<HTMLDivElement>(null)
+  useActiveIndicator(menu, pathname)
 
   return (
-    <fieldset className="header-nav header-nav--main glass-transparent">
-      <legend className="header-nav__legend">Main navigation</legend>
-      <div className={`header-nav__menu ${className || ""}`}>
-        {items.map((item) => (
-          <Link
-            key={item.value}
-            to={`/${item.value === "home" ? "" : item.value}`}
-            className="header-nav__item"
-          >
-            <input
-              className="header-nav__input"
-              type="radio"
-              name="nav-item"
-              value={item.value}
-              checked={
-                location.pathname ===
-                `/${item.value === "home" ? "" : item.value}`
-              }
-              readOnly
-            />
-            {item.label}
-          </Link>
-        ))}
-      </div>
-    </fieldset>
+    <>
+      <nav aria-label="پیمایش اصلی" className="header-nav header-nav--main glass-navigation glass-transparent">
+        <div ref={menu} className={`header-nav__menu glass-navigation__indicator ${className || ""}`}>
+          <NavigationLinks items={items} pathname={pathname} onSelect={onItemChange} />
+        </div>
+      </nav>
+      <MobileNavigation
+        items={items}
+        pathname={pathname}
+        locationKey={key}
+        onProfileSignIn={onProfileSignIn}
+        onSelect={onItemChange}
+      />
+    </>
   )
 }

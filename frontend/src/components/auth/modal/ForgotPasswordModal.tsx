@@ -30,7 +30,7 @@ export const ForgotPasswordModal = ({
             <ModalHeader>Forgot Password</ModalHeader>
             <ModalBody>
               <p>
-                Enter your email address and we'll send you a link to reset your
+                Enter your email address and we&apos;ll send you a link to reset your
                 password.
               </p>
               <Input
@@ -39,6 +39,8 @@ export const ForgotPasswordModal = ({
                 label="Email"
                 placeholder="Enter your email"
                 type="email"
+                autoComplete="email"
+                inputMode="email"
                 classNames={{
                   inputWrapper:
                     "rounded-full bg-gray2 data-[hover=true]:bg-gray2 data-[focus=true]:bg-gray2 data-[disabled=true]:bg-gray2 data-[has-value=false]:bg-gray2 data-[filled=false]:bg-gray2",

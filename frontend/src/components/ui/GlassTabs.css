@@ -1,93 +1,15 @@
 /* ── Step Tab Bar ──────────────────────────────────────────────── */
 
 .datasaz-step-tabs {
-  position: relative;
-  z-index: 1; /* Establish stacking context so ::before z-index:-1 is trapped */
-  isolation: isolate !important; /* Hard isolation to prevent ancestor interference */
   display: flex;
   align-items: center;
   width: fit-content;
-  height: 2.5rem;
+  block-size: var(--spacing-2xl);
   box-sizing: border-box;
-  padding: 0 4px;
+  padding-inline: var(--spacing-xs);
   border-radius: var(--border-radius-pill);
   gap: var(--spacing-xs);
   font-family: var(--font-family-persian);
-}
-
-/* Glass background — reuses glass-transparent pattern from glass.css */
-.datasaz-step-tabs::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background-image: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.5),
-    rgba(0, 0, 0, 0.05) 60%
-  );
-  backdrop-filter: var(--glass-backdrop-filter);
-  -webkit-backdrop-filter: var(--glass-backdrop-filter);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, #fff 10%, transparent),
-    inset 1.8px 3px 0px -2px color-mix(in srgb, #fff 90%, transparent),
-    inset -2px -2px 0px -2px color-mix(in srgb, #fff 80%, transparent),
-    inset -3px -8px 1px -6px color-mix(in srgb, #fff 60%, transparent),
-    inset -0.3px -1px 4px 0px color-mix(in srgb, #000 12%, transparent),
-    inset -1.5px 2.5px 0px -2px color-mix(in srgb, #000 20%, transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 20%, transparent),
-    inset 2px -6.5px 1px -4px color-mix(in srgb, #000 10%, transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000 10%, transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000 8%, transparent);
-}
-
-.dark .datasaz-step-tabs::before {
-  background-image: linear-gradient(
-    135deg,
-    rgba(104, 104, 104, 0.3),
-    rgba(0, 0, 0, 0.3) 30%
-  );
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--color-gray8) 4%, transparent),
-    inset 1.8px 3px 0px -2px color-mix(in srgb, var(--color-gray8) 12%, transparent),
-    inset -2px -2px 0px -2px color-mix(in srgb, var(--color-gray8) 10%, transparent),
-    inset -3px -8px 1px -6px color-mix(in srgb, var(--color-gray8) 8%, transparent),
-    inset -0.3px -1px 4px 0px color-mix(in srgb, #000 25%, transparent),
-    inset -1.5px 2.5px 0px -2px color-mix(in srgb, #000 30%, transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 30%, transparent),
-    inset 2px -6.5px 1px -4px color-mix(in srgb, #000 25%, transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000 15%, transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000 12%, transparent);
-}
-
-/* Animated blue-glass active indicator — mirrors data-finder-modes-container::after */
-.datasaz-step-tabs::after {
-  content: "";
-  position: absolute;
-  top: 10%;
-  height: 80%;
-  left: 0;
-  width: var(--indicator-width, 0px);
-  transform: translateX(var(--indicator-left, 0px));
-  transition:
-    transform var(--motion-duration-slow) var(--motion-easing-easeInOut),
-    width var(--motion-duration-slow) var(--motion-easing-easeInOut);
-  border-radius: var(--border-radius-pill);
-  background-color: color-mix(in srgb, var(--color-blue) 80%, transparent);
-  z-index: -1;
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, #01eeff 20%, transparent),
-    inset 2px 1px 0px -1px color-mix(in srgb, #01eeff 90%, transparent),
-    inset -1.5px -1px 0px -1px color-mix(in srgb, #01eeff 80%, transparent),
-    inset -2px -6px 1px -5px color-mix(in srgb, #01eeff 60%, transparent),
-    inset -1px 2px 3px -1px color-mix(in srgb, #001130 25%, transparent),
-    inset 0px -4px 1px -2px color-mix(in srgb, #000820 15%, transparent),
-    inset 0px 3px 6px 0px color-mix(in srgb, #000820 10%, transparent);
-}
-
-.dark .datasaz-step-tabs::after {
-  background-color: color-mix(in srgb, var(--color-blue) 90%, transparent);
 }
 
 /* ── Individual Tab Buttons ────────────────────────────────────── */
@@ -96,8 +18,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1px var(--spacing-md) 0px var(--spacing-md);
-  height: 1.9rem;
+  padding-inline: var(--spacing-md);
+  block-size: var(--spacing-xl);
   box-sizing: border-box;
   border-radius: var(--border-radius-pill);
   color: var(--color-gray10);
@@ -110,24 +32,12 @@
   cursor: pointer;
 }
 
-.datasaz-step-tab.active {
-  color: var(--color-gray1);
-}
-
-.datasaz-step-tab:not(.active):hover {
+.datasaz-step-tab:not([aria-current], [aria-selected="true"]):hover {
   color: var(--color-blue);
 }
 
 .dark .datasaz-step-tab {
   color: var(--color-gray12);
-}
-
-.dark .datasaz-step-tab.active {
-  color: var(--color-gray1);
-}
-
-.dark .datasaz-step-tab:not(.active):hover {
-  color: var(--color-blue);
 }
 
 /* The shared indicator follows the selected tab inside the rail. */
@@ -136,21 +46,16 @@
   flex: none;
   max-inline-size: 100%;
   overflow-x: auto;
-  padding: var(--spacing-xs);
-  margin: calc(-1 * var(--spacing-xs));
+  inline-size: fit-content;
+  border-radius: var(--border-radius-pill);
 }
-.ui-glass-tabs::-webkit-scrollbar { height: 6px; }
+.ui-glass-tabs::-webkit-scrollbar { height: var(--spacing-xs); }
 .ui-glass-tabs::-webkit-scrollbar-thumb { border: 0; }
 .ui-glass-tabs__placeholder { display: none; }
 .datasaz-step-tabs.ui-glass-tabs__list {
-  --ui-glass-tabs-inset: var(--spacing-xs);
   background: transparent;
   block-size: auto;
-  padding: var(--ui-glass-tabs-inset);
-}
-.ui-glass-tabs__list::after {
-  inset-block: var(--ui-glass-tabs-inset);
-  height: auto;
+  padding: var(--spacing-xs);
 }
 .ui-glass-tabs__list--animated::after { transition-timing-function: var(--motion-easing-settle); }
 .datasaz-step-tab.ui-glass-tabs__tab {
@@ -160,15 +65,21 @@
   width: auto;
 }
 .ui-glass-tabs__label { color: inherit; white-space: nowrap; }
-.ui-glass-tabs__tab[data-selected="true"] .ui-glass-tabs__label { color: var(--color-gray1); }
-.dark .ui-glass-tabs__tab[data-selected="true"] .ui-glass-tabs__label { color: var(--color-gray12); }
 .ui-glass-tabs__list .ui-glass-tabs__cursor { display: none; }
 .ui-glass-tabs__panel { padding: var(--spacing-md) 0 0; width: 100%; }
 
-@media (max-width: 620px) {
-  .datasaz-step-tab.ui-glass-tabs__tab { padding-inline: var(--spacing-sm); }
+@media (max-width: 960px) {
+  .glass-navigation .datasaz-step-tabs {
+    block-size: 100%;
+    padding: var(--spacing-xs);
+  }
+
+  .ui-glass-tabs__tab:focus-visible {
+    outline: var(--border-width-normal) solid var(--color-blue);
+    outline-offset: calc(-1 * var(--border-width-normal));
+  }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .datasaz-step-tabs::after { transition: none; }
+@media (max-width: 620px) {
+  .datasaz-step-tab.ui-glass-tabs__tab { padding-inline: var(--spacing-sm); }
 }

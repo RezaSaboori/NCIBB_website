@@ -83,7 +83,7 @@ export function createAmbientParticleRenderer(gl, config, headerSize, headerCent
     }
   }
 
-  function render(modelMatrix, viewMatrix, projectionMatrix, pointSize, mousePos, opacity = 1.0) {
+  function render(modelMatrix, viewMatrix, projectionMatrix, pointSizeScale, mousePos, opacity = 1.0) {
     if (!program) return;
     
     // Set the correct GL state for glowing, transparent particles using Pre-multiplied Alpha
@@ -132,7 +132,7 @@ export function createAmbientParticleRenderer(gl, config, headerSize, headerCent
       gl.uniformMatrix4fv(uniforms.uModel, false, modelMatrix);
       gl.uniformMatrix4fv(uniforms.uView, false, viewMatrix);
       gl.uniformMatrix4fv(uniforms.uProjection, false, projectionMatrix);
-      gl.uniform1f(uniforms.uPointSize, configRef.ambientType1Size || 2.0);
+      gl.uniform1f(uniforms.uPointSize, (configRef.ambientType1Size || 2.0) * pointSizeScale);
       gl.uniform1f(uniforms.uAmbientOpacity, opacity);
       
       // Set mouse repel uniforms if enabled for this particle type
@@ -161,7 +161,7 @@ export function createAmbientParticleRenderer(gl, config, headerSize, headerCent
       gl.uniformMatrix4fv(uniforms.uModel, false, modelMatrix);
       gl.uniformMatrix4fv(uniforms.uView, false, viewMatrix);
       gl.uniformMatrix4fv(uniforms.uProjection, false, projectionMatrix);
-      gl.uniform1f(uniforms.uPointSize, configRef.ambientType2Size || 1.5);
+      gl.uniform1f(uniforms.uPointSize, (configRef.ambientType2Size || 1.5) * pointSizeScale);
       gl.uniform1f(uniforms.uAmbientOpacity, opacity);
       
       // Set mouse repel uniforms if enabled for this particle type

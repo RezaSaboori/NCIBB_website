@@ -13,6 +13,7 @@ import { CreditLedger } from "../wallet/CreditLedger"
 const auditLabels: Record<string, string> = {
   roles_changed: "تغییر نقش‌ها", account_status_changed: "تغییر وضعیت حساب",
   conversation_reviewed: "مشاهده گفتگو توسط مدیر", email_verified: "تأیید ایمیل",
+  support_ticket_updated: "به‌روزرسانی تیکت پشتیبانی",
   admin_bootstrapped: "فعال‌سازی دسترسی مدیر", group_membership_changed: "تغییر عضویت گروه",
   group_spending_changed: "تغییر دسترسی به کیف پول گروه", mentor_assigned: "تعیین استاد",
   mentor_removed: "حذف ارتباط با استاد",
@@ -58,7 +59,7 @@ function ReviewThread({ id, thread, close }: { id: number; thread: Thread; close
     <div className="account-workspace__stack">
       <div className="account-workspace__toolbar"><h3>{thread.subject}</h3><GlassButton size="sm" variant="flat" onPress={close}>فهرست گفتگوها</GlassButton></div>
       <AccountStatus loading={query.loading && !query.data} error={query.error} retry={query.refresh} holdsReveal />
-      {query.data && <MessageHistory messages={query.data.results} userId={id} />}
+      {query.data && <MessageHistory messages={query.data.results} userId={id} showSender />}
       <PageControls data={query.data} page={query.page} onPage={query.setPage} />
     </div>
   )

@@ -21,6 +21,7 @@ import MessagesTab from "./messages/MessagesTab"
 import { AccountStatus } from "./shared/AccountStatus"
 import SessionExpiredBanner from "./shared/SessionExpiredBanner"
 import { useAccountQuery } from "./shared/useAccountQuery"
+import { useProfileVisualViewport } from "./shared/useProfileVisualViewport"
 import { profileNavigation } from "./sidebar/navItems"
 import ProfileSidebar from "./sidebar/ProfileSidebar"
 import { WalletTab } from "./wallet/WalletTab"
@@ -42,6 +43,7 @@ export default function ProfileManager() {
   const navigation = useMemo(() => profile ? profileNavigation(profile) : null, [profile])
   const canOpen = navigation && [...navigation.primary, ...navigation.bottom].some((item) => item.id === activeTab)
   useProfileWallet(isAuthenticated && (activeTab === "dashboard" || activeTab === "wallet"))
+  useProfileVisualViewport(isAuthenticated)
 
   const logout = useCallback(async () => {
     await authService.logout()

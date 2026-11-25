@@ -5,6 +5,7 @@ interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  ariaLabel?: string;
   className?: string;
   icon: React.ReactNode;
   multiline?: boolean;
@@ -14,6 +15,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   value,
   onChange,
   placeholder = "Search...",
+  ariaLabel,
   className = "",
   icon,
   multiline = false,
@@ -38,6 +40,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
+          aria-label={ariaLabel}
           autoComplete="off"
           spellCheck={false}
           rows={1}
@@ -46,9 +49,11 @@ export const SearchInput: React.FC<SearchInputProps> = ({
         <input
           className="ui-input-field"
           type="text"
+          inputMode="search"
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
+          aria-label={ariaLabel}
           autoComplete="off"
           spellCheck={false}
         />

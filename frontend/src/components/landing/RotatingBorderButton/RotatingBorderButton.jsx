@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import './RotatingBorderButton.css';
 
 const RotatingBorderButton = ({ 
@@ -6,13 +7,16 @@ const RotatingBorderButton = ({
   className = '', 
   style = {},
   variant = 'secondary', // 'secondary' or 'primary'
-  onClick,
+  to,
+  animated,
   ...props 
 }) => {
   const buttonRef = useRef(null);
   const borderMaskRef = useRef(null);
 
   useEffect(() => {
+    if (!animated) return;
+
     const handleMouseMove = (e) => {
       if (!buttonRef.current || !borderMaskRef.current) return;
       
@@ -51,15 +55,9 @@ const RotatingBorderButton = ({
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
     };
-  }, []);
+  }, [animated]);
 
   const baseStyle = {
-    position: 'relative',
-    padding: '1rem 3rem',
-    borderRadius: '9999px',
-    overflow: 'hidden',
-    cursor: 'pointer',
-    border: 'none',
     ...style
   };
 
@@ -76,16 +74,16 @@ const RotatingBorderButton = ({
   };
 
   return (
-    <button
+    <Link
       ref={buttonRef}
       className={`rotating-border-btn ${variant === 'secondary' ? 'glass-btn-secondary' : 'aurora-group'} ${className}`}
       style={{ ...baseStyle, ...variantStyles[variant] }}
-      onClick={onClick}
+      to={to}
       {...props}
     >
       <div ref={borderMaskRef} className="gradient-border-mask"></div>
       {children}
-    </button>
+    </Link>
   );
 };
 

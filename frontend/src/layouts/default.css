@@ -17,7 +17,7 @@
 
 .ncibb-main {
   min-width: 0;
-  padding-block-start: 4rem;
+  padding-block-start: calc(var(--site-header-height, 3.5rem) + var(--spacing-sm));
   padding-inline-start: var(--layout-sidebar-offset);
 }
 
@@ -31,27 +31,31 @@
   padding-inline-start: calc(var(--layout-sidebar-offset) + 1.5rem);
 }
 
-@media (max-width: 960px) {
-  .ncibb-layout--with-sidebar {
-    --layout-sidebar-offset: 0px;
-    padding-block-start: 3.5rem;
-  }
-
-  .ncibb-layout--with-sidebar .ncibb-main {
-    padding-block-start: 0;
+@media (max-width: 960px), (max-height: 600px), (pointer: coarse) {
+  .ncibb-layout__footer--home {
+    padding-left: max(var(--mobile-page-gutter), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--mobile-page-gutter), env(safe-area-inset-right, 0px));
+    padding-block-end: max(var(--spacing-lg), env(safe-area-inset-bottom, 0px));
   }
 }
 
-@media (max-width: 620px) {
-  .ncibb-main:not(.ncibb-main--home) {
-    padding-block-start: 6rem;
-  }
+:root:has(.ncibb-layout) {
+  --layout-scroll-padding: calc(var(--site-header-height, 3.5rem) + var(--spacing-sm));
+  scroll-padding-block-start: var(--layout-scroll-padding);
+}
 
+@media (max-width: 960px) {
   .ncibb-layout--with-sidebar {
-    padding-block-start: 5.75rem;
+    --layout-sidebar-offset: 0px;
+    padding-block-end: var(--profile-island-clearance);
   }
 
-  .ncibb-layout--with-sidebar .ncibb-main {
-    padding-block-start: 0;
+  :root:has(.ncibb-layout--with-sidebar) {
+    --profile-island-height: var(--spacing-5xl);
+    --profile-island-bottom: max(var(--spacing-md), calc(env(safe-area-inset-bottom, 0px) + var(--spacing-xs)));
+    --profile-island-clearance: calc(var(--profile-island-height) + var(--profile-island-bottom) + var(--spacing-sm));
+    scroll-padding-block-end: var(--profile-island-clearance);
   }
+
+  :root[data-profile-keyboard] { --profile-island-clearance: 0px; }
 }

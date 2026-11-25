@@ -1,0 +1,35 @@
+.auth-form__error { color: var(--mobile-error-color); }
+
+:is(.auth-form, .modal-container) [data-slot="input-wrapper"] {
+  border: var(--ui-stroke);
+  outline: none;
+}
+
+:is(.auth-form, .modal-container) [data-slot="input-wrapper"]:focus-within {
+  border-color: var(--color-blue);
+}
+
+@media (max-width: 768px) {
+  .auth-form__names { flex-direction: column; }
+
+  :is(.auth-form, .modal-container) input {
+    font-size: var(--mobile-type-body);
+    line-height: var(--mobile-line-body);
+  }
+
+  :is(.auth-form, .modal-container) :is([data-slot="input-wrapper"], button) {
+    min-block-size: var(--mobile-touch-target);
+  }
+
+  .auth-form a {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: var(--mobile-touch-target);
+    color: var(--color-blue);
+  }
+
+  :is(.auth-form, .modal-container) :is(a, button):focus-visible {
+    outline: var(--border-width-normal) solid var(--color-blue);
+    outline-offset: var(--border-width-normal);
+  }
+}

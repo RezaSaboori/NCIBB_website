@@ -65,7 +65,6 @@
 .primary-content-container {
   display: flex;
   flex-direction: column;
-  align-items: space-between;
   justify-content: space-between;
   padding: 3rem;
   width: 100%;
@@ -82,20 +81,12 @@
 }
 
 .primary-content-title {
-  font-size: 4rem;
+  font-size: clamp(var(--font-size-2xl), 4.25vw, 4rem);
   font-family: "IRANSansXV", "IRANSansX", sans-serif;
   font-weight: 1000;
   display: flex;
   flex-direction: column;
   width: 100%;
-}
-
-.title-first-line {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 0.5rem;
 }
 
 .title-logos {
@@ -121,15 +112,15 @@
   padding: 0.5rem 1rem;
 }
 
-.primary-content-title h1 {
-  margin: 0;
-}
-
 .justified-title {
   display: flex;
   justify-content: space-between;
   width: 100%;
   white-space: nowrap;
+}
+
+.justified-title + .justified-title {
+  margin-block-start: var(--spacing-sm);
 }
 
 .primary-content-subtitle-container {
@@ -154,21 +145,23 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
   width: 100%;
 }
 
 .primary-content-buttons-group {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   align-items: center;
 }
 
-.button-content {
+.button-text-secondary,
+.button-text-primary {
   position: relative;
   z-index: 20;
-  display: flex;
-  align-items: center;
-  padding-bottom: 0.3rem;
+  font-family: var(--font-family-persian);
 }
 
 .button-text-secondary {
@@ -177,7 +170,6 @@
   color: var(--btn-secondary-text);
   transition: color 0.3s;
   letter-spacing: 0.05em;
-  font-family: var(--font-family-system);
 }
 
 .button-text-primary {
@@ -186,6 +178,81 @@
   color: var(--btn-primary-text);
   letter-spacing: 0.05em;
   text-shadow: 0 2px 10px var(--shadow-color);
-  font-family: var(--font-family-system);
   transition: color var(--transition-speed) ease;
+}
+
+.landing-container--flow :is(.primary-content-wrapper, .primary-content-container) {
+  inline-size: 100%;
+  min-block-size: 0;
+  max-block-size: none;
+  border-radius: var(--mobile-radius-card);
+}
+
+.landing-container--flow .primary-content-wrapper {
+  flex: none;
+  contain: none;
+  transition-property: background-image;
+  will-change: auto;
+}
+
+.landing-container--flow .primary-content-container {
+  gap: var(--spacing-md);
+  padding: clamp(var(--mobile-card-padding), 5vw, var(--spacing-2xl));
+}
+
+/* Framer Motion can retain inline entrance styles when the viewport changes. */
+.landing-container--flow :is(.primary-content-container, .primary-content-title, .primary-content-description, .primary-content-buttons) {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.landing-container--flow .primary-content-title {
+  font-size: clamp(var(--font-size-xl), 7vw, var(--font-size-4xl));
+  line-height: var(--line-height-tight);
+}
+
+.landing-container--flow .justified-title {
+  display: block;
+  white-space: normal;
+}
+
+.landing-container--flow .primary-content-subtitle-container {
+  gap: var(--spacing-md);
+  margin-block-start: 0;
+}
+
+.landing-container--flow .primary-content-description {
+  font-size: var(--mobile-type-body);
+  line-height: var(--mobile-line-body);
+}
+
+.landing-container--flow .primary-content-buttons {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
+}
+
+.landing-container--flow .primary-content-buttons-group {
+  flex-wrap: wrap;
+  gap: var(--mobile-control-gap);
+}
+
+.landing-container--flow .title-logos {
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+}
+
+.landing-container--flow .rotating-border-btn {
+  flex: 1 1 auto;
+  min-block-size: var(--mobile-primary-action);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.landing-container--flow .title-logo {
+  block-size: var(--spacing-xl);
+}
+
+.landing-container--flow .aurora-blob {
+  animation-play-state: paused !important;
 }

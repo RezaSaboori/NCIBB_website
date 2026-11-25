@@ -6,6 +6,9 @@
      <div class="glass">              — opaque neutral surface (cards, panels)
      <div class="glass-transparent"> — truly transparent blur (header nav)
      <div class="blue-glass">        — colored opaque variant
+     .blue-glass-transparent         — translucent blue pill on a glass rail
+     .glass-navigation               — compact transparent navigation frame
+     .glass-navigation__indicator    — rail with a measured blue selection
      ... etc.
 
    Theme switching:
@@ -29,7 +32,7 @@
 }
 
 .glass::before,
-.blue-glass::before,
+.blue-glass:not(:where(.glass-navigation__item))::before,
 .green-glass::before,
 .red-glass::before,
 .orange-glass::before,
@@ -136,12 +139,18 @@
     z-index: 1;
 }
 
-.glass-transparent::before {
+.glass-transparent:not(:where(.glass-transparent--scroll))::before {
     content: "";
     position: absolute;
     inset: 0;
     z-index: -1;
     border-radius: inherit;
+    pointer-events: none;
+}
+
+/* Scroll containers paint the same material on their border box. */
+.glass-transparent:not(:where(.glass-transparent--scroll))::before,
+.glass-transparent--scroll {
     background-image: linear-gradient(
         135deg,
         rgba(255, 255, 255, 0.4),
@@ -164,7 +173,8 @@
         0px 6px 16px 0px color-mix(in srgb, #000 8%, transparent);
 }
 
-.dark .glass-transparent::before {
+.dark .glass-transparent:not(:where(.glass-transparent--scroll))::before,
+.dark .glass-transparent--scroll {
     background-image: linear-gradient(
         135deg,
         rgba(104, 104, 104, 0.3),
@@ -183,21 +193,117 @@
         0px 6px 16px 0px color-mix(in srgb, #000 12%, transparent);
 }
 
+@media (max-width: 768px) and (prefers-reduced-transparency: reduce) {
+    :root .glass-transparent:not(:where(.glass-transparent--scroll))::before,
+    :root .glass-transparent--scroll {
+        background-color: var(--color-gray1);
+        background-image: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    @media (max-width: 768px) {
+        :root .glass-transparent:not(:where(.glass-transparent--scroll))::before,
+        :root .glass-transparent--scroll {
+            background-color: var(--color-gray1);
+            background-image: none;
+        }
+    }
+}
+
+.glass-navigation__indicator {
+    position: relative;
+    isolation: isolate;
+}
+
+.glass-navigation__indicator::after {
+    content: "";
+    position: absolute;
+    inset-block: var(--spacing-xs);
+    left: 0;
+    width: var(--active-indicator-width, 0px);
+    transform: translateX(var(--active-indicator-left, 0px));
+    opacity: var(--active-indicator-opacity, 0);
+    border-radius: var(--border-radius-pill);
+    z-index: -1;
+    pointer-events: none;
+    transition:
+        transform var(--motion-duration-slow) var(--motion-easing-easeInOut),
+        width var(--motion-duration-slow) var(--motion-easing-easeInOut),
+        opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
+}
+
+/* Blue glass uses the same foreground across selected navigation controls. */
+:root .glass-navigation__item:is([aria-current], [aria-selected="true"], [aria-pressed="true"]) {
+    color: var(--color-gray12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .glass-navigation__indicator::after { transition-property: opacity; }
+}
+
+@media (max-width: 960px) {
+    :root .glass-navigation {
+        box-sizing: border-box;
+        block-size: calc(var(--mobile-touch-target) + 2 * var(--spacing-xs));
+        min-block-size: calc(var(--mobile-touch-target) + 2 * var(--spacing-xs));
+        border-radius: var(--border-radius-pill);
+    }
+
+    .glass-navigation.glass-transparent--scroll {
+        scrollbar-width: none;
+    }
+
+    .glass-navigation.glass-transparent--scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    :root .glass-navigation .glass-navigation__item {
+        box-sizing: border-box;
+        block-size: var(--mobile-touch-target);
+        min-inline-size: var(--mobile-touch-target);
+        padding-block: 0;
+    }
+}
+
 /* ==========================================================================
    COLORED LIQUID GLASS VARIANTS
    Opaque colored surfaces
    variables (incl. --color-gray12) shift in .dark {}.
    ========================================================================== */
 
-.blue-glass {
+.blue-glass,
+.blue-glass-transparent {
     position: relative;
+}
+
+/* Keep the rim and shadow at full strength while the blue fill shows the rail underneath. */
+.blue-glass-transparent,
+.glass-navigation__item.blue-glass,
+.glass-navigation__indicator::after {
+    --blue-glass-transparency: calc(var(--glass-opacity-light) * 100%);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .blue-glass-transparent,
+    .glass-navigation__item.blue-glass,
+    .glass-navigation__indicator::after {
+        --blue-glass-transparency: 0%;
+    }
+}
+
+.blue-glass,
+.blue-glass-transparent,
+.glass-navigation__indicator::after {
     background-image:
         radial-gradient(circle at 30% 18%,
             color-mix(in srgb, var(--color-cyan) 40%, transparent) 0%, transparent 42%),
         linear-gradient(135deg,
-            color-mix(in srgb, var(--color-cyan) 72%, var(--color-blue)) 0%,
-            color-mix(in srgb, var(--color-blue) 88%, var(--color-indigo)) 58%,
-            color-mix(in srgb, var(--color-blue) 70%, var(--color-gray12)) 100%);
+            color-mix(in srgb, color-mix(in srgb, var(--color-cyan) 72%, var(--color-blue)), transparent var(--blue-glass-transparency, 0%)) 0%,
+            color-mix(in srgb, color-mix(in srgb, var(--color-blue) 88%, var(--color-indigo)), transparent var(--blue-glass-transparency, 0%)) 58%,
+            color-mix(in srgb, color-mix(in srgb, var(--color-blue) 70%, var(--color-gray12)), transparent var(--blue-glass-transparency, 0%)) 100%);
     box-shadow:
         inset 0 0 0 1px color-mix(in srgb, var(--color-cyan) 20%, transparent),
         inset 2px 1px 0px -1px color-mix(in srgb, var(--color-cyan) 90%, transparent),
@@ -378,15 +484,16 @@
         0px 8px 20px 0px color-mix(in srgb, var(--color-brown) 24%, transparent);
 }
 
-.dark .blue-glass {
-    position: relative;
+.dark .blue-glass,
+.dark .blue-glass-transparent,
+.dark .glass-navigation__indicator::after {
     background-image:
         radial-gradient(circle at 30% 18%,
             color-mix(in srgb, var(--fill-color-cyan) 40%, transparent) 0%, transparent 42%),
         linear-gradient(135deg,
-            color-mix(in srgb, var(--fill-color-cyan) 72%, var(--fill-color-blue)) 0%,
-            color-mix(in srgb, var(--fill-color-blue) 88%, var(--fill-color-indigo)) 58%,
-            color-mix(in srgb, var(--fill-color-blue) 70%, var(--color-gray12)) 100%);
+            color-mix(in srgb, color-mix(in srgb, var(--fill-color-cyan) 72%, var(--fill-color-blue)), transparent var(--blue-glass-transparency, 0%)) 0%,
+            color-mix(in srgb, color-mix(in srgb, var(--fill-color-blue) 88%, var(--fill-color-indigo)), transparent var(--blue-glass-transparency, 0%)) 58%,
+            color-mix(in srgb, color-mix(in srgb, var(--fill-color-blue) 70%, var(--color-gray12)), transparent var(--blue-glass-transparency, 0%)) 100%);
     box-shadow:
         inset 0 0 0 1px color-mix(in srgb, var(--fill-color-cyan) 20%, transparent),
         inset 2px 1px 0px -1px color-mix(in srgb, var(--fill-color-cyan) 90%, transparent),

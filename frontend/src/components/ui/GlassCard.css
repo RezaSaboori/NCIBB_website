@@ -112,3 +112,16 @@
 }
 
 .ui-glass-card > :is(header, footer):empty { display: none; }
+
+@media (max-width: 768px) {
+  .dz-glass-container:is(.dz-glass-container--sm, .dz-glass-container--md, .dz-glass-container--lg) {
+    padding: var(--mobile-card-padding);
+    border-radius: var(--mobile-radius-card);
+  }
+
+  .dz-glass-container:is(.dz-glass-container--md, .dz-glass-container--lg) {
+    gap: var(--mobile-section-gap);
+  }
+
+  .dz-glass-container--xs { border-radius: var(--mobile-radius-compact); }
+}

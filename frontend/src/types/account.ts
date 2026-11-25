@@ -101,6 +101,21 @@ export interface AuditEvent {
 }
 
 export type ThreadRoute = "support_queue" | "admin_queue" | "support_direct" | "admin_direct" | "mentor" | "legacy"
+export type TicketStatus = "open" | "waiting" | "resolved"
+export type TicketOwnerFilter = "mine" | "unassigned"
+
+export interface TicketAssignee {
+  id: number
+  name: string
+}
+
+export interface Ticket {
+  status: TicketStatus
+  assignee?: TicketAssignee | null
+}
+
+export type TicketUpdate = { status: TicketStatus } |
+  { assignee_id: number | null; expected_assignee_id: number | null }
 
 export interface Thread {
   id: number
@@ -108,9 +123,18 @@ export interface Thread {
   subject: string
   counterpart: string
   preview: string
+  preview_sender: number | null
+  preview_created_at: string | null
   can_reply: boolean
   unread_count: number
   updated_at: string
+  ticket: Ticket | null
+}
+
+export interface MessageQuote {
+  id: number
+  sender_name: string
+  excerpt: string
 }
 
 export interface ThreadMessage {
@@ -120,6 +144,8 @@ export interface ThreadMessage {
   content: string
   forwarded: boolean
   created_at: string
+  reply_to: MessageQuote | null
+  read_by_other: boolean | null
 }
 
 export interface Destination {

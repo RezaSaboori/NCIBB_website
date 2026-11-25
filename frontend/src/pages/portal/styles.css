@@ -48,9 +48,9 @@
   display: flex;
   align-items: center;
   width: fit-content;
-  height: 2.5rem;
+  block-size: var(--spacing-2xl);
   box-sizing: border-box;
-  padding: 0 4px;
+  padding: var(--spacing-xs);
   border: none;
   border-radius: var(--border-radius-pill);
   font-family: var(--font-family-persian);
@@ -58,113 +58,12 @@
   text-align: center;
 }
 
-.data-finder-modes-container::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background-image: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.5),
-    rgba(0, 0, 0, 0.05) 60%
-  );
-  backdrop-filter: var(--glass-backdrop-filter);
-  -webkit-backdrop-filter: var(--glass-backdrop-filter);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, #fff calc(1 * 10%), transparent),
-    inset 1.8px 3px 0px -2px color-mix(in srgb, #fff calc(1 * 90%), transparent),
-    inset -2px -2px 0px -2px color-mix(in srgb, #fff calc(1 * 80%), transparent),
-    inset -3px -8px 1px -6px color-mix(in srgb, #fff calc(1 * 60%), transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, #000 calc(1 * 12%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 20%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 10%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 8%), transparent);
-  transition:
-    background-color var(--motion-duration-slow) var(--motion-easing-easeInOut),
-    box-shadow var(--motion-duration-slow) var(--motion-easing-easeInOut);
-}
-
-.dark .data-finder-modes-container::before {
-  background-image: linear-gradient(
-    135deg,
-    rgba(104, 104, 104, 0.3),
-    rgba(0, 0, 0, 0.3) 30%
-  );
-  backdrop-filter: var(--glass-backdrop-filter);
-  -webkit-backdrop-filter: var(--glass-backdrop-filter);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--color-gray8) 4%, transparent),
-    inset 1.8px 3px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 12%, transparent),
-    inset -2px -2px 0px -2px
-      color-mix(in srgb, var(--color-gray8) 10%, transparent),
-    inset -3px -8px 1px -6px
-      color-mix(in srgb, var(--color-gray8) 8%, transparent),
-    inset -0.3px -1px 4px 0px
-      color-mix(in srgb, #000 calc(1 * 25%), transparent),
-    inset -1.5px 2.5px 0px -2px
-      color-mix(in srgb, #000 calc(1 * 30%), transparent),
-    inset 0px 3px 4px -2px color-mix(in srgb, #000 calc(1 * 30%), transparent),
-    inset 2px -6.5px 1px -4px
-      color-mix(in srgb, #000 calc(1 * 25%), transparent),
-    0px 1px 5px 0px color-mix(in srgb, #000 calc(1 * 15%), transparent),
-    0px 6px 16px 0px color-mix(in srgb, #000 calc(1 * 12%), transparent);
-}
-
-.data-finder-modes-container::after {
-  content: "";
-  position: absolute;
-  top: 10%;
-  height: 80%;
-  left: 0;
-  width: var(--active-indicator-width);
-  transform: translateX(var(--active-indicator-left));
-  opacity: var(--active-indicator-opacity, 1);
-  transition:
-    transform var(--motion-duration-slow) var(--motion-easing-easeInOut),
-    width var(--motion-duration-slow) var(--motion-easing-easeInOut),
-    opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
-  display: block;
-  border-radius: var(--border-radius-pill);
-  background-color: color-mix(in srgb, var(--color-blue) 80%, transparent);
-  z-index: -1;
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, #01eeff 20%, transparent),
-    inset 2px 1px 0px -1px color-mix(in srgb, #01eeff 90%, transparent),
-    inset -1.5px -1px 0px -1px color-mix(in srgb, #01eeff 80%, transparent),
-    inset -2px -6px 1px -5px color-mix(in srgb, #01eeff 60%, transparent),
-    inset -1px 2px 3px -1px color-mix(in srgb, #001130 25%, transparent),
-    inset 0px -4px 1px -2px color-mix(in srgb, #000820 15%, transparent),
-    inset 0px 3px 6px 0px color-mix(in srgb, #000820 10%, transparent);
-}
-
-.dark .data-finder-modes-container::after {
-  background-color: color-mix(in srgb, var(--color-blue) 90%, transparent);
-  box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, #01eeff 20%, transparent),
-    inset 2px 1px 0px -1px color-mix(in srgb, #01eeff 90%, transparent),
-    inset -1.5px -1px 0px -1px color-mix(in srgb, #01eeff 80%, transparent),
-    inset -2px -6px 1px -5px color-mix(in srgb, #01eeff 60%, transparent),
-    inset -1px 2px 3px -1px color-mix(in srgb, #001130 25%, transparent),
-    inset 0px -4px 1px -2px color-mix(in srgb, #000820 15%, transparent),
-    inset 0px 3px 6px 0px color-mix(in srgb, #000820 10%, transparent);
-}
-
 .data-finder-mode {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1px var(--spacing-md) 0px var(--spacing-md);
-  height: 1.9rem;
+  padding-inline: var(--spacing-md);
+  block-size: var(--spacing-xl);
   box-sizing: border-box;
   border-radius: var(--border-radius-pill);
   color: var(--color-gray10);
@@ -177,24 +76,12 @@
   font-size: var(--font-size-sm);
 }
 
-.data-finder-mode.active {
-  color: var(--color-gray1);
-}
-
-.data-finder-mode:not(.active):hover {
+.data-finder-mode[aria-pressed="false"]:hover {
   color: var(--color-blue);
 }
 
 .dark .data-finder-mode {
   color: var(--color-gray12);
-}
-
-.dark .data-finder-mode.active {
-  color: var(--color-gray1);
-}
-
-.dark .data-finder-mode:not(.active):hover {
-  color: var(--color-blue);
 }
 
 .holistic-input-container {
@@ -410,4 +297,10 @@
   height: auto;
   min-height: 65vh;
   align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  .holistic-input-container.datasaz-expanded {
+    width: calc(100% - 2 * var(--mobile-page-gutter));
+  }
 }

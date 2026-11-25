@@ -9,10 +9,10 @@ export const Footer: FC = () => {
       className="glass footer-nav text-gray12 py-12 rounded-[var(--border-radius-container-lg)] max-w-5xl mx-auto"
       dir="rtl"
     >
-      <div className="container mx-auto px-8">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+      <div className="container mx-auto px-4 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Contact Us & Follow Us */}
-          <div className="col-span-3 h-full flex flex-col">
+          <div className="lg:col-span-3 min-w-0 h-full flex flex-col">
             <div className="mb-8">
               <h3 className="text-lg font-bold h-fit">ارتباط با ما</h3>
             </div>
@@ -20,21 +20,21 @@ export const Footer: FC = () => {
               <div className="flex flex-col w-full space-y-3">
                 <a
                   href="mailto:info@cardiosmart.ai"
-                  className="flex items-center justify-between h-fit w-full"
+                  className="footer-contact-link flex items-center justify-between gap-2 w-full"
                 >
-                  <div className="bg-gray12 rounded-full p-1.5">
+                  <div className="bg-gray12 rounded-full p-1.5 shrink-0">
                     <Icon
                       icon="mynaui:envelope"
                       className="w-5 h-5 text-gray1"
                     />
                   </div>
-                  <span>info@cardiosmart.ai</span>
+                  <bdi className="footer-contact-value">info@cardiosmart.ai</bdi>
                 </a>
                 <a
                   href="tel:+982123923136"
-                  className="flex items-center justify-between h-fit w-full"
+                  className="footer-contact-link flex items-center justify-between gap-2 w-full"
                 >
-                  <div className="bg-gray12 rounded-full p-1.5">
+                  <div className="bg-gray12 rounded-full p-1.5 shrink-0">
                     <Icon
                       icon="ph:phone-light"
                       className="w-5 h-5 text-gray1"
@@ -43,9 +43,9 @@ export const Footer: FC = () => {
                   <span dir="ltr">+98 212 3923136</span>
                 </a>
               </div>
-              <div className="w-full space-y-4">
+              <div className="w-full space-y-4 mt-4 lg:mt-0">
                 <h4 className="text-md font-bold">ما را دنبال کنید!</h4>
-                <div className="flex gap-6">
+                <div className="footer-social-links flex gap-3 lg:gap-4">
                   <a
                     href="#"
                     className="w-full aspect-square flex items-center justify-center rounded-full bg-gray12 text-gray1 hover:bg-gray8 transition-colors"
@@ -76,7 +76,7 @@ export const Footer: FC = () => {
           </div>
 
           {/* Address */}
-          <div className="col-span-5 h-full flex flex-col">
+          <div className="lg:col-span-5 min-w-0 h-full flex flex-col">
             <div className="mb-8">
               <h3 className="text-lg font-bold">آدرس</h3>
             </div>
@@ -98,7 +98,7 @@ export const Footer: FC = () => {
           </div>
 
           {/* Newsletter */}
-          <div className="md:col-span-4 space-y-6 flex flex-col justify-between">
+          <div className="lg:col-span-4 min-w-0 space-y-6 flex flex-col justify-between">
             <div className="mb-8">
               <h3 className="text-lg font-bold">
                 از جدیدترین اخبار باخبر شوید

@@ -2,10 +2,12 @@
 import React, { useEffect, useRef, useState, forwardRef } from 'react';
 import { createRenderer } from './webgl/renderer.js';
 import { loadCardioParticles } from './webgl/particle-loader.js';
+import { limitCardioParticles } from './webgl/limitCardioParticles.js';
 import { resize } from './webgl/utils.js';
 import { getFlatConfig, applyPreset } from './config.js';
 
 const DEFAULT_CONFIG_OVERRIDES = {};
+const compactHeartParticleLimit = 5000;
 
 function hexToRgbNormalized(hex) {
   if (!hex) return [0.04, 0.04, 0.06];
@@ -26,6 +28,28 @@ function hexToRgbNormalized(hex) {
   return [r / 255, g / 255, b / 255];
 }
 
+/**
+ * @typedef {object} CardioBackgroundProps
+ * @property {string} [quality]
+ * @property {boolean} [interactive]
+ * @property {boolean} [autoRotate]
+ * @property {boolean} [enableDragRotation]
+ * @property {boolean} [enableWheelZoom]
+ * @property {{ x: number, y: number }} [contentOffset]
+ * @property {string} [backgroundColor]
+ * @property {'light' | 'dark'} [theme]
+ * @property {string} [className]
+ * @property {import('react').CSSProperties} [style]
+ * @property {object} [configOverrides]
+ * @property {boolean} [compact]
+ * @property {boolean} [paused]
+ * @property {number} [scrollProgress]
+ * @property {(progress: number) => void} [onLoadingProgress]
+ * @property {() => void} [onInitialized]
+ * @property {(error: string) => void} [onError]
+ */
+
+/** @type {import('react').ForwardRefExoticComponent<CardioBackgroundProps & import('react').RefAttributes<HTMLCanvasElement>>} */
 const CardioBackground = forwardRef(({
   quality = 'auto',
   interactive = true,
@@ -38,6 +62,7 @@ const CardioBackground = forwardRef(({
   className = '',
   style = {},
   configOverrides = DEFAULT_CONFIG_OVERRIDES,
+  compact = false,
   paused = false,
   scrollProgress = 0,
   onLoadingProgress,
@@ -119,6 +144,7 @@ const CardioBackground = forwardRef(({
 
     if (!gl) {
       setIsSupported(false);
+      onError?.('WebGL 2 is unavailable');
       return;
     }
 
@@ -135,22 +161,26 @@ const CardioBackground = forwardRef(({
 
     if (!isWebGL2ByVersion && !isWebGL2ByFeatures) {
       setIsSupported(false);
+      onError?.('WebGL 2 is unavailable');
       return;
     }
 
-    const handleContextLost = (event) => {
-      event.preventDefault();
-
+    const handleContextLost = () => {
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
       }
+
+      rendererInstance?.dispose();
+      rendererRef.current = null;
+      setIsSupported(false);
+      onError?.('The WebGL context was lost');
     };
 
-    const handleContextRestored = () => {};
-
+    let pixelRatio;
     const handleResize = () => {
-      resize(canvas);
+      pixelRatio = window.devicePixelRatio;
+      resize(canvas, compact ? 1.5 : Infinity);
     };
 
     canvas.addEventListener(
@@ -158,12 +188,8 @@ const CardioBackground = forwardRef(({
       handleContextLost
     );
 
-    canvas.addEventListener(
-      'webglcontextrestored',
-      handleContextRestored
-    );
-
-    window.addEventListener('resize', handleResize);
+    const sizeObserver = new ResizeObserver(handleResize);
+    sizeObserver.observe(canvas);
 
     handleResize();
 
@@ -178,13 +204,7 @@ const CardioBackground = forwardRef(({
 
         onLoadingProgress?.(20);
 
-        const {
-          particleData,
-          particleCount,
-          center,
-          maxSize,
-          heartBounds
-        } = await loadCardioParticles(particlesUrl);
+        const asset = await loadCardioParticles(particlesUrl);
 
         if (cancelled) return;
 
@@ -297,12 +317,12 @@ const CardioBackground = forwardRef(({
         // requested by the existing rendering configuration.
         if (
           baseConfig.particleCount > 0 &&
-          baseConfig.particleCount !== particleCount
+          baseConfig.particleCount !== asset.particleCount
         ) {
           throw new Error(
             `Cardio particle count mismatch: ` +
             `expected ${baseConfig.particleCount}, ` +
-            `received ${particleCount}`
+            `received ${asset.particleCount}`
           );
         }
 
@@ -313,6 +333,10 @@ const CardioBackground = forwardRef(({
             'WebGL context lost during initialization'
           );
         }
+
+        const { particleData, particleCount, center, maxSize, heartBounds } = compact
+          ? limitCardioParticles(asset, compactHeartParticleLimit)
+          : asset;
 
         const renderer = createRenderer(
           gl,
@@ -344,11 +368,12 @@ const CardioBackground = forwardRef(({
         }
 
         rendererRef.current = renderer;
+        renderer.render(performance.now());
 
         onLoadingProgress?.(100);
         onInitialized?.();
 
-        const targetFPS = 60;
+        const targetFPS = compact ? 30 : 60;
         const frameInterval = 1000 / targetFPS;
 
         let lastFrameTime = 0;
@@ -359,6 +384,7 @@ const CardioBackground = forwardRef(({
           }
 
           if (!pausedRef.current) {
+            if (window.devicePixelRatio !== pixelRatio) handleResize();
             const elapsed = time - lastFrameTime;
 
             if (elapsed > frameInterval) {
@@ -407,19 +433,11 @@ const CardioBackground = forwardRef(({
     return () => {
       cancelled = true;
 
-      window.removeEventListener(
-        'resize',
-        handleResize
-      );
+      sizeObserver.disconnect();
 
       canvas.removeEventListener(
         'webglcontextlost',
         handleContextLost
-      );
-
-      canvas.removeEventListener(
-        'webglcontextrestored',
-        handleContextRestored
       );
 
       if (animationFrameId !== null) {
@@ -439,25 +457,14 @@ const CardioBackground = forwardRef(({
     };
   }, [
     quality,
+    compact,
     interactive,
     autoRotate,
     enableDragRotation,
     enableWheelZoom
   ]);
 
-  if (!isSupported) {
-    return (
-      <div
-        className={className}
-        style={{
-          ...style,
-          background: backgroundColor
-        }}
-      >
-        WebGL2 Not Supported
-      </div>
-    );
-  }
+  if (!isSupported) return null;
 
   return (
     <canvas
@@ -473,7 +480,7 @@ const CardioBackground = forwardRef(({
         maxWidth: '100%',
         zIndex: 0,
         pointerEvents: interactive ? 'auto' : 'none',
-        touchAction: 'none',
+        touchAction: enableDragRotation ? 'none' : 'auto',
         outline: 'none',
         ...style
       }}

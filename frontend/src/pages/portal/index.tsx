@@ -296,22 +296,20 @@ export const PortalPage = () => {
             isTextVisible ? "fade-in-up" : ""
           } ${activeMode === "datasaz" ? "datasaz-expanded" : ""}`}
         >
-          <div ref={modesContainerRef} className="data-finder-modes-container">
+          <div ref={modesContainerRef} className="data-finder-modes-container glass-navigation glass-navigation__indicator glass-transparent">
             <button
               id="manual"
               onClick={() => handleModeChange("manual")}
-              className={`data-finder-mode ${
-                activeMode === "manual" ? "active" : ""
-              }`}
+              aria-pressed={activeMode === "manual"}
+              className="data-finder-mode glass-navigation__item"
             >
               دستی
             </button>
             <button
               id="datayab"
               onClick={() => handleModeChange("datayab")}
-              className={`data-finder-mode ${
-                activeMode === "datayab" ? "active" : ""
-              }`}
+              aria-pressed={activeMode === "datayab"}
+              className="data-finder-mode glass-navigation__item"
             >
               داده‌یاب
             </button>
@@ -319,9 +317,8 @@ export const PortalPage = () => {
             <button
               id="datasaz"
               onClick={() => handleModeChange("datasaz")}
-              className={`data-finder-mode ${
-                activeMode === "datasaz" ? "active" : ""
-              }`}
+              aria-pressed={activeMode === "datasaz"}
+              className="data-finder-mode glass-navigation__item"
             >
               داده‌ساز
             </button>

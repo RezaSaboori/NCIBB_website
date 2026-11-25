@@ -33,6 +33,15 @@
 
 .ui-state-button__content svg { inline-size: 1rem; block-size: 1rem; flex: none; }
 
+@media (max-width: 768px) {
+  .ui-state-button__size { inline-size: auto; }
+  .ui-state-button__content { flex: 0 1 auto; max-inline-size: 100%; }
+  .ui-state-button__content svg {
+    inline-size: var(--mobile-icon-compact);
+    block-size: var(--mobile-icon-compact);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ui-state-button__surfaces > span { transition-duration: var(--motion-duration-fast); }
 }

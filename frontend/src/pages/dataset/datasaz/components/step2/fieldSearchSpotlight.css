@@ -1,12 +1,6 @@
 /* fieldSearchSpotlight.css — Spotlight search overlay for Step 2 */
 
 /* ── Overlay wrapper — in normal flow, blurs windows below via parent modifier ── */
-.s2-spotlight-overlay * {
-  direction: ltr !important;
-  text-align: left !important;
-  gap: var(--spacing-sm);
-}
-
 .s2-spotlight-overlay {
   position: absolute;
   top: 0;
@@ -68,6 +62,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  border: var(--ui-stroke);
   border-radius: var(--border-radius-container-md);
   padding: var(--spacing-xs);
   margin: 0;
@@ -96,13 +91,19 @@
 
 .s2-spotlight__input {
   flex: 1;
+  min-inline-size: 0;
   background: transparent;
   border: none;
   outline: none;
   color: var(--color-gray12);
   font-size: var(--font-size-md);
   font-family: var(--font-family-base);
-  padding: 0 0 0 var(--spacing-sm);
+  padding-inline-start: var(--spacing-sm);
+  text-align: start;
+}
+
+.s2-spotlight__search-row:focus-within {
+  border-color: var(--color-blue);
 }
 
 .s2-spotlight__input::placeholder {
@@ -174,5 +175,27 @@
   font-weight: var(--font-weight-semibold);
   color: var(--color-gray12);
   font-family: var(--font-family-base);
-  white-space: nowrap;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+  .s2-spotlight { margin-inline: var(--spacing-xs); }
+  .s2-spotlight__search-row { border-radius: var(--mobile-radius-compact, 20px); }
+  .s2-spotlight__input {
+    min-block-size: var(--mobile-touch-target, 44px);
+    font-size: var(--mobile-type-body, 1rem);
+    line-height: var(--mobile-line-body, 1.6);
+  }
+  .s2-spotlight__suggestion-tab {
+    align-items: center;
+    min-block-size: var(--mobile-touch-target, 44px);
+    min-inline-size: var(--mobile-touch-target, 44px);
+    max-inline-size: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s2-spotlight-overlay, .s2-spotlight, .s2-spotlight__suggestion-tab {
+    animation: s2-overlay-in var(--motion-duration-fast) ease-out both;
+  }
 }

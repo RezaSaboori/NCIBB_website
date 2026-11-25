@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { ANIMATION_CONFIG } from '../../config/landing/constants';
 
-export function useScrollProgress(containerRef) {
+export function useScrollProgress(enabled) {
   const [scrollProgress, setScrollProgress] = useState(0);
   const scrollProgressRef = useRef(0);
   const targetProgressRef = useRef(0);
@@ -13,6 +12,7 @@ export function useScrollProgress(containerRef) {
 
   // Animate scroll progress smoothly
   useEffect(() => {
+    if (!enabled) return;
     let animationId = null;
     
     const animate = () => {
@@ -51,29 +51,30 @@ export function useScrollProgress(containerRef) {
       if (animationId) cancelAnimationFrame(animationId);
       clearInterval(intervalId);
     };
-  }, []);
+  }, [enabled]);
 
   // Handle scroll events
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+    if (!enabled) {
+      targetProgressRef.current = 0;
+      setScrollProgress(0);
+      return;
+    }
+
+    let pastHeroStart = false;
 
     const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-      
-      // If we've scrolled past the first section, ensure progress stays at 1.0
-      // Otherwise, let progress be 0 and we handle it via wheel/touch for section 1
-      if (scrollTop > 10) {
-        setScrollProgress(1.0);
-        targetProgressRef.current = 1.0;
-      } else if (targetProgressRef.current < 0.01) {
-        setScrollProgress(0);
-        targetProgressRef.current = 0;
-      }
+      const pastStart = window.scrollY > 10;
+      if (pastStart === pastHeroStart) return;
+
+      pastHeroStart = pastStart;
+      const progress = pastStart ? 1 : 0;
+      targetProgressRef.current = progress;
+      setScrollProgress(progress);
     };
 
     const handleWheel = (e) => {
+      if (e.ctrlKey || Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
       const scrollTop = window.scrollY;
       const currentProgress = scrollProgressRef.current;
       const scrollingDown = e.deltaY > 0;
@@ -103,38 +104,15 @@ export function useScrollProgress(containerRef) {
       }
     };
 
-    const handleTouchMove = (e) => {
-      const scrollTop = window.scrollY;
-      const currentProgress = scrollProgressRef.current;
-      const touch = e.touches[0];
-      const lastTouch = container.lastTouchY || touch.clientY;
-      const scrollingDown = touch.clientY < lastTouch;
-      container.lastTouchY = touch.clientY;
-
-      if (scrollTop <= 5) {
-        const isScrollingDownAndNotFinished = scrollingDown && currentProgress < 0.99;
-        const isScrollingUpAndNotAtStart = !scrollingDown && currentProgress > 0.01;
-
-        if (isScrollingDownAndNotFinished || isScrollingUpAndNotAtStart) {
-          e.preventDefault();
-          const increment = scrollingDown ? 0.05 : -0.05;
-          targetProgressRef.current = Math.min(Math.max(targetProgressRef.current + increment, 0.0), 1.0);
-          return false;
-        }
-      }
-    };
-
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
     handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [containerRef]);
+  }, [enabled]);
 
   return { scrollProgress };
 }

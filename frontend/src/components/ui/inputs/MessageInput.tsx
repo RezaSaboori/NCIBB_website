@@ -1,10 +1,12 @@
-import type { ComponentProps } from "react"
+import { forwardRef, type ComponentPropsWithoutRef } from "react"
 import "../inputs.css"
 
-export function MessageInput({ className = "", ...props }: ComponentProps<"textarea">) {
-  return (
-    <span className="ui-input-shell ui-input-shell--persian ui-input-shell--grow">
-      <textarea {...props} className={`ui-input-field ui-input-field--textarea ${className}`} />
-    </span>
-  )
-}
+export const MessageInput = forwardRef<HTMLTextAreaElement, ComponentPropsWithoutRef<"textarea">>(
+  function MessageInput({ className = "", ...props }, ref) {
+    return (
+      <span className="ui-input-shell ui-input-shell--persian ui-input-shell--grow">
+        <textarea {...props} ref={ref} className={`ui-input-field ui-input-field--textarea ${className}`} />
+      </span>
+    )
+  },
+)

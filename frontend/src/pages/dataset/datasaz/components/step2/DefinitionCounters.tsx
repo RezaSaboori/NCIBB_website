@@ -7,6 +7,9 @@ interface DefinitionCountersProps {
   exclusionCount: number;
   errorCount: number;
   onStartProcessing: () => void;
+  isStarting: boolean;
+  isSaving: boolean;
+  processError: string;
 }
 
 export const DefinitionCounters: React.FC<DefinitionCountersProps> = ({
@@ -14,6 +17,9 @@ export const DefinitionCounters: React.FC<DefinitionCountersProps> = ({
   exclusionCount,
   errorCount,
   onStartProcessing,
+  isStarting,
+  isSaving,
+  processError,
 }) => {
   return (
     <div className="s2-counters-bar">
@@ -30,12 +36,15 @@ export const DefinitionCounters: React.FC<DefinitionCountersProps> = ({
         <span className="s2-counter-tab__label">خطا</span>
       </div>
       <button
+        type="button"
         className="blue-glass s2-counter-tab s2-counter-tab--start"
         onClick={onStartProcessing}
-        aria-label="شروع پردازش"
+        disabled={isStarting || isSaving}
+        aria-busy={isStarting}
       >
-        <span className="s2-counter-tab__label">شروع پردازش</span>
+        <span className="s2-counter-tab__label">{isStarting ? "در حال آماده‌سازی…" : "شروع پردازش"}</span>
       </button>
+      {processError && <p className="s2-process-error" role="alert">{processError}</p>}
     </div>
   );
 };

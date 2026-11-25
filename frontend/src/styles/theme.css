@@ -128,7 +128,7 @@
   /* Font Size */
   --font-size-xs: 11px;
   --font-size-sm: 13px;
-  --font-size-base: 17px;
+  --font-size-base: 16px;
   --font-size-lg: 20px;
   --font-size-xl: 22px;
   --font-size-2xl: 28px;
@@ -173,6 +173,33 @@
   --motion-easing-easeIn: cubic-bezier(0.4, 0, 1, 1);
   --motion-easing-easeInOut: cubic-bezier(0.4, 0, 0.2, 1);
   --motion-easing-settle: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Responsive web roles, using the mobile scale from prof. */
+  --mobile-page-gutter: var(--spacing-md);
+  --mobile-card-padding: var(--spacing-md);
+  --mobile-section-gap: 20px;
+  --mobile-control-gap: var(--spacing-sm);
+  --mobile-touch-target: 44px;
+  --mobile-primary-action: var(--spacing-3xl);
+  --mobile-toolbar-height: var(--spacing-4xl);
+  --mobile-dialog-inset: var(--spacing-sm);
+  --mobile-radius-compact: var(--border-radius-item-xl);
+  --mobile-radius-card: var(--border-radius-container-xs);
+  --mobile-radius-dialog: var(--border-radius-container-sm);
+  --mobile-icon-face: 35px;
+  --mobile-icon-compact: 18px;
+  --mobile-icon-standard: 20px;
+  --mobile-icon-prominent: 24px;
+  --mobile-type-metadata: 0.8125rem;
+  --mobile-type-body: 1rem;
+  --mobile-type-section: 1.25rem;
+  --mobile-type-title: 1.75rem;
+  --mobile-line-body: var(--line-height-relaxed);
+  --mobile-line-title: var(--line-height-normal);
+  --mobile-body-color: var(--color-gray12);
+  --mobile-muted-color: var(--color-gray8);
+  --mobile-error-color: #a7253a;
+  --mobile-on-glass-accent: #fff;
 }
 
 .dark {
@@ -214,6 +241,7 @@
   --color-gray10: rgb(210, 210, 210);
   --color-gray11: rgb(228, 228, 228);
   --color-gray12: rgb(248, 248, 248);
+  --mobile-error-color: #ff8e99;
 }
 
 
@@ -223,8 +251,11 @@
 * ========================================
 */
 html {
-    scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
 }
 
 body {
@@ -328,21 +359,44 @@ body {
   --page-max-width: 760px;
 }
 
+@media (max-width: 768px) {
+  :root {
+    --elevation-1: 0 1px 3px rgb(0 0 0 / 0.05);
+    --elevation-2: 0 3px 6px rgb(0 0 0 / 0.08);
+    --elevation-3: 0 6px 12px rgb(0 0 0 / 0.11);
+    --elevation-4: 0 10px 20px rgb(0 0 0 / 0.13);
+  }
+
+  .page-content {
+    --page-padding-x: var(--mobile-page-gutter);
+    --page-padding-y: var(--mobile-section-gap);
+  }
+
+  :where(.page-content, .profile-modal) a:focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+  }
+}
+
 .custom-scrollbar {
   overflow-y: auto;
   overflow-x: hidden;
-  &::-webkit-scrollbar-thumb:hover {
-    background: var(--color-gray6) !important;
-  }
+}
 
-  &::-webkit-scrollbar {
-    width: 5px;
-    background-color: transparent;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: var(--color-gray5);
-    border-radius: 100px;
-  }
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  background-color: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  border: 0;
+  border-radius: var(--border-radius-pill);
+  background-color: var(--color-gray5);
+  background-clip: border-box;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-gray6);
 }
 /* ── Custom scrollbar ── */
 

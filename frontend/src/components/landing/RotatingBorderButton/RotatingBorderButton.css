@@ -40,6 +40,19 @@
 }
 
 .rotating-border-btn {
-  font-family: 'Inter', sans-serif;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md) clamp(var(--spacing-md), 2vw, var(--spacing-3xl));
+  border-radius: var(--border-radius-pill);
+  overflow: hidden;
+  text-align: center;
+  font-family: var(--font-family-persian);
+}
+
+.rotating-border-btn:focus-visible {
+  outline: var(--border-width-normal) solid var(--color-blue);
+  outline-offset: calc(-1 * var(--border-width-normal));
 }
 

@@ -1,19 +1,18 @@
 import { useEffect } from 'react';
 
-export function useCanvasMouseForwarding(sectionRef, canvasRef) {
+export function useCanvasMouseForwarding(sectionRef, canvasRef, enabled) {
   useEffect(() => {
     const section1 = sectionRef.current;
-    const canvas = canvasRef.current;
-    
-    if (!section1 || !canvas) return;
+    if (!enabled || !section1) return;
 
     let isForwarding = false;
 
     const forwardMouseMove = (e) => {
-      if (isForwarding || e.target === canvas) return;
-      
+      const canvas = canvasRef.current;
+      if (!canvas || isForwarding || e.target === canvas) return;
+
       isForwarding = true;
-      
+
       const syntheticEvent = new MouseEvent('mousemove', {
         bubbles: false,
         cancelable: true,
@@ -31,7 +30,7 @@ export function useCanvasMouseForwarding(sectionRef, canvasRef) {
         movementX: e.movementX,
         movementY: e.movementY,
       });
-      
+
       canvas.dispatchEvent(syntheticEvent);
       isForwarding = false;
     };
@@ -41,6 +40,5 @@ export function useCanvasMouseForwarding(sectionRef, canvasRef) {
     return () => {
       section1.removeEventListener('mousemove', forwardMouseMove, { capture: true });
     };
-  }, [sectionRef, canvasRef]);
+  }, [sectionRef, canvasRef, enabled]);
 }
-

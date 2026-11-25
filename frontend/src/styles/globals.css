@@ -2,7 +2,7 @@
 
 @config "../../tailwind.config.js";
 
-[dir="rtl"] * {
-  text-align: right;
+:where([dir="rtl"]) :dir(rtl) {
+  text-align: start;
 }
 

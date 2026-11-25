@@ -7,7 +7,7 @@
 .auth-page-card {
   width: 100%;
   max-width: 28rem;
-  min-width: 320px;
+  min-width: 0;
   border-radius: var(--border-radius-container-sm);
   padding: var(--spacing-xl);
   box-sizing: border-box;
@@ -16,12 +16,17 @@
 .auth-page-card-scroll {
   width: 100%;
   max-width: 28rem;
-  min-width: 320px;
+  min-width: 0;
   border-radius: var(--border-radius-container-sm);
   padding: var(--spacing-xl);
   box-sizing: border-box;
   overflow-y: auto;
   max-height: calc(100vh - var(--spacing-5xl));
+  max-height: calc(100dvh - var(--spacing-5xl));
+}
+
+@media (max-width: 620px) {
+  :is(.auth-page-card, .auth-page-card-scroll) { padding: var(--spacing-md); }
 }
 
 .auth-page-title {

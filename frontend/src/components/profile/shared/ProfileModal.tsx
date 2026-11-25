@@ -10,6 +10,7 @@ type ProfileModalProps = Pick<ModalProps, "isOpen" | "onOpenChange" | "onClose" 
   title: string
   children: ReactNode
   footer?: ReactNode
+  surface?: "glass" | "glass-transparent"
   animateSize?: boolean
   bodyKey?: Key
   contentPending?: boolean
@@ -22,7 +23,7 @@ const dialogTimingStyle = {
 } as CSSProperties
 
 export function ProfileModal({
-  title, children, footer, animateSize = false, bodyKey, contentPending = false, estimatedBodySize, headerNavigationRef, ...props
+  title, children, footer, surface = "glass-transparent", animateSize = false, bodyKey, contentPending = false, estimatedBodySize, headerNavigationRef, ...props
 }: ProfileModalProps) {
   const variants = useMotionVariants("dialog")
 
@@ -32,7 +33,7 @@ export function ProfileModal({
       classNames={{
         wrapper: "profile-modal__viewport",
         backdrop: "profile-modal__backdrop",
-        base: "glass-transparent profile-modal",
+        base: `${surface} profile-modal`,
         header: "profile-modal__title",
         body: "profile-modal__body",
         footer: "profile-modal__footer",

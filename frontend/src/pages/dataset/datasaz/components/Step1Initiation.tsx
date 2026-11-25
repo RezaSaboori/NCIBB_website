@@ -12,7 +12,7 @@ type BtnState = "idle" | "loading" | "done";
 type ProjectMode = "new" | "existing";
 
 interface Step1InitiationProps {
-  onProjectInit: (name: string, estimatedCount?: number) => Promise<void> | void;
+  onProjectInit: (name: string, estimatedCount?: number) => Promise<boolean>;
   existingProject?: DatasazProject | null;
   onLoadExistingProject?: (project: DatasazProject) => void;
 }
@@ -30,6 +30,7 @@ export const Step1Initiation: React.FC<Step1InitiationProps> = ({
     existingProject?.estimated_count != null ? String(existingProject.estimated_count) : ""
   );
   const [btnState, setBtnState] = useState<BtnState>(existingProject ? "done" : "idle");
+  const [submitError, setSubmitError] = useState("");
 
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const { projects } = useProjectList(isAuthenticated);
@@ -53,6 +54,7 @@ export const Step1Initiation: React.FC<Step1InitiationProps> = ({
     setProjectName("");
     setEstimatedCount("");
     setBtnState("idle");
+    setSubmitError("");
   };
 
   const handleSelectExistingProject = (selectedName: string) => {
@@ -67,15 +69,13 @@ export const Step1Initiation: React.FC<Step1InitiationProps> = ({
   const handleConfirm = async () => {
     if (!projectName.trim() || btnState !== "idle") return;
     setBtnState("loading");
-    try {
-      await onProjectInit(
-        projectName.trim(),
-        estimatedCount ? Number(estimatedCount) : undefined
-      );
-      setBtnState("done");
-    } catch {
-      setBtnState("idle");
-    }
+    setSubmitError("");
+    const created = await onProjectInit(
+      projectName.trim(),
+      estimatedCount ? Number(estimatedCount) : undefined
+    );
+    setBtnState(created ? "done" : "idle");
+    if (!created) setSubmitError("ایجاد پروژه انجام نشد. دوباره تلاش کنید.");
   };
 
   const btnLabel =
@@ -99,6 +99,7 @@ export const Step1Initiation: React.FC<Step1InitiationProps> = ({
           onEstimatedCountChange={setEstimatedCount}
           btnState={btnState}
           btnLabel={btnLabel}
+          submitError={submitError}
           onConfirm={handleConfirm}
           projectOptions={projectNames}
           selectedProjectName={mode === "existing" ? projectName : ""}

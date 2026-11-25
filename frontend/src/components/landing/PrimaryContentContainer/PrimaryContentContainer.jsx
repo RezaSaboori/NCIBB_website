@@ -1,6 +1,7 @@
 import React from "react"
 import { Tooltip } from "@heroui/react"
 import { motion } from "framer-motion"
+import { useSelector } from "react-redux"
 import RotatingBorderButton from "../RotatingBorderButton/RotatingBorderButton"
 import AuroraButtonContent from "../AuroraButtonContent/AuroraButtonContent"
 import cticiLogo from "./assets/ctici.svg"
@@ -10,10 +11,11 @@ import "./PrimaryContentContainer.css"
 
 const PrimaryContentContainer = ({
   scrollProgress,
+  animated,
   auroraVisible,
-  onLoginClick,
-  onSignupClick,
+  introRef,
 }) => {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
   const clampedProgress = Math.min(Math.max(scrollProgress, 0), 1)
   const firstPageProgress = Math.min(
     Math.max((clampedProgress - 0.1) / 0.4, 0),
@@ -21,11 +23,11 @@ const PrimaryContentContainer = ({
   )
   const firstPageOpacity = Math.max(0, 1 - firstPageProgress)
 
-  const containerStyle = {
+  const containerStyle = animated ? {
     transform: `translateY(${-Math.min(clampedProgress * 6, 10)}vh)`,
     opacity: firstPageOpacity,
-    pointerEvents: firstPageOpacity > 0.05 ? "auto" : "none",
-  }
+    visibility: firstPageOpacity > 0.05 ? "visible" : "hidden",
+  } : undefined
 
   const containerVariants = {
     hidden: { opacity: 0, y: 30 },
@@ -51,33 +53,31 @@ const PrimaryContentContainer = ({
   }
 
   return (
-    <div className="primary-content-wrapper" style={containerStyle}>
+    <div className="primary-content-wrapper" style={containerStyle} ref={introRef}>
       <motion.div
         className="primary-content-container"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
+        initial={animated ? "hidden" : false}
+        animate={animated ? "visible" : { opacity: 1, y: 0, transition: { duration: 0 } }}
+        variants={animated ? containerVariants : undefined}
       >
-        <motion.div className="primary-content-title" variants={itemVariants}>
-          <div className="title-first-line">
-            <h1 className="justified-title">
-              <span>بانـک</span>
-              <span>ملـی</span>
-              <span>زیسـت</span>
-              <span>داده</span>
-            </h1>
-          </div>
-          <h1 className="justified-title">
-            <span>یکپـارچـه</span>
-            <span>قلـب</span>
-            <span>و</span>
+        <motion.h1 className="primary-content-title" variants={animated ? itemVariants : undefined}>
+          <span className="justified-title">
+            <span>بانـک</span>{" "}
+            <span>ملـی</span>{" "}
+            <span>زیسـت</span>{" "}
+            <span>داده</span>
+          </span>{" "}
+          <span className="justified-title">
+            <span>یکپـارچـه</span>{" "}
+            <span>قلـب</span>{" "}
+            <span>و</span>{" "}
             <span>عـروق</span>
-          </h1>
-        </motion.div>
+          </span>
+        </motion.h1>
         <div className="primary-content-subtitle-container">
           <motion.p
             className="primary-content-description"
-            variants={itemVariants}
+            variants={animated ? itemVariants : undefined}
           >
             <strong>از داده خام تا تحلیل نهایی</strong> | ما با جمع آوری داده
             های سلامت موجود بصورت یکپارچه، منبعی ارزشمند را برای محققین قلب و
@@ -85,20 +85,20 @@ const PrimaryContentContainer = ({
           </motion.p>
           <motion.div
             className="primary-content-buttons"
-            variants={itemVariants}
+            variants={animated ? itemVariants : undefined}
           >
             <div className="primary-content-buttons-group">
-              <RotatingBorderButton variant="secondary" onClick={onLoginClick}>
-                <div className="button-content">
+              {!isAuthenticated && (
+                <RotatingBorderButton variant="secondary" to="/login" animated={animated}>
                   <span className="button-text-secondary">وارد شوید</span>
-                </div>
-              </RotatingBorderButton>
+                </RotatingBorderButton>
+              )}
 
-              <RotatingBorderButton variant="primary" onClick={onSignupClick}>
+              <RotatingBorderButton variant="primary" to={isAuthenticated ? "/profile" : "/signup"} animated={animated}>
                 <AuroraButtonContent visible={auroraVisible} />
-                <div className="button-content">
-                  <span className="button-text-primary">ثبت‌نام کنید</span>
-                </div>
+                <span className="button-text-primary">
+                  {isAuthenticated ? "داشبورد" : "ثبت‌نام کنید"}
+                </span>
               </RotatingBorderButton>
             </div>
 
@@ -117,7 +117,7 @@ const PrimaryContentContainer = ({
                   },
                 }}
               >
-                <img src={cticiLogo} alt="CTICI" className="title-logo" />
+                <img src={cticiLogo} alt="مرکز فناوری و نوآوری انفرماتیک و قلب و عروق" className="title-logo" />
               </Tooltip>
               <Tooltip
                 content="انستیتو قلب و عروق شهید رجایی"
@@ -133,10 +133,10 @@ const PrimaryContentContainer = ({
                   },
                 }}
               >
-                <img src={rajaeiLogo} alt="RAJAEI" className="title-logo" />
+                <img src={rajaeiLogo} alt="انستیتو قلب و عروق شهید رجایی" className="title-logo" />
               </Tooltip>
               <Tooltip
-                content=" معاونت تحقیقات و فناوری وزارت بهداشت درمان و آموزش پزشکی"
+                content="معاونت تحقیقات و فناوری وزارت بهداشت درمان و آموزش پزشکی"
                 classNames={{
                   content: "logo-tooltip-content",
                 }}
@@ -149,7 +149,7 @@ const PrimaryContentContainer = ({
                   },
                 }}
               >
-                <img src={ministryLogo} alt="MINISTRY" className="title-logo" />
+                <img src={ministryLogo} alt="معاونت تحقیقات و فناوری وزارت بهداشت درمان و آموزش پزشکی" className="title-logo" />
               </Tooltip>
             </div>
           </motion.div>

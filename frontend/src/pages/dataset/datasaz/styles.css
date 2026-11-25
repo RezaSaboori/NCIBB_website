@@ -58,8 +58,8 @@
   width: var(--dz-icon-btn-size, 1.75rem);
   height: var(--dz-icon-btn-size, 1.75rem);
   border: none;
-  border-radius: 50%;
-  background: transparent;
+  border-radius: var(--border-radius-pill);
+  background-color: transparent;
   cursor: pointer;
   padding: 0;
   box-sizing: border-box;
@@ -104,10 +104,24 @@
 .dz-modal-overlay {
   position: fixed;
   inset: 0;
-  z-index: 1000;
-  display: flex;
+  margin: 0;
+  inline-size: 100%;
+  max-inline-size: none;
+  block-size: 100%;
+  max-block-size: none;
+  overflow: auto;
+  padding: var(--spacing-sm);
+  background: transparent;
+  color: inherit;
+}
+
+.dz-modal-overlay[open] {
+  display: grid;
   align-items: center;
   justify-content: center;
+}
+
+.dz-modal-overlay::backdrop {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   background-color: color-mix(in srgb, #000 30%, transparent);
@@ -183,8 +197,7 @@
   color: var(--color-gray11);
   line-height: 1.6;
   margin: 0;
-  direction: ltr !important;
-  text-align: left !important;
+  text-align: start;
 }
 
 .dark .dz-modal__message {
@@ -299,12 +312,20 @@
 .datasaz-tabs-row {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--spacing-md);
+  max-inline-size: 100%;
 }
 
-.datasaz-tabs-row > :first-child {
-  flex: 1;
-  min-width: 0;
+.datasaz-step-viewport {
+  min-inline-size: 0;
+  border-radius: var(--border-radius-pill);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.datasaz-step-viewport .datasaz-step-tab {
+  flex: none;
+  white-space: nowrap;
 }
 
 .datasaz-save-spinner-container {
@@ -315,4 +336,29 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
+}
+
+@media (max-width: 768px) {
+  .datasaz-page { padding-inline: var(--mobile-page-gutter, 16px); }
+  .datasaz-mode-wrapper { --dz-input-h: var(--mobile-touch-target, 44px); }
+  .datasaz-tabs-row { gap: var(--mobile-control-gap, 8px); }
+  .datasaz-step-viewport .datasaz-step-tab {
+    padding-inline: var(--spacing-sm);
+  }
+  .datasaz-step-viewport .datasaz-step-tab:focus-visible {
+    outline: var(--border-width-normal) solid var(--color-blue);
+    outline-offset: calc(-1 * var(--border-width-normal));
+  }
+  .datasaz-mode-wrapper :is(button, [tabindex]):focus-visible:not(:where(.ui-input-shell)) {
+    outline-color: var(--color-blue);
+  }
+
+  .dz-modal { width: min(100%, 26.25rem); border-radius: var(--mobile-radius-dialog, 32px); }
+  .dz-modal :is(.dz-modal__header, .dz-modal__body, .dz-modal__footer) { padding: var(--mobile-card-padding, 16px); }
+  .dz-modal__footer { flex-wrap: wrap; }
+  .dz-modal :is(.dz-modal__close-btn, .dz-modal__btn) {
+    min-inline-size: var(--mobile-touch-target, 44px);
+    min-block-size: var(--mobile-touch-target, 44px);
+  }
+  .dz-modal__btn--delete { min-block-size: var(--mobile-primary-action, 48px); }
 }

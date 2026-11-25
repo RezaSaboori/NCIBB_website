@@ -1,33 +1,18 @@
-import { useEffect, useState } from 'react';
-import { ANIMATION_CONFIG } from '../../config/landing/constants';
+import { useEffect, useState } from "react"
+import { ANIMATION_CONFIG } from "../../config/landing/constants"
 
-export function useAuroraStyles() {
-  const [auroraVisible, setAuroraVisible] = useState(false);
-
-  useEffect(() => {
-    const fontLinkId = 'inter-font-link';
-    if (!document.getElementById(fontLinkId)) {
-      const link = document.createElement('link');
-      link.id = fontLinkId;
-      link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap';
-      link.rel = 'stylesheet';
-      document.head.appendChild(link);
-    }
-
-    return () => {
-      const link = document.getElementById(fontLinkId);
-      if (link) link.remove();
-    };
-  }, []);
+export function useAuroraStyles(animated) {
+  const [auroraVisible, setAuroraVisible] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setAuroraVisible(true);
-    }, ANIMATION_CONFIG.AURORA_DELAY);
+    if (!animated) return
 
-    return () => clearTimeout(timer);
-  }, []);
+    const timer = window.setTimeout(() => {
+      setAuroraVisible(true)
+    }, ANIMATION_CONFIG.AURORA_DELAY)
 
-  return auroraVisible;
+    return () => window.clearTimeout(timer)
+  }, [animated])
+
+  return !animated || auroraVisible
 }
-

@@ -83,6 +83,10 @@
   cursor: not-allowed;
 }
 
+@media (max-width: 768px) {
+  .ui-glass-switch { min-block-size: var(--mobile-touch-target); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ui-glass-switch__track > .ui-glass-switch__thumb { transition: none; }
 }

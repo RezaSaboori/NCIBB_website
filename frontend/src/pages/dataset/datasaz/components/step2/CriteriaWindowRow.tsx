@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 import { TextInput, NumberInput, DropdownInput, RadioToggle } from "../../../../../components/ui/inputs";
 import { ChevronIcon, TrashIcon } from "./icons/Step2Icons";
 
@@ -34,6 +34,8 @@ export const CriteriaWindowRow: React.FC<CriteriaWindowRowProps> = ({
   showDelete = false,
   onDelete,
 }) => {
+  const valueId = useId();
+  const operatorId = useId();
   const buildPlaceholder = () => {
     if (isNumeric && value_min != null && value_max != null)
       return `Range: ${value_min} – ${value_max}`;
@@ -42,27 +44,11 @@ export const CriteriaWindowRow: React.FC<CriteriaWindowRowProps> = ({
 
   return (
     <div className="s2-criteria-window__row">
-      {showDelete && (
-        <button
-          className="glass dz-icon-btn s2-icon-btn"
-          aria-label="Delete"
-          type="button"
-          onClick={() => onDelete?.(row.id)}
-        >
-          <TrashIcon className="dz-icon-btn__icon dz-icon-btn__icon--trash" />
-        </button>
-      )}
-      {isEnum ? (
-        <DropdownInput
-          value={row.inputValue}
-          options={values!}
-          onChange={(v) => onChange(row.id, { inputValue: v })}
-          placeholder="Select value..."
-          chevronIcon={<ChevronIcon />}
-        />
-      ) : isNumeric ? (
-        <div className="s2-criteria-window__numeric-row">
+      {isNumeric && (
+        <div className="s2-criteria-window__operator" dir="ltr">
+          <label className="s2-rule-label" htmlFor={operatorId} lang="en">Operator</label>
           <DropdownInput
+            id={operatorId}
             value={row.numericOperator}
             options={NUMERIC_OPERATORS}
             onChange={(v) => onChange(row.id, { numericOperator: v })}
@@ -70,25 +56,52 @@ export const CriteriaWindowRow: React.FC<CriteriaWindowRowProps> = ({
             chevronIcon={<ChevronIcon />}
             dir="ltr"
           />
+        </div>
+      )}
+      <div className="s2-criteria-window__field">
+        <label className="s2-rule-label" htmlFor={valueId} lang="en" dir="ltr">Value</label>
+        {isEnum ? (
+          <DropdownInput
+            id={valueId}
+            value={row.inputValue}
+            options={values ?? []}
+            onChange={(v) => onChange(row.id, { inputValue: v })}
+            placeholder="Select value..."
+            chevronIcon={<ChevronIcon />}
+          />
+        ) : isNumeric ? (
           <NumberInput
+            id={valueId}
             value={row.inputValue}
             onChange={(v) => onChange(row.id, { inputValue: v })}
             placeholder={buildPlaceholder()}
             min={value_min}
             max={value_max}
+            dir="ltr"
           />
-        </div>
-      ) : (
-        <TextInput
-          value={row.inputValue}
-          onChange={(v) => onChange(row.id, { inputValue: v })}
-          placeholder={buildPlaceholder()}
-        />
-      )}
+        ) : (
+          <TextInput
+            id={valueId}
+            value={row.inputValue}
+            onChange={(v) => onChange(row.id, { inputValue: v })}
+            placeholder={buildPlaceholder()}
+          />
+        )}
+      </div>
       <RadioToggle
         checked={row.isRequired}
         onChange={(v) => onChange(row.id, { isRequired: v })}
       />
+      {showDelete && (
+        <button
+          className="glass dz-icon-btn s2-icon-btn"
+          aria-label="Delete rule"
+          type="button"
+          onClick={() => onDelete?.(row.id)}
+        >
+          <TrashIcon className="dz-icon-btn__icon dz-icon-btn__icon--trash" />
+        </button>
+      )}
     </div>
   );
 };

@@ -32,6 +32,17 @@
 .audit-table tr > :last-child { border-inline-end: var(--ui-stroke); }
 
 @media (max-width: 760px) {
-  .audit-panel.u-container { --p: var(--spacing-sm); --gap: var(--spacing-sm); --radius: var(--border-radius-container-sm); }
+  .audit-panel.u-container {
+    --p: var(--mobile-card-padding, 16px);
+    --gap: var(--mobile-control-gap, 8px);
+    --radius: var(--mobile-radius-card, 24px);
+    --audit-row-radius: var(--mobile-radius-compact, 20px);
+  }
+  .audit-panel__body { overscroll-behavior-inline: contain; }
+  .audit-panel__body:focus-visible {
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+  }
+  .audit-table thead { background-color: var(--color-gray1); }
   .audit-table :is(th, td) { padding-inline: var(--spacing-sm); }
 }

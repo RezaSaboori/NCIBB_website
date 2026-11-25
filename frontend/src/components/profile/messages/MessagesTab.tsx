@@ -1,151 +1,156 @@
-import { GlassCard } from "@/components/ui/GlassCard"
-import { SingleLineInput, MessageInput } from "@/components/ui/inputs"
-import { GlassButton } from "@/components/ui/GlassButton"
-import { StatefulGlassButton } from "@/components/ui/StatefulGlassButton"
-import { useToast } from "@/components/ui/motion/useToast"
-import { useCallback, useEffect, useId, useState, type FormEvent } from "react"
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
+import axios from "axios"
 import { Icon } from "@iconify/react"
-import { accountApi, accountError } from "@/dataset_services/accountApi"
+import { GlassButton } from "@/components/ui/GlassButton"
+import { useToast } from "@/components/ui/motion/useToast"
+import { accountApi } from "@/dataset_services/accountApi"
 import type { Thread, ThreadMessage } from "@/types/account"
 import { AccountStatus } from "../shared/AccountStatus"
-import { PageControls } from "../shared/PageControls"
-import { formatAccountDate, formatCoins } from "../shared/accountFormat"
 import { useAccountQuery } from "../shared/useAccountQuery"
 import { ComposeDialog } from "./ComposeDialog"
-import { MessageHistory } from "./MessageHistory"
+import { ConversationDetail } from "./ConversationDetail"
+import { ConversationList, type ConversationFilters } from "./ConversationList"
+import { useConversationDrafts } from "./useConversationDrafts"
+import { useMessagingRefresh } from "./useMessagingRefresh"
+
+const emptyFilters: ConversationFilters = { search: "", status: "", owner: "" }
+
+interface Composer {
+  open: boolean
+  key: number
+  source?: Thread
+  messages: ThreadMessage[]
+}
 
 export default function MessagesTab({ userId, queue = false }: { userId: number; queue?: boolean }) {
-  const inputId = useId()
+  const navigate = useNavigate()
+  const { pathname, search, hash, state } = useLocation()
+  const handoffId: unknown = state?.messagingThread
+  const [active, setActive] = useState<{ id: number; thread?: Thread } | undefined>(() =>
+    !queue && typeof handoffId === "number" && Number.isSafeInteger(handoffId) && handoffId > 0
+      ? { id: handoffId } : undefined,
+  )
   const [page, setPage] = useState(1)
-  const [search, setSearch] = useState("")
-  const [active, setActive] = useState<Thread>()
-  const [messagePage, setMessagePage] = useState(1)
-  const [composer, setComposer] = useState<{ mode: "compose" | "forward"; open: boolean; key: number }>()
-  const [selected, setSelected] = useState<ThreadMessage[]>([])
-  const [draft, setDraft] = useState("")
-  const [sending, setSending] = useState(false)
-  const [error, setError] = useState("")
+  const [filters, setFilters] = useState(emptyFilters)
+  const [hadHistory, setHadHistory] = useState(false)
+  const [composer, setComposer] = useState<Composer>()
+  const listPane = useRef<HTMLDivElement>(null)
+  const listScroll = useRef<HTMLDivElement>(null)
+  const listScrollPosition = useRef<number>()
+  const heading = useRef<HTMLHeadingElement>(null)
+  const returnFocus = useRef<number>()
   const announce = useToast()
 
-  const showComposer = (mode: "compose" | "forward") => {
-    setComposer((current) => ({ mode, open: true, key: (current?.key ?? 0) + 1 }))
-  }
-
-  const hideComposer = () => {
-    setComposer((current) => current && { ...current, open: false })
-  }
-
-  const list = useAccountQuery(useCallback(() => accountApi.threads(page, queue ? "support_queue" : undefined, search), [page, queue, search]))
+  const list = useAccountQuery(useCallback(() => accountApi.threads(
+    page, queue ? "support_queue" : undefined, filters.search.trim(), filters.status || undefined, filters.owner || undefined,
+  ).then(
+    (data) => ({ data, page, filters }),
+    (error: unknown) => {
+      if (page > 1 && axios.isAxiosError(error) && error.response?.status === 404) {
+        return { data: undefined, page, filters }
+      }
+      throw error
+    },
+  ), [page, queue, filters]))
+  const result = list.data?.page === page && list.data.filters === filters ? list.data : undefined
+  const data = result?.data
+  const filtered = Boolean(filters.search.trim() || filters.status || filters.owner)
+  const showList = filtered || (data ? data.count > 0 : hadHistory)
   const activeId = active?.id
-  const messages = useAccountQuery(useCallback(() => activeId
-    ? accountApi.threadMessages(activeId, messagePage).then((data) => ({ activeId, messagePage, data }))
-    : null, [activeId, messagePage]))
-  const thread = useAccountQuery(useCallback(() => activeId ? accountApi.thread(activeId) : null, [activeId]))
-  const messageData = messages.data?.activeId === activeId && messages.data?.messagePage === messagePage
-    ? messages.data?.data : undefined
-  const latest = messagePage === 1 ? messageData?.results[0]?.id : undefined
-  const refreshList = list.refresh
+  const currentRefresh = useRef(list.refresh)
+
+  useMessagingRefresh(list.refreshInBackground)
+  useLayoutEffect(() => { currentRefresh.current = list.refresh }, [list.refresh])
+  const refreshList = useCallback(() => { void currentRefresh.current() }, [])
+  const drafts = useConversationDrafts(refreshList)
 
   useEffect(() => {
-    if (!activeId || !latest) return
-    void accountApi.markRead(activeId, latest).then(refreshList).catch(() => undefined)
-  }, [activeId, latest, refreshList])
+    if (!queue && typeof handoffId === "number") navigate({ pathname, search, hash }, { replace: true, state: null })
+  }, [handoffId, queue, pathname, search, hash, navigate])
 
-  const open = (item?: Thread) => {
-    setActive(item)
-    setSelected([])
-    setMessagePage(1)
-    setDraft("")
-    setError("")
+  useEffect(() => {
+    if (result && !data) setPage(1)
+    if (data && !filtered) setHadHistory(data.count > 0)
+  }, [result, data, filtered])
+
+  useLayoutEffect(() => {
+    if (activeId !== undefined || returnFocus.current === undefined) return
+    if (listScroll.current && listScrollPosition.current !== undefined) {
+      listScroll.current.scrollTop = listScrollPosition.current
+    }
+    const row = listPane.current?.querySelector<HTMLButtonElement>(`[data-thread-id="${returnFocus.current}"]`)
+    const target = row ?? listPane.current?.querySelector("h2") ?? heading.current
+    target?.focus({ preventScroll: true })
+    target?.scrollIntoView({ block: "nearest" })
+    returnFocus.current = undefined
+    listScrollPosition.current = undefined
+  }, [activeId])
+
+  const openConversation = (thread: Thread) => {
+    listScrollPosition.current = window.matchMedia("(max-width: 760px)").matches ? listScroll.current?.scrollTop : undefined
+    setActive({ id: thread.id, thread })
   }
 
-  const reply = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (!activeId || !draft.trim() || sending) return
-    setSending(true)
-    setError("")
-    try {
-      await accountApi.reply(activeId, draft.trim())
-      announce({ tone: "success", message: "پاسخ ارسال شد." })
-      setDraft("")
-      if (messagePage === 1) void messages.refresh()
-      else setMessagePage(1)
-      void list.refresh()
-    } catch (error) {
-      setError(accountError(error))
-    } finally {
-      setSending(false)
+  const openComposer = (source?: Thread, messages: ThreadMessage[] = []) => {
+    setComposer((current) => ({ open: true, key: (current?.key ?? 0) + 1, source, messages }))
+  }
+  const closeComposer = () => setComposer((current) => current && { ...current, open: false })
+
+  const onSent = (thread: Thread) => {
+    closeComposer()
+    announce({
+      tone: "success",
+      message: thread.ticket ? "تیکت ایجاد شد." : composer?.source ? "پیام‌ها ارسال شد." : "گفتگو ایجاد شد.",
+    })
+    if (queue && thread.route !== "support_queue") {
+      navigate("/profile?tab=messages", { state: { messagingThread: thread.id } })
+      return
+    }
+    setActive({ id: thread.id, thread })
+    if (page !== 1 || filters !== emptyFilters) {
+      setPage(1)
+      setFilters(emptyFilters)
+    } else {
+      refreshList()
     }
   }
 
-  const toggleMessage = (message: ThreadMessage) => {
-    setSelected((items) => items.some((item) => item.id === message.id)
-      ? items.filter((item) => item.id !== message.id)
-      : items.length < 10 ? [...items, message] : items)
-  }
+  const newConversation = (
+    <GlassButton color="primary" size={showList ? "sm" : undefined} onPress={() => openComposer()}
+      startContent={<Icon icon="tabler:message-plus" />}>گفتگوی جدید</GlassButton>
+  )
 
   return (
     <div className="account-workspace__stack">
-      <div className="account-workspace__toolbar">
-        <h1>{queue ? "صف پشتیبانی" : "پیام‌ها"}</h1>
-        <GlassButton color="primary" onPress={() => showComposer("compose")} startContent={<Icon icon="tabler:message-plus" />}>گفتگوی جدید</GlassButton>
+      <div className="account-messages__workspace-heading">
+        <h1 ref={heading} tabIndex={-1}>{queue ? "صف پشتیبانی" : "پیام‌ها"}</h1>
+        {!showList && newConversation}
       </div>
-      <div className={`account-messages${active ? " account-messages--active" : ""}`}>
-        <GlassCard size="sm" className="account-messages__list"
-          footer={<PageControls data={list.data} page={page} onPage={setPage} />}>
-          <label htmlFor={`${inputId}-search`} className="account-workspace__form">جستجو در موضوع گفتگو
-            <SingleLineInput id={`${inputId}-search`} type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} />
-          </label>
-          <AccountStatus loading={list.loading} error={list.error} retry={list.refresh} />
-          {list.data?.results.length === 0 && <p className="account-workspace__muted">گفتگویی یافت نشد.</p>}
-          {list.data?.results.map((item) => (
-            <button type="button" className={`account-messages__thread ${active?.id === item.id ? "blue-glass" : "glass"}`} aria-pressed={active?.id === item.id} key={item.id}
-              onClick={() => open(item)}>
-              <span className="account-workspace__toolbar"><strong>{item.subject}</strong>
-                {item.unread_count > 0 && <span className="account-messages__unread" aria-label="پیام خوانده‌نشده">{formatCoins(item.unread_count)}</span>}
-              </span>
-              <span>{item.counterpart} · {formatAccountDate(item.updated_at)}</span>
-              <span className="account-messages__preview">{item.preview}</span>
-            </button>
-          ))}
-        </GlassCard>
-        <GlassCard key={activeId ?? "empty"} size="md" className="account-messages__detail ui-fade-in"
-          footer={active && <PageControls data={messageData} page={messagePage} onPage={setMessagePage} />}>
-          {!active ? <p className="account-workspace__muted">یک گفتگو را از فهرست انتخاب کنید.</p> : (
-            <>
-              <GlassButton className="account-messages__back" size="sm" variant="flat" onPress={() => open()}>بازگشت به گفتگوها</GlassButton>
-              <div className="account-workspace__toolbar">
-                <div><h2>{active.subject}</h2><span className="account-workspace__muted">{active.counterpart}</span></div>
-                {!!selected.length && (
-                  <GlassButton size="sm" variant="flat" onPress={() => showComposer("forward")}>ارسال مجدد ({formatCoins(selected.length)})</GlassButton>
-                )}
-              </div>
-              <AccountStatus loading={messages.loading && !messageData} error={messages.error || thread.error} retry={messages.refresh} />
-              {messageData && <MessageHistory messages={messageData.results} userId={userId} selected={selected} toggle={toggleMessage} />}
-              {thread.data?.id === activeId && thread.data?.can_reply && <form className="account-workspace__form" onSubmit={reply}>
-                <label htmlFor={`${inputId}-reply`}>پاسخ<MessageInput id={`${inputId}-reply`} maxLength={6000} rows={3} value={draft} onChange={(event) => setDraft(event.target.value)} /></label>
-                <AccountStatus error={error} />
-                <StatefulGlassButton className="account-workspace__submit" type="submit"
-                  color={sending ? "pending" : "primary"} state={sending ? "sending" : "ready"}
-                  label={sending ? "در حال ارسال…" : "ارسال پاسخ"} disabled={!draft.trim()} busy={sending} />
-              </form>}
-            </>
-          )}
-        </GlassCard>
-      </div>
-      {composer && (
-        <ComposeDialog key={composer.key} isOpen={composer.open}
-          source={composer.mode === "forward" ? active : undefined} selected={selected}
-          onClose={hideComposer} onSent={(item) => {
-            hideComposer()
-            announce({ tone: "success", message: composer.mode === "forward" ? "پیام‌ها ارسال شد." : "گفتگو ایجاد شد." })
-            if (queue && item.route !== "support_queue") {
-              open()
-            } else open(item)
-            setPage(1)
-            void list.refresh()
-          }} />
+      {!showList && <AccountStatus loading={list.loading || Boolean(result && !data)} error={list.error} retry={refreshList} />}
+      {!showList && !list.loading && !list.error && data?.count === 0 && activeId === undefined && (
+        <p role="status" className="account-workspace__muted">
+          {queue ? "هنوز تیکتی در صف پشتیبانی ثبت نشده است." : "هنوز گفتگویی ندارید."}
+        </p>
       )}
+      {(showList || activeId !== undefined) && (
+        <div className={`account-messages${activeId !== undefined ? " account-messages--active" : ""}${showList ? " account-messages--with-list" : ""}`}>
+          {showList && <ConversationList queue={queue} userId={userId} newConversation={newConversation}
+            activeId={activeId} page={page} filters={filters} data={data}
+            loading={list.loading || Boolean(result && !data)} error={list.error} listRef={listPane} scrollRef={listScroll}
+            onPage={setPage} onRetry={refreshList} onSelect={openConversation}
+            onChange={(next) => { setPage(1); setFilters(next) }} />}
+          {activeId !== undefined && (
+            <ConversationDetail key={activeId} id={activeId} userId={userId}
+              initial={data?.results.find(({ id }) => id === activeId) ?? active?.thread}
+              draft={drafts.get(activeId)} onDraftChange={(changes) => drafts.update(activeId, changes)}
+              onReply={() => void drafts.send(activeId)} onForward={openComposer} refreshList={refreshList}
+              onBack={() => { returnFocus.current = activeId; setActive(undefined) }} />
+          )}
+        </div>
+      )}
+      {composer && <ComposeDialog key={composer.key} isOpen={composer.open} source={composer.source} userId={userId}
+        selected={composer.messages} onClose={closeComposer} onSent={onSent} />}
     </div>
   )
 }

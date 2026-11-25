@@ -11,6 +11,7 @@ interface NumberInputProps {
   className?: string;
   dir?: "rtl" | "ltr";
   id?: string;
+  ariaLabel?: string;
 }
 
 export const NumberInput: React.FC<NumberInputProps> = ({
@@ -23,6 +24,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({
   className = "",
   dir,
   id,
+  ariaLabel,
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
@@ -46,6 +48,8 @@ export const NumberInput: React.FC<NumberInputProps> = ({
         id={id}
         className="ui-input-field"
         type="number"
+        inputMode={min !== undefined && min >= 0 ? "decimal" : undefined}
+        aria-label={ariaLabel}
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}

@@ -7,24 +7,12 @@ export const HomeButton = ({
   title,
 }: IconButtonProps) => {
   return (
-    <fieldset id="home-icon-nav" className="header-nav header-nav--icon">
-      <legend className="header-nav__legend">Home</legend>
-      <Link to="/">
-        <button
-          className={`header-nav__control ${className || ""}`}
-          aria-label={ariaLabel}
-          title={title}
-        >
-          <div className="home-icon-wrapper">
-            <img
-              src="/NCIBB_logo.svg"
-              alt="NCIBB Logo"
-              className="header-nav__icon"
-              style={{ width: "100%", height: "100%" }}
-            />
-          </div>
-        </button>
+    <div id="home-icon-nav" className="header-nav header-nav--icon glass-navigation glass-transparent">
+      <Link to="/" className={`header-nav__control ${className || ""}`} aria-label={ariaLabel} title={title}>
+        <span className="home-icon-wrapper">
+          <img src="/NCIBB_logo.svg" alt="" className="header-nav__icon" />
+        </span>
       </Link>
-    </fieldset>
+    </div>
   )
 }

@@ -1,0 +1,495 @@
+.account-messages__workspace-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.account-messages {
+  --messages-panel-limit: max(21rem, min(44rem, calc(100dvh - 7rem)));
+  --messages-header-control-size: 2rem;
+  display: grid;
+  grid-template-columns: minmax(0, 32rem);
+  align-items: start;
+  gap: var(--spacing-lg);
+}
+
+.account-messages--active { grid-template-columns: minmax(0, 1fr); }
+.account-messages--active.account-messages--with-list {
+  grid-template-columns: minmax(13rem, 1fr) minmax(0, 1.7fr);
+}
+
+.account-messages__list-pane, .account-messages__detail { min-inline-size: 0; }
+.account-messages__list, .account-messages__detail { max-block-size: var(--messages-panel-limit); }
+.account-messages__detail.dz-glass-container { container-type: inline-size; gap: var(--spacing-md); }
+.account-messages__list > .dz-glass-container__body,
+.account-messages__detail > .dz-glass-container__body {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  gap: var(--spacing-md);
+}
+
+.account-messages__list-scroll,
+.account-messages__timeline {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  overscroll-behavior: contain;
+  min-block-size: 0;
+  padding: var(--spacing-sm);
+}
+
+.account-messages__timeline[hidden] { display: none; }
+.account-messages :is(.account-messages__list-scroll, .account-messages__timeline):focus-visible { outline-offset: -1px; }
+
+.account-messages__detail-heading {
+  container-type: inline-size;
+  display: grid;
+  gap: var(--spacing-sm);
+  width: 100%;
+  min-inline-size: 0;
+}
+
+.account-messages__panel-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(max-content, 1fr);
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.account-messages__panel-heading :is(.account-messages__counterpart, .account-messages__subject) {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.4;
+}
+.account-messages__detail-heading :is(.account-messages__counterpart, .account-messages__subject) {
+  font-size: var(--font-size-base);
+}
+.account-messages__counterpart {
+  justify-self: start;
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-gray10);
+}
+.account-messages__subject { text-align: center; }
+.account-messages__heading-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-xs);
+}
+
+.account-messages__detail-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+@container (max-width: 27rem) {
+  .account-messages__panel-heading--selecting .account-messages__heading-actions { grid-column: 1 / -1; }
+}
+
+.account-messages__heading-actions .account-messages__close {
+  inline-size: var(--messages-header-control-size);
+  min-inline-size: var(--messages-header-control-size);
+}
+
+.account-messages__detail-heading :is(.account-messages__close, .account-messages__forward, .account-messages__ticket-state) {
+  min-block-size: var(--messages-header-control-size);
+}
+.account-messages__ticket-state {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-block-size: 1.5rem;
+  padding-inline: var(--spacing-sm);
+  border-radius: var(--border-radius-pill);
+  color: var(--color-gray12);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.account-messages__ticket-dot {
+  display: inline-block;
+  inline-size: .625rem;
+  block-size: .625rem;
+  border-radius: 50%;
+}
+
+.account-messages__unread {
+  display: inline-grid;
+  place-items: center;
+  min-block-size: 1.125rem;
+  min-inline-size: 1.125rem;
+  padding-inline: var(--spacing-xs);
+  border-radius: var(--border-radius-pill);
+  color: var(--color-gray12);
+  font-size: .6875rem;
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.account-messages__field { display: grid; gap: var(--spacing-xs); min-inline-size: 0; }
+.account-messages__filters, .account-messages__triage, .account-messages__triage-editor {
+  display: grid;
+  min-inline-size: 0;
+  gap: var(--spacing-sm) var(--spacing-md);
+}
+.account-messages__filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.account-messages__filters .account-messages__field,
+.account-messages__triage .account-messages__field {
+  color: var(--color-gray10);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+.account-messages__triage {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.65fr);
+  align-items: start;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: var(--ui-stroke);
+  border-radius: var(--border-radius-container-xs);
+  background-color: color-mix(in srgb, var(--color-gray1) 45%, transparent);
+}
+.account-messages__triage-status .ui-dropdown__trigger {
+  block-size: auto;
+  padding-block: var(--spacing-xs);
+}
+.account-messages__triage-status .ui-dropdown__text {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.account-messages__triage-owner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-block-size: var(--ui-input-height);
+  gap: var(--spacing-sm);
+  color: var(--color-gray12);
+}
+.account-messages__triage-owner > bdi {
+  flex: 1 1 6rem;
+  overflow-wrap: anywhere;
+  font-weight: var(--font-weight-semibold);
+}
+.account-messages__triage-editor,
+.account-messages__triage > .account-workspace__status { grid-column: 1 / -1; }
+.account-messages__triage-editor {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  padding-block-start: var(--spacing-sm);
+  border-block-start: var(--ui-stroke);
+}
+
+@container (max-width: 27rem) {
+  .account-messages__triage, .account-messages__triage-editor { grid-template-columns: minmax(0, 1fr); }
+}
+
+.account-messages__thread {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-container-xs);
+  color: var(--color-gray12);
+  text-align: start;
+}
+.glass.account-messages__thread[aria-pressed="true"] {
+  background-color: var(--color-gray12);
+  background-image: linear-gradient(135deg, var(--color-gray11), var(--color-gray12));
+  color: var(--color-gray1);
+}
+.account-messages__thread[aria-pressed="true"] .account-messages__counterpart { color: var(--color-gray3); }
+.account-messages__thread .account-messages__heading-actions {
+  flex-wrap: nowrap;
+}
+.account-messages__thread-owner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--spacing-xs) var(--spacing-sm);
+  padding-block-start: var(--spacing-sm);
+  border-block-start: var(--border-width-thin) solid color-mix(in srgb, currentColor 15%, transparent);
+  font-size: var(--font-size-xs);
+  overflow-wrap: anywhere;
+}
+.account-messages__thread-owner > span { color: var(--color-gray10); }
+.account-messages__thread[aria-pressed="true"] .account-messages__thread-owner > span { color: var(--color-gray3); }
+.account-messages__thread-owner > bdi { font-weight: var(--font-weight-semibold); }
+
+@media (max-width: 360px) {
+  .account-messages__filters { gap: var(--spacing-sm); }
+}
+
+.account-messages__preview-row {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  gap: var(--spacing-sm);
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+.account-messages__preview-row time { align-self: flex-end; max-inline-size: 100%; }
+.account-messages__preview-row--mine,
+.account-messages__preview-row--mine time { align-self: flex-start; }
+.account-messages__preview-row time { font-size: var(--font-size-xs); }
+.account-messages__preview {
+  display: block;
+  max-inline-size: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-container-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
+  color: var(--color-gray12);
+}
+
+.account-messages__list .account-messages__search-button {
+  inline-size: var(--ui-input-icon-size);
+  min-inline-size: var(--ui-input-icon-size);
+  block-size: var(--ui-input-icon-size);
+}
+
+.account-messages__history {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  gap: var(--spacing-lg);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.account-messages__message {
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  gap: var(--spacing-sm);
+  max-inline-size: min(94%, 46rem);
+  min-inline-size: 0;
+  border-radius: var(--border-radius-container-xs);
+}
+.account-messages__message--mine { align-self: flex-start; }
+.account-messages__bubble {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding: .75rem var(--spacing-lg);
+  border-radius: var(--border-radius-container-xs);
+  color: var(--color-gray12);
+}
+.account-messages__sender {
+  display: block;
+  margin-block-end: var(--spacing-sm);
+  overflow-wrap: anywhere;
+  font-weight: var(--font-weight-semibold);
+}
+.account-messages__bubble p {
+  font-size: var(--font-size-sm);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.account-messages__bubble small { font-size: var(--font-size-xs); }
+.account-messages__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-gray11);
+}
+.account-messages__timestamp {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  white-space: nowrap;
+}
+.account-messages__meta .ui-glass-button.account-messages__message-action {
+  block-size: 1.5rem;
+  min-block-size: 1.5rem;
+  min-inline-size: 1.5rem;
+  padding-inline: .375rem;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1;
+}
+.account-messages__delivery { display: inline-flex; align-items: center; }
+.account-messages__delivery--sent, .account-messages__delivery--read {
+  color: color-mix(in srgb, var(--color-green) 65%, var(--color-gray12));
+}
+.account-messages__delivery--failed { color: var(--color-red); }
+
+.account-messages__reply-preview { display: flex; align-items: center; gap: var(--spacing-sm); min-inline-size: 0; }
+.account-messages__reply-preview > .account-messages__quote { flex: 1; }
+.account-messages__quote {
+  display: grid;
+  gap: var(--spacing-xs);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin-block-end: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-inline-start: 2px solid currentColor;
+  border-radius: var(--border-radius-item-sm);
+  color: var(--color-gray11);
+  background: color-mix(in srgb, currentColor 8%, transparent);
+  font-size: var(--font-size-xs);
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+.account-messages__bubble.green-glass .account-messages__quote { color: inherit; }
+.account-messages__quote > span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.account-messages__quote--link { cursor: pointer; }
+
+.account-messages__forward-preview { display: grid; gap: var(--spacing-md); }
+.account-messages__forward-preview .account-messages__quote > span { display: block; overflow: visible; }
+
+.account-messages__detail > .dz-glass-container__footer { flex: 0 0 auto; align-items: stretch; }
+
+.account-messages__composer {
+  --reply-collapsed-limit: 7rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-inline-size: 0;
+  min-block-size: 0;
+  inline-size: 100%;
+}
+.account-messages__composer-shell.ui-input-shell {
+  direction: rtl;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  block-size: auto;
+  padding: var(--spacing-xs);
+}
+.account-messages__composer-input.ui-input-field {
+  box-sizing: border-box;
+  align-self: stretch;
+  min-block-size: 2rem;
+  max-block-size: var(--reply-collapsed-limit);
+  background-color: transparent;
+  border-radius: var(--border-radius-item-xl);
+}
+.account-messages__composer-input.ui-input-field:not(:placeholder-shown) { background-color: var(--color-gray3); }
+.account-messages__composer-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+.account-messages__composer .account-messages__composer-icon {
+  inline-size: 2rem;
+  min-inline-size: 2rem;
+  block-size: 2rem;
+}
+.account-messages__composer-send { margin-block-start: auto; }
+.account-messages__reopen { font-size: var(--font-size-xs); }
+.account-messages__composer-error:empty { margin-block-start: calc(-1 * var(--spacing-xs)); }
+
+.account-messages__detail--expanded { block-size: var(--messages-panel-limit); }
+.account-messages__detail--expanded > .dz-glass-container__body { display: none; }
+.account-messages__detail--expanded > .dz-glass-container__footer,
+.account-messages__detail--expanded .account-messages__composer-shell { flex: 1 1 auto; min-block-size: 0; }
+.account-messages__detail--expanded .account-messages__composer-input.ui-input-field { block-size: 100%; max-block-size: none; }
+
+@media (max-width: 760px) {
+  .account-messages,
+  .account-messages--active.account-messages--with-list {
+    --messages-header-control-size: var(--mobile-touch-target);
+    --messages-panel-limit: max(21rem, min(44rem, calc(100dvh - var(--site-header-height, 3.5rem) - 4rem)));
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--mobile-section-gap);
+  }
+  .account-messages--active .account-messages__list-pane { display: none; }
+
+  .account-messages__bubble { padding-inline: var(--mobile-card-padding); }
+  .account-messages__bubble p,
+  .account-messages__composer-input.ui-input-field {
+    font-size: var(--mobile-type-body);
+    line-height: var(--mobile-line-body);
+  }
+
+  .account-messages__meta, .account-messages__preview,
+  .account-messages__preview-row time, .account-messages__reopen,
+  .account-messages__composer-error { font-size: var(--mobile-type-metadata); }
+
+  .account-messages__detail-heading .account-messages__panel-heading {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "counterpart actions" "subject subject";
+    gap: var(--mobile-control-gap);
+  }
+  .account-messages__detail-heading .account-messages__panel-heading--selecting {
+    grid-template-areas: "counterpart counterpart" "subject subject" "actions actions";
+  }
+  .account-messages__detail-heading .account-messages__counterpart { grid-area: counterpart; }
+  .account-messages__detail-heading .account-messages__subject { grid-area: subject; }
+  .account-messages__detail-heading .account-messages__heading-actions { grid-area: actions; }
+
+  .account-messages__panel-heading .account-messages__subject .ui-scroll-text { white-space: normal; }
+  .account-messages__panel-heading .account-messages__subject .ui-scroll-text[data-scroll-overflow] .ui-scroll-text__label {
+    opacity: 1;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-align: inherit;
+  }
+  .account-messages__panel-heading .account-messages__subject .dz-scroll-inner { display: none; }
+
+  .account-messages__heading-actions, .account-messages__composer-actions { gap: var(--mobile-control-gap); }
+  .account-messages__detail-heading .account-messages__forward { min-block-size: var(--mobile-primary-action); }
+  .account-messages__meta .ui-glass-button.account-messages__message-action {
+    block-size: auto;
+    min-block-size: var(--mobile-touch-target);
+    min-inline-size: var(--mobile-touch-target);
+    padding-inline: var(--mobile-control-gap);
+  }
+  .account-messages__quote--link { min-block-size: var(--mobile-touch-target); }
+  .account-messages__list .ui-input-shell:has(.account-messages__search-button) {
+    min-block-size: calc(var(--mobile-touch-target) + 2 * var(--border-width-thin));
+  }
+  .account-messages__list .account-messages__search-button,
+  .account-messages__composer .account-messages__composer-icon {
+    inline-size: var(--mobile-touch-target);
+    min-inline-size: var(--mobile-touch-target);
+    block-size: var(--mobile-touch-target);
+  }
+  .account-messages__composer .account-messages__composer-send {
+    inline-size: var(--mobile-primary-action);
+    min-inline-size: var(--mobile-primary-action);
+    block-size: var(--mobile-primary-action);
+  }
+  html[data-profile-keyboard]:not(:has(.profile-modal__viewport)) .account-messages--active:has(.account-messages__composer) {
+    min-block-size: var(--messages-panel-limit);
+  }
+  html[data-profile-keyboard]:not(:has(.profile-modal__viewport)) .account-messages__detail:has(.account-messages__composer) {
+    --messages-panel-limit: calc(var(--profile-viewport-height) - 2 * var(--mobile-dialog-inset));
+    position: fixed;
+    z-index: 600;
+    inset-block-start: calc(var(--profile-viewport-top) + var(--mobile-dialog-inset));
+    left: max(var(--mobile-page-gutter), env(safe-area-inset-left, 0px));
+    right: max(var(--mobile-page-gutter), env(safe-area-inset-right, 0px));
+    inline-size: auto;
+    block-size: var(--messages-panel-limit);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 390px) {
+  .account-messages__filters { grid-template-columns: minmax(0, 1fr); }
+}

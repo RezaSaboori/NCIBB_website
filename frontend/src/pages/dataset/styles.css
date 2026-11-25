@@ -46,9 +46,9 @@
   display: flex;
   align-items: center;
   width: fit-content;
-  height: 2.5rem;
+  block-size: var(--spacing-2xl);
   box-sizing: border-box;
-  padding: 0 4px;
+  padding: var(--spacing-xs);
   border: none;
   border-radius: var(--border-radius-pill);
   font-family: var(--font-family-persian);
@@ -62,8 +62,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1px var(--spacing-md) 0px var(--spacing-md);
-  height: 1.9rem;
+  padding-inline: var(--spacing-md);
+  block-size: var(--spacing-xl);
   box-sizing: border-box;
   border-radius: var(--border-radius-pill);
   color: var(--color-gray10);
@@ -76,24 +76,12 @@
   font-size: var(--font-size-sm);
 }
 
-.data-finder-mode.active {
-  color: var(--color-gray1);
-}
-
-.data-finder-mode:not(.active):hover {
+.data-finder-mode[aria-pressed="false"]:hover {
   color: var(--color-blue);
 }
 
 .dark .data-finder-mode {
   color: var(--color-gray12);
-}
-
-.dark .data-finder-mode.active {
-  color: var(--color-gray1);
-}
-
-.dark .data-finder-mode:not(.active):hover {
-  color: var(--color-blue);
 }
 
 .holistic-input-container {

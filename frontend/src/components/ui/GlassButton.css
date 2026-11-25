@@ -20,14 +20,19 @@
 
 .ui-glass-button[data-size="sm"] { min-block-size: 2rem; padding-inline: var(--spacing-sm); }
 .ui-glass-button.ui-glass-button--icon { min-block-size: 0; padding-inline: 0; }
-.ui-glass-button:is(.blue-glass, .indigo-glass, .green-glass) { color: var(--color-gray1); }
-.dark .ui-glass-button:is(.blue-glass, .indigo-glass, .green-glass) { color: var(--color-gray12); }
-.ui-glass-button.red-glass { color: var(--color-gray1); }
-.dark .ui-glass-button.red-glass { color: var(--color-gray12); }
+.ui-glass-button.indigo-glass,
+.dark .ui-glass-button:is(.blue-glass, .green-glass, .red-glass) {
+  color: var(--mobile-on-glass-accent);
+}
+
+.dark .ui-glass-button.blue-glass {
+  --blue-glass-transparency: calc(var(--glass-opacity-light) * 100%);
+  background-color: var(--color-gray2);
+}
 
 .ui-glass-button:focus-visible {
-  outline: var(--border-width-thin) solid var(--color-blue);
-  outline-offset: var(--spacing-xs);
+  outline: var(--border-width-normal) solid var(--color-blue);
+  outline-offset: var(--border-width-normal);
 }
 
 .ui-glass-button[data-pressed="true"]:not([aria-disabled="true"]) {
@@ -38,6 +43,42 @@
 
 @media (pointer: coarse) {
   .ui-glass-button[data-pressed="true"]:not([aria-disabled="true"]) { scale: 0.96; }
+}
+
+@media (max-width: 768px) {
+  .ui-glass-button,
+  .ui-glass-button[data-size="sm"],
+  .ui-glass-button.ui-glass-button--icon {
+    block-size: auto;
+    min-block-size: var(--mobile-touch-target);
+    min-inline-size: var(--mobile-touch-target);
+    max-inline-size: 100%;
+    line-height: var(--mobile-line-title);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
+  .ui-glass-button.ui-glass-button--icon {
+    inline-size: var(--mobile-touch-target);
+  }
+
+  .ui-glass-button:not(.ui-glass-button--icon) { padding-block: var(--spacing-xs); }
+
+  .ui-glass-button > svg { inline-size: var(--mobile-icon-standard); block-size: var(--mobile-icon-standard); }
+  .ui-glass-button.ui-glass-button--icon > svg {
+    inline-size: var(--mobile-icon-compact);
+    block-size: var(--mobile-icon-compact);
+  }
+  .ui-glass-button.ui-glass-button--icon:is(.blue-glass, .indigo-glass) > svg {
+    inline-size: var(--mobile-icon-prominent);
+    block-size: var(--mobile-icon-prominent);
+  }
+
+  .ui-glass-button:is(.blue-glass, .indigo-glass, .green-glass):not(.ui-glass-button--icon),
+  .ui-glass-button.ui-state-button {
+    min-block-size: var(--mobile-primary-action);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

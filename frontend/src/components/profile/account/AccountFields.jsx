@@ -6,24 +6,24 @@ import { SelectInput, SingleLineInput } from "@/components/ui/inputs"
 import { ProfileSaveAction } from "./ProfileSaveAction"
 
 const basicFields = [
-  { key: "first_name", label: "نام" },
-  { key: "last_name", label: "نام خانوادگی" },
-  { key: "email", label: "ایمیل", type: "email", dir: "ltr" },
-  { key: "phone", label: "شماره موبایل", type: "tel", dir: "ltr" },
+  { key: "first_name", label: "نام", autoComplete: "given-name" },
+  { key: "last_name", label: "نام خانوادگی", autoComplete: "family-name" },
+  { key: "email", label: "ایمیل", type: "email", dir: "ltr", autoComplete: "email" },
+  { key: "phone", label: "شماره موبایل", type: "tel", dir: "ltr", autoComplete: "tel" },
   { key: "gender", label: "جنسیت", options: [
     { value: "male", label: "مرد" },
     { value: "female", label: "زن" },
     { value: "other", label: "سایر" },
     { value: "prefer_not_to_say", label: "ترجیح می‌دهم اعلام نکنم" },
   ] },
-  { key: "city", label: "شهر" },
-  { key: "state_province", label: "استان" },
-  { key: "country", label: "کشور" },
+  { key: "city", label: "شهر", autoComplete: "address-level2" },
+  { key: "state_province", label: "استان", autoComplete: "address-level1" },
+  { key: "country", label: "کشور", autoComplete: "country-name" },
 ]
 
 const professionalFields = [
-  { key: "job_title", label: "عنوان شغلی" },
-  { key: "company", label: "شرکت / سازمان" },
+  { key: "job_title", label: "عنوان شغلی", autoComplete: "organization-title" },
+  { key: "company", label: "شرکت / سازمان", autoComplete: "organization" },
   { key: "department", label: "واحد / دپارتمان" },
 ]
 
@@ -46,7 +46,7 @@ export default function AccountFields({
         if (editing && canSave && !saving && phase !== "saved") void onSubmit(event)
         else event.preventDefault()
       }}>
-        {fields.map(({ key, label, type, dir, options }) => (
+        {fields.map(({ key, label, type, dir, autoComplete, options }) => (
           <Controller key={key} control={control} name={key} render={({ field }) => {
             const error = errors[key]?.message
             const errorId = `${formId}-${key}-error`
@@ -57,7 +57,7 @@ export default function AccountFields({
                   <SelectInput {...field} disabled={!editing || saving} options={[{ value: "", label: "—" }, ...options]}
                     aria-invalid={error ? "true" : undefined} aria-describedby={error ? errorId : undefined} />
                 ) : (
-                  <SingleLineInput {...field} type={type} dir={dir} disabled={!editing} readOnly={saving}
+                  <SingleLineInput {...field} type={type} dir={dir} autoComplete={autoComplete} disabled={!editing} readOnly={saving}
                     aria-invalid={error ? "true" : undefined} aria-describedby={error ? errorId : undefined} />
                 )}
                 {error && <small id={errorId} role="alert" className="account-workspace__error">{error}</small>}

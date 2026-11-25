@@ -10,9 +10,10 @@
 }
 
 .floating-content-inner {
-  width: 100vw;
+  width: 100%;
   display: flex;
-  justify-content: flex-start;
+  flex-direction: row-reverse;
+  justify-content: space-between;
   align-items: center;
   gap: 2rem;
   flex-wrap: nowrap;
@@ -21,3 +22,15 @@
   padding: 0 3vw;
 }
 
+.landing-container--flow :is(.floating-content-outer, .floating-content-inner) {
+  display: contents;
+}
+
+.landing-container--flow :is(.primary-content-wrapper, .secondary-content-wrapper) {
+  grid-column: 1;
+  z-index: 1;
+}
+
+.landing-container--flow .primary-content-wrapper { grid-row: intro; }
+
+.landing-container--flow .secondary-content-wrapper { grid-row: details; }

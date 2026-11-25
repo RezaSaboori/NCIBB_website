@@ -9,6 +9,8 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from apps.user_management.access import is_admin, is_support, mentor_contacts
 from apps.user_management.models import PlatformRoleAssignment
 from .models import MessageThread, ThreadMessage, ThreadReadReceipt
+from .recipient_search import matches_recipient, recipient_label, search_recipients
+from .tickets import reopen_on_requester_reply, support_agents
 
 Route = MessageThread.Route
 
@@ -38,14 +40,22 @@ def readable_threads(user):
     return MessageThread.objects.filter(allowed).distinct()
 
 
-def thread_list(user):
+def thread_list(user, *, include_ticket_owner=False):
     read = ThreadReadReceipt.objects.filter(user=user, message_id=OuterRef("pk"))
     messages = ThreadMessage.objects.filter(thread_id=OuterRef("pk"))
+    latest = messages.order_by("-pk")
     unread = messages.exclude(sender=user).exclude(Exists(read)).order_by().values("thread_id")
-    return readable_threads(user).select_related("created_by", "recipient", "group").annotate(
+    threads = readable_threads(user).select_related("created_by", "recipient", "group").annotate(
         unread=Subquery(unread.annotate(total=Count("pk")).values("total")[:1]),
-        preview=Subquery(messages.order_by("-pk").values("content")[:1]),
+        preview=Subquery(latest.values("content")[:1]),
+        preview_sender=Subquery(latest.values("sender_id")[:1]),
+        preview_created_at=Subquery(latest.values("created_at")[:1]),
     )
+    if include_ticket_owner:
+        threads = threads.select_related("ticket_assignee").annotate(
+            ticket_has_owner=Exists(support_agents().filter(pk=OuterRef("ticket_assignee_id"))),
+        )
+    return threads
 
 
 def unread_messages(user):
@@ -53,34 +63,28 @@ def unread_messages(user):
     return ThreadMessage.objects.filter(thread__in=readable_threads(user)).exclude(sender=user).exclude(Exists(read))
 
 
-def label(user):
-    return (user.get_full_name() or user.username) if user else ""
-
-
 def available_destinations(user, search=""):
     admin, support = is_admin(user), is_support(user)
+    search = " ".join(search.split())
+    term = search.casefold()
     result = []
-    if not support:
+    if not support and term in "پشتیبانی":
         result.append({"kind": "support_queue", "label": "پشتیبانی"})
-    if support:
+    if support and term in "مدیریت":
         result.append({"kind": "admin_queue", "label": "مدیریت"})
     peers = get_user_model().objects.filter(is_active=True).exclude(pk=user.pk)
-    if search:
-        peers = peers.filter(
-            Q(first_name__icontains=search) | Q(last_name__icontains=search) | Q(username__icontains=search)
-        )
     if admin or support:
         if support and not admin:
             peers = peers.exclude(Q(is_superuser=True) | Q(pk__in=queue_users("admin")) | Q(pk__in=queue_users("support")))
         kind = "admin_direct" if admin else "support_direct"
         result.extend(
-            {"kind": kind, "recipient": peer.pk, "label": label(peer)}
-            for peer in peers.order_by("first_name", "last_name", "pk")[:25]
+            {"kind": kind, "recipient": peer.pk, "label": recipient_label(peer)}
+            for peer in search_recipients(peers, search).order_by("first_name", "last_name", "pk")[:25]
         )
     result.extend(
-        {"kind": "mentor", "recipient": peer_id, "group": group_id, "label": label(peer)}
+        {"kind": "mentor", "recipient": peer_id, "group": group_id, "label": recipient_label(peer)}
         for (peer_id, group_id), peer in mentor_contacts(user).items()
-        if not search or search.casefold() in label(peer).casefold()
+        if matches_recipient(peer, term)
     )
     return result
 
@@ -125,6 +129,7 @@ def compose(user, *, kind, subject, content, recipient=None, group=None, forward
     peer = validate_destination(user, kind, recipient, group)
     thread = MessageThread.objects.create(
         route=kind, subject=subject, created_by=user, recipient=peer, group_id=group,
+        ticket_status=MessageThread.TicketStatus.OPEN if kind == Route.SUPPORT_QUEUE else None,
     )
     thread.participants.add(user)
     if peer:
@@ -139,13 +144,19 @@ def compose(user, *, kind, subject, content, recipient=None, group=None, forward
 
 
 @transaction.atomic
-def reply(user, thread_id, content):
+def reply(user, thread_id, content, reply_to_id=None):
     thread = get_object_or_404(MessageThread.objects.select_for_update(), pk=thread_id)
     if not readable_threads(user).filter(pk=thread_id).exists():
         raise Http404
     if not may_reply(thread):
         raise PermissionDenied("This conversation is read-only.")
-    message = ThreadMessage.objects.create(thread=thread, sender=user, content=content)
+    original = None
+    if reply_to_id is not None:
+        original = thread.thread_messages.select_related("sender").filter(pk=reply_to_id).first()
+        if original is None:
+            raise ValidationError({"reply_to_id": "The quoted message is unavailable in this conversation."})
+    message = ThreadMessage.objects.create(thread=thread, sender=user, content=content, reply_to=original)
+    reopen_on_requester_reply(user, thread)
     thread.updated_at = timezone.now()
     thread.save(update_fields=["updated_at"])
     return message

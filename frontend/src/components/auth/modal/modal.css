@@ -69,9 +69,9 @@
   flex-direction: row;
   align-items: center;
   border-radius: var(--border-radius-pill);
-  padding: 4px;
+  padding: var(--spacing-xs);
   width: 100%;
-  gap: 4px;
+  gap: var(--spacing-xs);
   box-sizing: border-box;
 }
 
@@ -80,10 +80,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6px var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--border-radius-pill);
   border: none;
-  background: transparent;
+  background-color: transparent;
   font-family: var(--font-family-persian);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
@@ -96,8 +96,7 @@
   color: var(--color-blue);
 }
 
-.auth-modal-tab--active {
-  color: var(--color-gray1);
+.auth-modal-tab[aria-selected="true"] {
   cursor: default;
 }
 
@@ -105,6 +104,14 @@
   color: var(--color-gray5);
 }
 
-.dark .auth-modal-tab--active {
-  color: var(--color-gray1);
+@media (max-width: 768px) {
+  .auth-modal-close-btn {
+    min-block-size: var(--mobile-touch-target);
+    min-inline-size: var(--mobile-touch-target);
+  }
+
+  .auth-modal-panel :is(.auth-modal-tab, .auth-modal-close-btn):focus-visible {
+    outline: var(--border-width-normal) solid var(--color-blue);
+    outline-offset: var(--border-width-normal);
+  }
 }

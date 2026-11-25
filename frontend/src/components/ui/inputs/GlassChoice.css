@@ -44,7 +44,7 @@
   flex: none;
   inline-size: 1rem;
   block-size: 1rem;
-  border: var(--border-width-thin) solid var(--color-gray7);
+  border: var(--ui-stroke);
   border-radius: 50%;
   background: var(--color-gray2);
 }
@@ -83,6 +83,14 @@
 .ui-glass-choice:has(> .ui-glass-choice__input:disabled) {
   opacity: .55;
   cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .ui-glass-choice {
+    min-block-size: var(--mobile-touch-target);
+    min-inline-size: var(--mobile-touch-target);
+  }
+
 }
 
 @media (forced-colors: active) {

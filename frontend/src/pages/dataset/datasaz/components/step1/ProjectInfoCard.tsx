@@ -1,5 +1,5 @@
 /*ProjectInfoCard.tsx*/
-import React, { useRef } from "react";
+import React, { useId, useRef } from "react";
 import { TextInput, NumberInput, DropdownInput } from "../../../../../components/ui/inputs";
 import { ChevronIcon } from "../step2/icons/Step2Icons";
 import { useDataFinderModeIndicator } from "../../../hooks/useDataFinderModeIndicator";
@@ -17,6 +17,7 @@ interface ProjectInfoCardProps {
   onEstimatedCountChange: (value: string) => void;
   btnState: BtnState;
   btnLabel: string;
+  submitError: string;
   onConfirm: () => void;
   projectOptions: string[];
   selectedProjectName: string;
@@ -33,17 +34,16 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
   onEstimatedCountChange,
   btnState,
   btnLabel,
+  submitError,
   onConfirm,
   projectOptions,
   selectedProjectName,
   onSelectExistingProject,
 }) => {
+  const projectSelectId = useId();
   // Show detail fields: always in "new" mode; in "existing" only after a project is selected
   const showDetailFields = mode === "new" || (mode === "existing" && !!selectedProjectName);
 
-  // Blue-glass active indicator — mirrors the datafinder mode toggle.
-  // The hook measures the active button and drives the ::after indicator
-  // via --active-indicator-* CSS custom properties on the container.
   const modeToggleRef = useRef<HTMLDivElement>(null);
   const activeModeId =
     mode === "new" ? "project-info-mode-new" : "project-info-mode-existing";
@@ -55,13 +55,14 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
         {showModeToggle && (
           <div
             ref={modeToggleRef}
-            className="data-finder-modes-container glass s1-mode-toggle"
+            className="data-finder-modes-container glass-navigation glass-navigation__indicator glass-transparent s1-mode-toggle"
             dir="rtl"
           >
             <button
               type="button"
               id="project-info-mode-new"
-              className={`data-finder-mode${mode === "new" ? " active" : ""}`}
+              aria-pressed={mode === "new"}
+              className="data-finder-mode glass-navigation__item"
               onClick={() => onModeChange("new")}
             >
               پروژه جدید
@@ -69,7 +70,8 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
             <button
               type="button"
               id="project-info-mode-existing"
-              className={`data-finder-mode${mode === "existing" ? " active" : ""}`}
+              aria-pressed={mode === "existing"}
+              className="data-finder-mode glass-navigation__item"
               onClick={() => onModeChange("existing")}
             >
               پروژه قبلی
@@ -77,16 +79,15 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
           </div>
         )}
         <h2 className="s1-card-header__title">اطلاعات پروژه</h2>
-        {/* Mode toggle — styled like the datafinder mode toggle */}
-
       </div>
 
       <div className="dz-glass-container__body">
         {/* Existing project: show dropdown first */}
         {mode === "existing" && (
           <div className="s1-field">
-            <label className="s1-label">انتخاب پروژه</label>
+            <label className="s1-label" htmlFor={projectSelectId}>انتخاب پروژه</label>
             <DropdownInput
+              id={projectSelectId}
               value={selectedProjectName}
               options={projectOptions}
               onChange={onSelectExistingProject}
@@ -136,6 +137,7 @@ export const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({
       </div>
 
       <div className="dz-glass-container__footer">
+        {submitError && <p className="s1-form-error" role="alert">{submitError}</p>}
         <button
           className={`s1-create-btn blue-glass s1-create-btn--${btnState}`}
           type="button"

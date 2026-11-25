@@ -32,7 +32,7 @@ export default function DashboardTab({ profile }: { profile: AccountProfile }) {
           action={{ to: "/profile?tab=messages", label: "پیام‌ها" }} />
         <DashboardMetric label="پروژه‌های من" icon="tabler:folder" value={projects.data?.length}
           action={{ to: "/profile?tab=projects", label: "مشاهده پروژه‌ها" }} />
-        {isSupport && <DashboardMetric label="گفتگوهای پشتیبانی" icon="tabler:headset" value={queue.data?.count}
+        {isSupport && <DashboardMetric label="تیکت‌های پشتیبانی" icon="tabler:headset" value={queue.data?.count}
           action={{ to: "/profile?tab=support", label: "صف پشتیبانی" }} />}
       </div>
       {isSupport && queue.error && <AccountStatus error={queue.error} retry={queue.refresh} />}

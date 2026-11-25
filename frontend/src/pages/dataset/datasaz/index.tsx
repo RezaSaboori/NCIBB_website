@@ -19,6 +19,8 @@ export const DatasazMode: React.FC = () => {
 
   // Show the tab-bar spinner only when a save takes longer than 2s
   const showSaveSpinner = useDelayedFlag(saving, 2000);
+  const [isStarting, setIsStarting] = useState(false);
+  const [processError, setProcessError] = useState("");
 
   // Block navigation beyond step 1 until a project is created or chosen
   const handleStepChange = useCallback(
@@ -75,16 +77,22 @@ export const DatasazMode: React.FC = () => {
     async (name: string, estimatedCount?: number) => {
       const project = await initProject(name, estimatedCount);
       if (project) nextStep();
+      return Boolean(project);
     },
     [initProject, nextStep]
   );
 
   const handleStartProcessing = useCallback(async () => {
+    if (isStarting || saving) return;
+    setIsStarting(true);
+    setProcessError("");
     // Cancel any pending debounced save and persist the latest definition now
     cancelDefinitionSave();
-    await persistStep(2, { definition: definitionRef.current });
-    nextStep();
-  }, [cancelDefinitionSave, persistStep, nextStep]);
+    const saved = await persistStep(2, { definition: definitionRef.current });
+    setIsStarting(false);
+    if (saved) nextStep();
+    else setProcessError("ذخیره معیارها انجام نشد. دوباره تلاش کنید.");
+  }, [isStarting, saving, cancelDefinitionSave, persistStep, nextStep]);
 
   const renderStep = () => {
     switch (activeStep) {
@@ -136,6 +144,9 @@ export const DatasazMode: React.FC = () => {
           exclusionCount={exclusionCount}
           errorCount={0}
           onStartProcessing={handleStartProcessing}
+          isStarting={isStarting}
+          isSaving={saving}
+          processError={processError}
         />
       )}
       {renderStep()}

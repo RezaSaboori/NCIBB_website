@@ -8,16 +8,15 @@ export const ThemeToggle = ({
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <fieldset
-      className="header-nav header-nav--icon glass-transparent"
-      style={{ paddingBottom: "0.4rem", paddingRight: "0.4rem" }}
-    >
-      <legend className="header-nav__legend">Toggle Dark Mode</legend>
+    <fieldset className="header-nav header-nav--icon header-nav--theme glass-navigation glass-transparent">
+      <legend className="header-nav__legend">نمایش روشن و تیره</legend>
       <Around
+        type="button"
         className={`header-nav__control ${className || ""}`}
         id="dark-mode-toggle"
-        aria-label="Toggle Dark Mode"
-        title="Toggle Dark Mode"
+        aria-label="حالت تیره"
+        aria-pressed={theme === "dark"}
+        title="حالت تیره"
         toggled={theme === "dark"}
         toggle={toggleTheme}
       />

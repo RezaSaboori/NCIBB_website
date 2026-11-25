@@ -1,4 +1,4 @@
-import { Input, Button } from "@heroui/react"
+import { Input } from "@heroui/react"
 import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
@@ -10,6 +10,8 @@ import { fetchUserProfile } from "../../store/profileSlice"
 import { AppDispatch } from "../../store/store"
 import { SocialButtons } from "./SocialButtons"
 import { useState } from "react"
+import { GlassButton } from "@/components/ui/GlassButton"
+import "./authForm.css"
 
 type RegisterFormFields = {
   username: string
@@ -49,12 +51,13 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<RegisterFormFields>({
     resolver: yupResolver(registerSchema),
   })
 
   const onSubmit = async (data: RegisterFormFields) => {
+    setServerError(null)
     try {
       const userData = await authService.register(data)
       localStorage.setItem("access_token", userData.access)
@@ -73,7 +76,7 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
   }
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+    <form className="auth-form flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
       {serverError && (
         <div
           className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
@@ -104,6 +107,7 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
             {...field}
             isRequired
             label="نام کاربری"
+            autoComplete="username"
             placeholder="نام کاربری خود را وارد کنید"
             isInvalid={!!errors.username}
             errorMessage={errors.username?.message}
@@ -117,7 +121,7 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
           />
         )}
       />
-      <div className="flex gap-4" dir="rtl">
+      <div className="auth-form__names flex gap-4" dir="rtl">
         <Controller
           name="first_name"
           control={control}
@@ -128,6 +132,7 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
               {...field}
               isRequired
               label="نام"
+              autoComplete="given-name"
               placeholder="نام خود را وارد کنید"
               isInvalid={!!errors.first_name}
               errorMessage={errors.first_name?.message}
@@ -151,6 +156,7 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
               {...field}
               isRequired
               label="نام خانوادگی"
+              autoComplete="family-name"
               placeholder="نام خانوادگی خود را وارد کنید"
               isInvalid={!!errors.last_name}
               errorMessage={errors.last_name?.message}
@@ -177,6 +183,8 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
             label="ایمیل"
             placeholder="ایمیل خود را وارد کنید"
             type="email"
+            autoComplete="email"
+            inputMode="email"
             isInvalid={!!errors.email}
             errorMessage={errors.email?.message}
             labelPlacement="outside"
@@ -201,6 +209,7 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
             label="رمز عبور"
             placeholder="رمز عبور خود را وارد کنید"
             type="password"
+            autoComplete="new-password"
             isInvalid={!!errors.password}
             errorMessage={errors.password?.message}
             labelPlacement="outside"
@@ -225,6 +234,7 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
             label="تایید رمز عبور"
             placeholder="رمز عبور خود را تایید کنید"
             type="password"
+            autoComplete="new-password"
             isInvalid={!!errors.password_confirm}
             errorMessage={errors.password_confirm?.message}
             labelPlacement="outside"
@@ -237,9 +247,9 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
           />
         )}
       />
-      <Button color="primary" type="submit" radius="full">
-        ثبت نام
-      </Button>
+      <GlassButton color="primary" type="submit" isLoading={isSubmitting} aria-busy={isSubmitting || undefined}>
+        {isSubmitting ? "در حال ثبت‌نام…" : "ثبت نام"}
+      </GlassButton>
       <div className="flex items-center gap-4">
         <hr className="w-full" />
         <span>یا</span>

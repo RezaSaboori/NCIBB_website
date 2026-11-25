@@ -1,7 +1,6 @@
 .secondary-content-wrapper {
   flex: 0 0 40vw;
   width: 40vw;
-  margin-left: auto;
   border-radius: var(--border-radius-container-xl);
   transition:
     opacity 0.08s linear,
@@ -87,7 +86,7 @@
   justify-content: flex-start;
 }
 
-.secondary-content-title {
+.morph-container .secondary-content-title {
   position: absolute;
   font-size: 4rem;
   margin-top: 1rem;
@@ -97,16 +96,62 @@
   color: var(--text-primary);
 }
 
+.cardio-morph-filter {
+  position: absolute;
+}
+
+.landing-container--flow :is(.secondary-content-wrapper, .secondary-content-container) {
+  inline-size: 100%;
+  min-block-size: 0;
+  border-radius: var(--mobile-radius-card);
+}
+
+.landing-container--flow .secondary-content-wrapper {
+  flex: none;
+  transition: none;
+}
+
+.landing-container--flow .secondary-content-container {
+  padding: clamp(var(--mobile-card-padding), 5vw, var(--spacing-2xl));
+}
+
+.landing-container--flow .morph-container {
+  height: auto;
+  min-block-size: calc(var(--mobile-type-title) * var(--mobile-line-title));
+  margin-block-start: 0;
+  margin-block-end: var(--spacing-sm);
+}
+
+.landing-container--flow .morph-container .secondary-content-title {
+  margin-block-start: 0;
+  font-size: var(--mobile-type-title);
+  line-height: var(--mobile-line-title);
+}
+
+.landing-container--flow .morph-container .secondary-content-title--static {
+  position: relative;
+  font-size: var(--mobile-type-section);
+  font-weight: var(--font-weight-bold);
+}
+
 .secondary-content-description {
   font-size: 1rem;
   width: 100%;
   line-height: 1.8;
   margin-top: 4rem;
   opacity: 0.85;
-  text-align: justify !important;
-  text-align-last: right !important;
+  text-align: justify;
+  text-align-last: right;
   text-justify: inter-word;
   hyphens: none;
+}
+
+.landing-container--flow .secondary-content-description {
+  margin-block-start: 0;
+  font-size: var(--mobile-type-body);
+  line-height: var(--mobile-line-body);
+  text-align: start;
+  text-align-last: auto;
 }
 
 @keyframes highlight-draw {
@@ -127,6 +172,11 @@
   background-repeat: no-repeat;
   background-size: 0% 100%;
   background-position: right center;
+}
+
+.landing-container--flow :is(.highlight, .green-highlight, .blue-highlight) {
+  display: inline;
+  padding: 0;
 }
 
 .is-visible .highlight,

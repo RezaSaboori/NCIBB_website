@@ -83,7 +83,7 @@ export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
     <div className="glass-transparent dz-glass-container dz-glass-container--xs s2-criteria-window s2-criteria-window--mini">
       {/* Header */}
       <div className="dz-glass-container__header s2-criteria-window__header">
-        <span className="s2-criteria-window__title">
+        <span className="s2-criteria-window__title" dir="auto">
           {label}
           {unit && <span className="s2-criteria-window__unit">{unit}</span>}
         </span>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 
 interface DeleteConfirmModalProps {
@@ -12,21 +12,40 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  const titleId = useId();
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+
+    const opener = document.activeElement;
+    dialog.showModal();
+    cancelRef.current?.focus();
+    return () => {
+      dialog.close();
+      if (opener instanceof HTMLElement && opener.isConnected) {
+        opener.focus({ preventScroll: true });
+      }
+    };
+  }, []);
+
   return createPortal(
-    <div className="dz-modal-overlay" onClick={onCancel}>
-      <div
-        className="glass dz-modal"
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="dz-modal-title"
-        dir="ltr"
-      >
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Backdrop clicks supplement Escape and the visible Cancel button.
+    <dialog
+      ref={dialogRef}
+      className="dz-modal-overlay"
+      aria-labelledby={titleId}
+      onClick={(event) => { if (event.target === event.currentTarget) onCancel(); }}
+      onCancel={(event) => { event.preventDefault(); onCancel(); }}
+    >
+      <div className="glass dz-modal" dir="ltr" lang="en">
         {/* Header */}
         <div className="dz-modal__header">
-          <span id="dz-modal-title" className="dz-modal__title">
+          <h2 id={titleId} className="dz-modal__title">
             Confirm Delete
-          </span>
+          </h2>
           <button
             className="glass dz-modal__close-btn"
             aria-label="Close"
@@ -41,13 +60,14 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         <div className="dz-modal__body">
           <p className="dz-modal__message">
             Are you sure you want to delete{" "}
-            <strong className="dz-modal__item-name">{itemLabel}</strong>?
+            <bdi className="dz-modal__item-name">{itemLabel}</bdi>?
           </p>
         </div>
 
         {/* Footer */}
         <div className="dz-modal__footer">
           <button
+            ref={cancelRef}
             className="glass dz-modal__btn dz-modal__btn--cancel"
             onClick={onCancel}
             type="button"
@@ -63,7 +83,7 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           </button>
         </div>
       </div>
-    </div>,
+    </dialog>,
     document.body
   );
 };

@@ -2,7 +2,8 @@ import axios from "axios"
 import api from "./api"
 import type {
   AccountGroup, AccountProfile, Adjustment, AdminProject, AuditEvent, ComposeMessage, Destination, DirectoryUser,
-  Group, GroupMember, LedgerEntry, Mentorship, Page, Role, Thread, ThreadMessage, UserDetail, Wallet,
+  Group, GroupMember, LedgerEntry, Mentorship, Page, Role, Thread, ThreadMessage, TicketAssignee,
+  TicketOwnerFilter, TicketStatus, TicketUpdate, UserDetail, Wallet,
 } from "@/types/account"
 
 const get = async <T,>(path: string, params?: Record<string, string | number | undefined>) =>
@@ -67,7 +68,8 @@ export const accountApi = {
   mentors: (id: number) => get<Mentorship[]>(`${groups}${id}/mentors/`),
   linkMentor: (id: number, data: Omit<Mentorship, "id">) => post<Mentorship>(`${groups}${id}/mentors/`, data),
   unlinkMentor: async (group: number, id: number) => { await api.delete(`${groups}${group}/mentors/${id}/`) },
-  threads: (page = 1, route?: string, search = "") => get<Page<Thread>>(threads, { page, route, search }),
+  threads: (page = 1, route?: string, search = "", ticketStatus?: TicketStatus, ticketOwner?: TicketOwnerFilter) =>
+    get<Page<Thread>>(threads, { page, route, search, ticket_status: ticketStatus, ticket_owner: ticketOwner }),
   thread: (id: number) => get<Thread>(`${threads}${id}/`),
   threadMessages: (id: number, page = 1) => get<Page<ThreadMessage>>(`${threads}${id}/messages/`, { page }),
   markRead: (id: number, through: number) => post<void>(`${threads}${id}/read/`, { through }),
@@ -75,7 +77,10 @@ export const accountApi = {
   compose: (data: ComposeMessage) => post<Thread>(threads, data),
   forward: (id: number, data: ComposeMessage & { message_ids: number[] }) =>
     post<Thread>(`${threads}${id}/forward/`, data),
-  reply: (id: number, content: string) => post<ThreadMessage>(`${threads}${id}/messages/`, { content }),
+  reply: (id: number, content: string, replyToId?: number) =>
+    post<ThreadMessage>(`${threads}${id}/messages/`, { content, reply_to_id: replyToId }),
+  ticketAssignees: (search = "") => get<TicketAssignee[]>("/messaging/ticket-assignees/", { search }),
+  updateTicket: (id: number, data: TicketUpdate) => patch<Thread>(`${threads}${id}/ticket/`, data),
 }
 
 export function accountError(error: unknown) {

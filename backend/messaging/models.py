@@ -39,10 +39,17 @@ class MessageThread(models.Model):
         ADMIN_DIRECT = "admin_direct", "Administrator conversation"
         MENTOR = "mentor", "Mentorship conversation"
 
+    class TicketStatus(models.TextChoices):
+        OPEN = "open", "Open"
+        WAITING = "waiting", "Waiting for requester"
+        RESOLVED = "resolved", "Resolved"
+
     route = models.CharField(max_length=20, choices=Route.choices, default=Route.LEGACY)
     created_by = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="+")
     recipient = models.ForeignKey(User, null=True, on_delete=models.SET_NULL, related_name="+")
     group = models.ForeignKey("user_management.UserGroup", null=True, on_delete=models.PROTECT)
+    ticket_status = models.CharField(max_length=10, choices=TicketStatus.choices, null=True, blank=True)
+    ticket_assignee = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     participants = models.ManyToManyField(User, related_name='message_threads')
     subject = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -54,6 +61,16 @@ class MessageThread(models.Model):
         verbose_name_plural = 'Message Threads'
         ordering = ["-updated_at", "-pk"]
         indexes = [models.Index(fields=["route", "-updated_at"])]
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(route="support_queue", ticket_status__isnull=False)
+                    | (~models.Q(route="support_queue")
+                       & models.Q(ticket_status__isnull=True, ticket_assignee__isnull=True))
+                ),
+                name="ticket_fields_match_support_route",
+            ),
+        ]
     
     def __str__(self):
         return self.subject
@@ -68,6 +85,7 @@ class ThreadMessage(models.Model):
     forwarded = models.BooleanField(default=False)
     thread = models.ForeignKey(MessageThread, on_delete=models.CASCADE, related_name='thread_messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='thread_messages')
+    reply_to = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     content = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

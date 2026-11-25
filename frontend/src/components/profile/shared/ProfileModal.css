@@ -7,7 +7,7 @@ html:has(.profile-modal) { scrollbar-gutter: auto !important; }
 .profile-modal__backdrop { background-color: rgb(0 0 0 / 0.24); }
 .dark .profile-modal__backdrop { background-color: rgb(0 0 0 / 0.48); }
 
-.profile-modal.glass-transparent {
+.profile-modal:is(.glass, .glass-transparent) {
   --profile-modal-padding: var(--spacing-lg);
   --profile-modal-scrollbar: 6px;
   isolation: isolate;
@@ -18,11 +18,15 @@ html:has(.profile-modal) { scrollbar-gutter: auto !important; }
   padding: var(--profile-modal-padding);
   gap: var(--spacing-md);
   border-radius: var(--border-radius-container-lg);
-  background: transparent;
-  box-shadow: none;
   color: var(--color-gray12);
 }
 
+.profile-modal.glass-transparent {
+  background: transparent;
+  box-shadow: none;
+}
+
+.profile-modal.glass { background-color: var(--color-gray1); }
 .profile-modal.glass-transparent::before { pointer-events: none; }
 
 .profile-modal :is(.profile-modal__title, .profile-modal__body, .profile-modal__footer) { padding: 0; min-inline-size: 0; }
@@ -75,31 +79,60 @@ html:has(.profile-modal) { scrollbar-gutter: auto !important; }
 .profile-modal__content { display: flow-root; }
 .profile-modal__body[aria-busy="true"] .profile-modal__content { display: grid; place-items: center; }
 
-.profile-modal :focus-visible {
+.profile-modal :focus-visible:not(:where(.ui-input-shell, .ui-input-field, .ui-dropdown__list)) {
   outline: var(--border-width-thin) solid var(--color-blue);
   outline-offset: 2px;
 }
 
-.profile-modal .ui-input-field:focus-visible { outline: none; }
 .profile-modal .ui-glass-tabs__tab:focus-visible { outline-offset: -2px; }
 .profile-modal h3 { font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); }
 .profile-modal blockquote { white-space: pre-wrap; overflow-wrap: anywhere; }
 
 @media (min-width: 761px) {
-  .profile-modal--with-navigation.glass-transparent { gap: var(--spacing-lg); }
+  .profile-modal--with-navigation:is(.glass, .glass-transparent) { gap: var(--spacing-lg); }
 }
 
 @media (max-width: 760px) {
-  .profile-modal.glass-transparent {
-    --profile-modal-padding: var(--spacing-md);
-    border-radius: var(--border-radius-container-sm);
-    margin: var(--spacing-sm);
-    max-block-size: calc(var(--visual-viewport-height, 100dvh) - 2 * var(--spacing-sm));
+  .profile-modal__viewport {
+    --profile-modal-top-inset: max(var(--mobile-dialog-inset), env(safe-area-inset-top, 0px));
+    --profile-modal-bottom-inset: max(var(--mobile-dialog-inset), env(safe-area-inset-bottom, 0px));
+    box-sizing: border-box;
+    padding-block: var(--profile-modal-top-inset) var(--profile-modal-bottom-inset);
+    padding-left: max(var(--mobile-dialog-inset), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--mobile-dialog-inset), env(safe-area-inset-right, 0px));
+    block-size: var(--profile-viewport-height, var(--visual-viewport-height, 100dvh));
+    inset-block-start: var(--profile-viewport-top, 0px);
+    inset-block-end: auto;
+  }
+
+  .profile-modal:is(.glass, .glass-transparent) {
+    --profile-modal-padding: var(--mobile-card-padding);
+    border-radius: var(--mobile-radius-dialog);
+    margin: 0;
+    max-block-size: 100%;
+    gap: var(--mobile-control-gap);
+  }
+
+  .profile-modal.glass-transparent { background-color: color-mix(in srgb, var(--color-gray1) 96%, transparent); }
+  .profile-modal .profile-modal__header { gap: var(--mobile-control-gap); }
+  .profile-modal__header h2 { font-size: var(--mobile-type-section); line-height: var(--mobile-line-title); }
+  .profile-modal .profile-modal__close {
+    inline-size: var(--mobile-touch-target);
+    min-inline-size: var(--mobile-touch-target);
+    block-size: var(--mobile-touch-target);
+  }
+  .profile-modal .profile-modal__close svg { inline-size: var(--mobile-icon-compact); block-size: var(--mobile-icon-compact); }
+  .profile-modal .profile-modal__body { margin-block: 0; }
+  .profile-modal .profile-modal__footer { flex-wrap: wrap; flex-shrink: 0; gap: var(--mobile-control-gap); }
+  .profile-modal :focus-visible:not(:where(.ui-input-shell, .ui-input-field, .ui-dropdown__list)) {
+    outline-width: var(--border-width-normal);
   }
 
   .profile-modal--with-navigation .profile-modal__header {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: "title close" "navigation navigation";
   }
-  .profile-modal[data-estimated-size="true"] .profile-modal__navigation:empty { min-block-size: 2.875rem; }
+  .profile-modal[data-estimated-size="true"] .profile-modal__navigation:empty {
+    min-block-size: calc(var(--mobile-touch-target) + 2 * var(--spacing-xs));
+  }
 }

@@ -28,10 +28,9 @@ export function createRenderer(gl, canvas, config, particles, PARTICLE_COUNT, ce
     let portalProgram, portalUniforms, portalVao, portalBuffer;
     let portalVideoTexture, portalNoiseTexture;
     let portalVideo, portalInitialized = false;
-    const PORTAL_POSITION = [-maxSize * 4.0, 0, 0]; // Far left side of scene (negative X)
     const PORTAL_SIZE = maxSize * 0.4; // 50% of original width (0.8 * 0.5 = 0.4)
-    const PORTAL_TARGET_NDC = { x: -0.8, y: 0.0 }; // Point on canvas to zoom into
-    const PORTAL_TARGET_SIZE_PX = 1500; // Final size of portal in pixels (when scrollProgress = 1)
+    const desktopPortalTargetX = -0.8;
+    const desktopPortalSize = 1500;
     
     // Event listeners storage for cleanup
     const eventListeners = [];
@@ -571,39 +570,43 @@ void main() {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
                 
-                // Load noise texture
-                const noiseUrl = 'https://gist.githubusercontent.com/atdr/1bd65e54a3f51cd9e2a28e4e9e189b01/raw/08d3409bba9206af9f6a24cdfd99b82cae5de095/rgba-noise-small.png';
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                img.onload = () => {
-                    if (disposed) return;
+                const setNoiseTexture = (upload) => {
                     portalNoiseTexture = gl.createTexture();
                     gl.bindTexture(gl.TEXTURE_2D, portalNoiseTexture);
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+                    upload();
                     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
                     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
                     portalInitialized = true;
                 };
-                img.onerror = () => {
-                    if (disposed) return;
-                    console.warn('Failed to load portal noise texture, using fallback');
-                    // Create a simple noise texture as fallback
-                    portalNoiseTexture = gl.createTexture();
-                    gl.bindTexture(gl.TEXTURE_2D, portalNoiseTexture);
+
+                const generateNoise = () => {
                     const size = 64;
                     const data = new Uint8Array(size * size * 4);
                     for (let i = 0; i < size * size; i++) {
                         data[i * 4] = data[i * 4 + 1] = data[i * 4 + 2] = Math.random() * 255;
                         data[i * 4 + 3] = 255;
                     }
-                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-                    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-                    portalInitialized = true;
+                    setNoiseTexture(() => gl.texImage2D(
+                        gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, data
+                    ));
+                };
+
+                if (config.compact) {
+                    generateNoise();
+                    return;
+                }
+
+                const noiseUrl = 'https://gist.githubusercontent.com/atdr/1bd65e54a3f51cd9e2a28e4e9e189b01/raw/08d3409bba9206af9f6a24cdfd99b82cae5de095/rgba-noise-small.png';
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    if (disposed) return;
+                    setNoiseTexture(() => gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img));
+                };
+                img.onerror = () => {
+                    if (!disposed) generateNoise();
                 };
                 img.src = noiseUrl;
             };
@@ -623,11 +626,15 @@ void main() {
         const timeInSeconds = time * 0.001;
         frameCount++;
         
-        const aspect = canvas.clientWidth / canvas.clientHeight;
-        if (aspect <= 0) return;
+        const canvasHeight = canvas.clientHeight;
+        const aspect = canvas.clientWidth / canvasHeight;
+        if (!Number.isFinite(aspect) || aspect <= 0) return;
+
+        // Scale GPU point sizes with the compact scene using a 384 CSS pixel reference height.
+        const pointSizeScale = gl.drawingBufferHeight / (config.compact ? 384 : canvasHeight);
         
         // Get scroll progress
-        const scrollProgress = scrollProgressRef ? scrollProgressRef.current : 0;
+        const scrollProgress = config.compact && !portalInitialized ? 0 : (scrollProgressRef?.current ?? 0);
         
         // Portal animation: use actual elapsed time for continuous swirling (like reference)
         // The portal should animate continuously regardless of scroll progress
@@ -721,7 +728,17 @@ void main() {
           view = mat.multiply4(tiltMatrix, view);
         }
         
-        let projection = mat.perspective4(config.fov, aspect, maxSize * 0.01, maxSize * 100);
+        const projection = mat.perspective4(config.fov, aspect, maxSize * 0.01, maxSize * 100);
+        const heartProjectionScale = config.heartProjectionScale ?? 1;
+        const heartVerticalOffset = config.heartVerticalOffset ?? 0;
+        const hasHeartFraming = heartProjectionScale !== 1 || heartVerticalOffset !== 0;
+        const heartProjection = hasHeartFraming ? projection.slice() : projection;
+        if (hasHeartFraming) {
+          // Frame the heart for compact viewports with its own projection.
+          heartProjection[0] *= heartProjectionScale;
+          heartProjection[5] *= heartProjectionScale;
+          heartProjection[9] += heartVerticalOffset * 2;
+        }
         
         // ========================================
         // PORTAL ANIMATION
@@ -742,14 +759,14 @@ void main() {
           const portalUp = [0, 1, 0];
           portalView = mat.lookAt4(portalEye, portalCameraCenter, portalUp);
           
-          // Calculate portal world position to appear at (-0.8, 0) in NDC
           const portalDistance = effectiveDistance * 0.5; // Fixed distance from camera
           const portalVisibleHeight = 2.0 * portalDistance * tanHalfFov;
           const portalVisibleWidth = portalVisibleHeight * aspect;
           
           // Base portal position
-          portalWorldX = PORTAL_TARGET_NDC.x * portalVisibleWidth * 0.5;
-          portalWorldY = PORTAL_TARGET_NDC.y * portalVisibleHeight * 0.5;
+          const targetX = config.compact ? 0 : desktopPortalTargetX;
+          portalWorldX = targetX * portalVisibleWidth * 0.5;
+          portalWorldY = 0;
           portalWorldZ = -portalDistance; // In front of camera (negative Z in view space)
           
           // Natural particle-like floating animation using multiple sine waves and physics
@@ -807,7 +824,7 @@ void main() {
         // Portal Animation: Render glow effect (fades out as portal grows)
         if (glowRenderer) {
           const heartCenter = [0, 0, 0];
-          glowRenderer.render(animatedModel, view, projection, heartCenter, maxSize, heartFadeOpacity);
+          glowRenderer.render(animatedModel, view, heartProjection, heartCenter, maxSize, heartFadeOpacity);
         }
         
         gl.useProgram(program);
@@ -815,9 +832,9 @@ void main() {
         
         gl.uniformMatrix4fv(uniforms.uModel, false, animatedModel);
         gl.uniformMatrix4fv(uniforms.uView, false, view);
-        gl.uniformMatrix4fv(uniforms.uProjection, false, projection);
+        gl.uniformMatrix4fv(uniforms.uProjection, false, heartProjection);
         gl.uniform1f(uniforms.uTime, timeInSeconds * config.heartRate);
-        gl.uniform1f(uniforms.uPointSize, config.heartPointSize);
+        gl.uniform1f(uniforms.uPointSize, config.heartPointSize * pointSizeScale);
         gl.uniform3f(uniforms.uMousePos, mouseWorldPos[0], mouseWorldPos[1], mouseWorldPos[2]);
         gl.uniform1f(uniforms.uMouseRadius, config.mouseRadius * maxSize * 0.5);
         gl.uniform1f(uniforms.uMouseGrowStrength, config.heartGrow);
@@ -873,7 +890,7 @@ void main() {
 
         // Portal Animation: Render connections (fade out as portal grows)
         if (connectionRenderer) {
-          connectionRenderer.render(animatedModel, view, projection, timeInSeconds, heartFadeOpacity);
+          connectionRenderer.render(animatedModel, view, heartProjection, timeInSeconds, heartFadeOpacity, pointSizeScale);
         }
         
         // ** FIX: Re-bind particle program and VAO before drawing particles **
@@ -885,11 +902,11 @@ void main() {
         // Matrices
         gl.uniformMatrix4fv(uniforms.uModel, false, animatedModel);
         gl.uniformMatrix4fv(uniforms.uView, false, view);
-        gl.uniformMatrix4fv(uniforms.uProjection, false, projection);
+        gl.uniformMatrix4fv(uniforms.uProjection, false, heartProjection);
         
         // Time & Interaction
         gl.uniform1f(uniforms.uTime, timeInSeconds * config.heartRate);
-        gl.uniform1f(uniforms.uPointSize, config.heartPointSize);
+        gl.uniform1f(uniforms.uPointSize, config.heartPointSize * pointSizeScale);
         gl.uniform3f(uniforms.uMousePos, mouseWorldPos[0], mouseWorldPos[1], mouseWorldPos[2]);
         gl.uniform1f(uniforms.uMouseRadius, config.mouseRadius * maxSize * 0.5);
         gl.uniform1f(uniforms.uMouseGrowStrength, config.heartGrow);
@@ -1008,7 +1025,7 @@ void main() {
             ambientRenderer.updateConfig(config);
             
             ambientRenderer.update(timeInSeconds);
-            ambientRenderer.render(animatedModel, view, projection, 1.0, mouseWorldPos, ambientOpacity);
+            ambientRenderer.render(animatedModel, view, projection, pointSizeScale, mouseWorldPos, ambientOpacity);
             
             // Restore original config values
             config.dofEnabled = originalDofEnabled;
@@ -1022,7 +1039,7 @@ void main() {
             config.dofAtmosphericFade = originalAtmosphericFade;
           } else {
             ambientRenderer.update(timeInSeconds);
-            ambientRenderer.render(animatedModel, view, projection, 1.0, mouseWorldPos, ambientOpacity);
+            ambientRenderer.render(animatedModel, view, projection, pointSizeScale, mouseWorldPos, ambientOpacity);
           }
         }
 
@@ -1050,8 +1067,13 @@ void main() {
           
           // Portal grows from 0 to target size independently (2D scale, not camera zoom)
           // Calculate scale needed to achieve target pixel size at portal's distance from camera
-          const portalDistanceFromCamera = Math.abs(portalWorldZ);
-          const worldSizeAtTarget = (PORTAL_TARGET_SIZE_PX * tanHalfFov * portalDistanceFromCamera) / canvas.clientHeight;
+          const portalDistanceFromCamera = config.compact
+            ? effectiveDistance - portalWorldZ
+            : Math.abs(portalWorldZ);
+          const targetSize = config.compact
+            ? Math.min(canvas.clientWidth, canvas.clientHeight) * 0.85
+            : desktopPortalSize;
+          const worldSizeAtTarget = (targetSize * tanHalfFov * portalDistanceFromCamera) / canvas.clientHeight;
           
           // Portal starts at 0 size and grows to target size based on scroll progress
           const minPortalSize = 0;

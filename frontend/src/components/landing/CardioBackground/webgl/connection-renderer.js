@@ -321,8 +321,9 @@ export function createConnectionRenderer(gl, config, particles, particleCount, c
     /**
      * Render connections
      * @param {number} opacityMultiplier - Opacity multiplier (0.0 to 1.0) for fade effects
+     * @param {number} widthScale - Screen scale for connection width
      */
-    function render(modelMatrix, viewMatrix, projectionMatrix, time, opacityMultiplier = 1.0) {
+    function render(modelMatrix, viewMatrix, projectionMatrix, time, opacityMultiplier = 1.0, widthScale = 1) {
         if (!config.connectionsEnabled || vertexCount === 0 || !program) return;
         
         // Save current GL state
@@ -340,7 +341,7 @@ export function createConnectionRenderer(gl, config, particles, particleCount, c
         gl.uniform3fv(uniforms.uConnectionColor, config.connectionColor);
         gl.uniform1f(uniforms.uConnectionOpacity, config.connectionOpacity * opacityMultiplier);
         gl.uniform1i(uniforms.uConnectionPulse, config.connectionPulse ? 1 : 0);
-        gl.uniform1f(uniforms.uLineWidth, config.connectionLineWidth);
+        gl.uniform1f(uniforms.uLineWidth, config.connectionLineWidth * widthScale);
         gl.uniform2f(uniforms.uResolution, gl.canvas.width, gl.canvas.height);
         
         // Enable blending for transparency

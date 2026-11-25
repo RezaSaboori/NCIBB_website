@@ -27,7 +27,7 @@ export default function DefaultLayout() {
           <Outlet context={{ setSidebar, setSidebarWidth } satisfies LayoutContext} />
         </main>
       </div>
-      <div className="ncibb-layout__footer px-6 pb-6"><Footer /></div>
+      <div className={`ncibb-layout__footer px-6 pb-6${isHomePage ? " ncibb-layout__footer--home" : ""}`}><Footer /></div>
     </div>
   )
 }

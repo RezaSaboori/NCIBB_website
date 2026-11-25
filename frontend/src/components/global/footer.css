@@ -9,3 +9,16 @@
   border-radius: var(--border-radius-container-xl);
   font-size: 15px;
 }
+
+.footer-contact-value { overflow-wrap: anywhere; }
+
+@media (max-width: 960px), (pointer: coarse) {
+  .footer-contact-link { min-block-size: var(--mobile-touch-target); }
+}
+
+@media (width < 1024px) {
+  .footer-social-links a {
+    inline-size: var(--mobile-primary-action);
+    flex: none;
+  }
+}

@@ -17,6 +17,7 @@ export const AddCriteriaTab: React.FC<AddCriteriaTabProps> = ({ label, isActive 
       onClick={onClick}
       aria-label={label}
       aria-pressed={isActive}
+      lang="en"
     >
       <span className="dz-criteria-tab__title s2-add-criteria-tab__title">{label}</span>
       <div className="dz-criteria-tab__actions">

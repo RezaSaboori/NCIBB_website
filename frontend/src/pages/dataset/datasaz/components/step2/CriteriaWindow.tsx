@@ -5,7 +5,7 @@ import { CriteriaDescriptionHelp } from "./CriteriaDescriptionHelp";
 import { CriteriaWindowRow, RowState } from "./CriteriaWindowRow";
 import type { EnumValues } from "../../types";
 import { getEnumOptions } from "../../utils/enumOptions";
-import { useScrollText } from "../../hooks/useScrollText";
+import { useScrollText } from "@/components/ui/motion/useScrollText";
 
 interface CriteriaWindowProps {
   label: string;
@@ -96,7 +96,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
     >
       {/* Header */}
       <div className="dz-glass-container__header s2-criteria-window__header">
-        <span ref={wrapperRef} className="s2-criteria-window__title dz-scroll-wrapper">
+        <span ref={wrapperRef} className="s2-criteria-window__title dz-scroll-wrapper" dir="auto">
           <span ref={innerRef} className="dz-scroll-inner">
             {label}
             {unit && <span className="s2-criteria-window__unit">{unit}</span>}

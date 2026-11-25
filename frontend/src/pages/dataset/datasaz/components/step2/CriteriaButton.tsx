@@ -1,18 +1,17 @@
 /* CriteriaButton.tsx */
 import React from "react";
 import "./step2.css";
-import { TrashIcon, QuestionIcon, ExpandIcon, MinimizeIcon } from "./icons/Step2Icons";
-import { useScrollText } from "../../hooks/useScrollText";
+import { TrashIcon, ExpandIcon, MinimizeIcon } from "./icons/Step2Icons";
+import { useScrollText } from "@/components/ui/motion/useScrollText";
 
 interface CriteriaButtonProps {
   label?: string;
   isSelected?: boolean;
   isExpanded?: boolean;
   isAdvanced?: boolean;
-  onSelect?: () => void;
-  onDelete?: () => void;
-  onHelp?: () => void;
-  onExpand?: () => void;
+  onSelect: () => void;
+  onDelete: () => void;
+  onExpand: () => void;
 }
 
 export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
@@ -22,43 +21,26 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
   isAdvanced = false,
   onSelect,
   onDelete,
-  onHelp,
   onExpand,
 }) => {
   const { wrapperRef, innerRef } = useScrollText<HTMLSpanElement, HTMLSpanElement>();
 
-  const handleActionClick = (e: React.MouseEvent, callback?: () => void) => {
-    e.stopPropagation();
-    callback?.();
-  };
-
   return (
     <div
       className={`${isAdvanced ? "opal-glass" : "glass"} dz-criteria-tab s2-criteria-tab${isSelected ? " s2-criteria-tab--selected" : ""}${isAdvanced ? " s2-criteria-tab--advanced" : ""}`}
-      onClick={onSelect}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onSelect?.()}
     >
-      <span ref={wrapperRef} className="dz-criteria-tab__title dz-scroll-wrapper">
-        <span ref={innerRef} className="dz-scroll-inner">{label}</span>
-      </span>
-      <div className="dz-criteria-tab__actions s2-criteria-tab__actions">
-        <button
-          className="teal-glass dz-icon-btn s2-icon-btn"
-          aria-label="Help"
-          onClick={(e) => handleActionClick(e, onHelp)}
-          type="button"
-          tabIndex={isSelected ? 0 : -1}
-        >
-          <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
-        </button>
+      <button className="s2-criteria-tab__select" type="button" onClick={onSelect} aria-expanded={isSelected}>
+        <span ref={wrapperRef} className="dz-criteria-tab__title dz-scroll-wrapper" dir="auto">
+          <span ref={innerRef} className="dz-scroll-inner">{label}</span>
+        </span>
+      </button>
+      <div className="dz-criteria-tab__actions s2-criteria-tab__actions" aria-hidden={!isSelected}>
         <button
           className={`${isExpanded ? "orange-glass" : "green-glass"} dz-icon-btn s2-icon-btn`}
-          aria-label={isExpanded ? "Minimize" : "Expand"}
-          onClick={(e) => handleActionClick(e, onExpand)}
+          aria-label={`${isExpanded ? "Minimize" : "Expand"} ${label}`}
+          onClick={onExpand}
           type="button"
-          tabIndex={isSelected ? 0 : -1}
+          disabled={!isSelected}
         >
           {isExpanded
             ? <MinimizeIcon className="dz-icon-btn__icon dz-icon-btn__icon--minimize" />
@@ -67,10 +49,10 @@ export const CriteriaButton: React.FC<CriteriaButtonProps> = ({
         </button>
         <button
           className="red-glass dz-icon-btn s2-icon-btn"
-          aria-label="Delete"
-          onClick={(e) => handleActionClick(e, onDelete)}
+          aria-label={`Delete ${label}`}
+          onClick={onDelete}
           type="button"
-          tabIndex={isSelected ? 0 : -1}
+          disabled={!isSelected}
         >
           <TrashIcon className="dz-icon-btn__icon dz-icon-btn__icon--trash" />
         </button>

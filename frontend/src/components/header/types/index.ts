@@ -5,7 +5,6 @@ export interface HeaderProps {
 export interface NavigationItem {
   value: string
   label: string
-  checked?: boolean
 }
 
 export interface IconButtonProps {
@@ -22,5 +21,6 @@ export interface ThemeToggleProps {
 export interface NavigationProps {
   items: NavigationItem[]
   onItemChange?: (value: string) => void
+  onProfileSignIn?: () => void
   className?: string
 }

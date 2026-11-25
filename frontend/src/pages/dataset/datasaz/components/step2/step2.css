@@ -1,13 +1,4 @@
 
-/* ── LTR override for the entire step 2 panel ──────────────────── */
-
-.s2-criteria-panel * {
-  direction: ltr !important;
-  text-align: left !important;
-}
-
-
-
 /* ── Two-panel row layout ───────────────────────────────────────── */
 
 .s2-criteria-row {
@@ -26,7 +17,9 @@
 }
 
 .s2-criteria-panel {
+  min-inline-size: 0;
   overflow: hidden !important;
+  text-align: start;
 }
 
 /* ── Panel header layout ────────────────────────────────────────── */
@@ -42,13 +35,8 @@
   flex-shrink: 0;
 }
 
-.s2-panel-header__title--inclusion {
-  color: var(--color-green);
-}
-
-.s2-panel-header__title--exclusion {
-  color: var(--color-red);
-}
+.s2-panel-header__title--inclusion { color: var(--color-green); }
+.s2-panel-header__title--exclusion { color: var(--color-red); }
 
 .s2-panel-header__search {
   flex: 1;
@@ -58,11 +46,7 @@
   min-width: 0;
 }
 
-.s2-icon-btn--help {
-  width:2.5rem;
-  height:2.5rem 
-}
-
+.s2-icon-btn--search { cursor: default; }
 
 /* ── Panel tabs layout ────────────────────────────────────────── */
 
@@ -148,55 +132,28 @@
   --dz-icon-btn-size: 1.3rem;
 }
 
-/* ── Scrolling text on hover (tabs + window headers) ───────────── */
-/*
- * Two-layer structure required:
- *   .dz-scroll-wrapper  — the clip zone: overflow:hidden, fixed max-width, stays still.
- *                          useScrollText writes --scroll-distance here.
- *   .dz-scroll-inner    — the moving text: white-space:nowrap, no width limit.
- *                          translateX animation runs only on this element.
- *
- * When text fits: --scroll-distance is 0px → translateX(0) → no movement.
- * When text overflows: inner slides left by exactly --scroll-distance px.
- */
-
-@keyframes dz-text-scroll {
-  0%   { transform: translateX(0); }
-  15%  { transform: translateX(0); }
-  85%  { transform: translateX(calc(-1 * var(--scroll-distance, 0px) - 1rem)); }
-  100% { transform: translateX(calc(-1 * var(--scroll-distance, 0px) - 1rem)); }
+/* Datasaz labels use a fade at the edge of the shared scrolling surface. */
+.dz-scroll-wrapper:is(.dz-criteria-tab__title, .s2-criteria-window__title) {
+  --dz-scroll-padding: 1rem;
 }
 
-.dz-scroll-wrapper {
-  overflow: hidden;
-  white-space: nowrap;
-  min-width: 0;
-  /* Fade-out mask is only active when --dz-scroll-overflow is 1 (set by useScrollText) */
-  -webkit-mask-image: linear-gradient(
-    to right,
-    black calc(100% - calc(var(--dz-scroll-overflow, 0) * 1.5rem)),
-    transparent calc(100% - calc((1 - var(--dz-scroll-overflow, 0)) * 100%))
-  );
-  mask-image: linear-gradient(
-    to right,
-    black calc(100% - calc(var(--dz-scroll-overflow, 0) * 1.5rem)),
-    transparent calc(100% - calc((1 - var(--dz-scroll-overflow, 0)) * 100%))
-  );
+.dz-scroll-wrapper:is(.dz-criteria-tab__title, .s2-criteria-window__title)[data-scroll-overflow="true"] {
+  mask-image: linear-gradient(to right, black calc(100% - 1.5rem), transparent);
 }
 
-.dz-scroll-inner {
-  display: inline-block;
-  white-space: nowrap;
+.dz-scroll-wrapper:is(.dz-criteria-tab__title, .s2-criteria-window__title):dir(rtl)[data-scroll-overflow="true"] {
+  mask-image: linear-gradient(to left, black calc(100% - 1.5rem), transparent);
 }
 
-.dz-scroll-wrapper:hover {
-  /* Remove the fade mask while scrolling so the full text is readable */
-  -webkit-mask-image: none;
-  mask-image: none;
-}
-
-.dz-scroll-wrapper:hover .dz-scroll-inner {
-  animation: dz-text-scroll 3s linear forwards;
+@media (prefers-reduced-motion: no-preference) {
+  .dz-scroll-wrapper:is(.dz-criteria-tab__title, .s2-criteria-window__title):hover,
+  .s2-criteria-tab__select:focus-visible .dz-scroll-wrapper {
+    mask-image: none;
+  }
+  .dz-scroll-wrapper:is(.dz-criteria-tab__title, .s2-criteria-window__title)[data-scroll-overflow="true"]:hover .dz-scroll-inner,
+  .s2-criteria-tab__select:focus-visible [data-scroll-overflow="true"] .dz-scroll-inner {
+    animation: dz-text-scroll 3s linear forwards;
+  }
 }
 
 
@@ -360,6 +317,22 @@
   color: var(--color-red);
 }
 
+.s2-criteria-window__field {
+  flex: 1 1 0;
+  min-inline-size: 0;
+}
+
+.s2-criteria-window__operator { flex: 0 0 5rem; }
+
+.s2-rule-label {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 
 /* ── Window Footer ──────────────────────────────────────────────── */
 
@@ -412,6 +385,19 @@
 /* ── CriteriaButton expand-on-select animation ──────────────────── */
 
 .s2-criteria-tab {
+  gap: 0;
+  padding-block: 0;
+  padding-inline-start: 0;
+}
+
+.s2-criteria-tab__select {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  align-self: stretch;
+  min-inline-size: 0;
+  padding-inline: var(--spacing-sm);
+  border-radius: var(--border-radius-pill);
   cursor: pointer;
 }
 
@@ -447,6 +433,7 @@
 .s2-counters-bar {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
@@ -481,6 +468,15 @@
   transition: opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
+.s2-counter-tab--start:disabled { cursor: wait; opacity: .72; }
+
+.s2-process-error {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--color-gray12);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
 .s2-counter-tab--start:hover {
   opacity: 0.85;
 }
@@ -534,25 +530,6 @@
 }
 
 
-/* ── Numeric operator + value row ──────────────────────────────── */
-
-.s2-criteria-window__numeric-row {
-  display: flex;
-  flex-direction: row;
-  gap: var(--spacing-sm);
-  align-items: center;
-  width: 100%;
-}
-
-.s2-criteria-window__numeric-row .ui-dropdown {
-  flex: 0 0 auto;
-  width: 5rem;
-}
-
-.s2-criteria-window__numeric-row .ui-input-shell {
-  flex: 1 1 auto;
-}
-
 /* ── Add More Rule Button ───────────────────────────────────────── */
 
 .s2-criteria-window__add-rule-btn {
@@ -587,4 +564,138 @@
   font-size: var(--font-size-xs);
   line-height: 1;
   flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .s2-criteria-row {
+    flex-direction: column;
+    gap: var(--mobile-section-gap, 20px);
+    margin-block-start: 0;
+  }
+
+  .s2-criteria-row .s2-criteria-panel {
+    gap: var(--mobile-control-gap, 8px);
+    padding: var(--mobile-card-padding, 16px);
+    border-radius: var(--mobile-radius-card, 24px);
+  }
+
+  .s2-criteria-panel .dz-glass-container__header { margin: 0; }
+
+  .s2-criteria-panel > .dz-glass-container__header {
+    flex-wrap: wrap;
+    gap: var(--mobile-control-gap, 8px);
+  }
+
+  .s2-panel-header__title {
+    flex: 1 0 100%;
+    min-inline-size: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .s2-panel-header__search { flex-basis: 100%; }
+
+  .s2-criteria-panel :is(.dz-criteria-tabs, .s2-criteria-windows) {
+    max-height: none;
+    padding: var(--spacing-xs);
+    overflow: visible;
+    mask-image: none;
+  }
+
+  .s2-criteria-window {
+    border-radius: var(--mobile-radius-compact, 20px);
+  }
+
+  .s2-criteria-window .s2-criteria-window__header,
+  .s2-criteria-window__footer,
+  .s2-criteria-window__footer-left {
+    flex-wrap: wrap;
+    gap: var(--mobile-control-gap, 8px);
+  }
+
+  .s2-criteria-window .s2-criteria-window__title {
+    flex-basis: 100%;
+    max-inline-size: none;
+  }
+
+  .s2-adv-group .s2-adv-group__name-input.ui-input-shell {
+    flex: 1 0 100%;
+    height: auto;
+    min-height: var(--mobile-touch-target, 44px);
+  }
+
+  .s2-criteria-panel :is(.dz-criteria-tab__title, .s2-criteria-window__title, .dz-scroll-inner) {
+    max-inline-size: none;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    animation: none;
+    mask-image: none;
+  }
+
+  .s2-criteria-panel .dz-scroll-wrapper[data-scroll-overflow="true"] { mask-image: none; }
+  .s2-criteria-panel .dz-scroll-wrapper[data-scroll-overflow="true"] .dz-scroll-inner { animation: none; }
+
+  .s2-criteria-tab__select,
+  .s2-add-criteria-tab,
+  .s2-criteria-window :is(.s2-icon-btn, .s2-criteria-window__btn, .s2-criteria-window__add-rule-btn),
+  .s2-criteria-window .ui-radio-toggle {
+    min-block-size: var(--mobile-touch-target, 44px);
+    min-inline-size: var(--mobile-touch-target, 44px);
+  }
+
+  .s2-criteria-tab,
+  .s2-add-criteria-tab {
+    height: auto;
+    max-inline-size: 100%;
+  }
+
+  .s2-criteria-tab__actions .s2-icon-btn {
+    inline-size: var(--mobile-touch-target, 44px);
+    block-size: var(--mobile-touch-target, 44px);
+  }
+
+  .s2-criteria-tab--selected .s2-criteria-tab__actions {
+    max-width: calc(2 * var(--mobile-touch-target, 44px) + var(--spacing-xs));
+  }
+
+  .s2-criteria-tab__actions .s2-icon-btn:focus-visible { outline-offset: -2px; }
+
+  .s2-criteria-window__body {
+    max-block-size: none;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .s2-criteria-window__row {
+    flex-wrap: wrap;
+    justify-content: start;
+    align-items: end;
+    gap: var(--mobile-control-gap, 8px);
+  }
+
+  .s2-rule-label {
+    position: static;
+    display: block;
+    inline-size: auto;
+    block-size: auto;
+    margin-block-end: var(--spacing-xs);
+    clip-path: none;
+    color: var(--color-gray8);
+    font-size: var(--mobile-type-metadata, .8125rem);
+  }
+
+  .s2-criteria-window__field { flex-basis: min(100%, 7rem); }
+  .s2-criteria-window__operator { flex-basis: min(100%, 5rem); }
+
+  .s2-counters-bar { gap: var(--mobile-control-gap, 8px); }
+  .s2-counter-tab { height: auto; padding: var(--spacing-sm); }
+  .s2-counter-tab--start {
+    justify-content: center;
+    flex: 0 0 100%;
+    min-block-size: var(--mobile-primary-action, 48px);
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .s2-criteria-tab__actions { transition: opacity var(--motion-duration-fast) ease-out; }
 }

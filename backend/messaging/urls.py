@@ -10,6 +10,8 @@ urlpatterns = [
     path('send/', views.send_message_view, name='send_message'),
     
     path('destinations/', views.destinations_view, name='destinations'),
+    path('ticket-assignees/', views.ticket_assignees_view, name='ticket_assignees'),
+    path('threads/<int:thread_id>/ticket/', views.ticket_update_view, name='ticket_update'),
     path('threads/<int:thread_id>/read/', views.mark_thread_read_view, name='thread_read'),
     path('threads/<int:thread_id>/forward/', views.forward_view, name='thread_forward'),
 

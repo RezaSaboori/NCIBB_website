@@ -142,7 +142,7 @@ class UserConversationMessagesView(UserConversationsView):
         thread = get_object_or_404(self.related(user), pk=thread_id)
         audit(request.user, "conversation_reviewed", subject=user, thread_id=thread.pk)
         return self.paginate(
-            ThreadMessage.objects.filter(thread=thread).select_related("sender").order_by("-pk"),
+            ThreadMessage.objects.filter(thread=thread).select_related("sender", "reply_to__sender").order_by("-pk"),
             ThreadMessageSerializer,
         )
 

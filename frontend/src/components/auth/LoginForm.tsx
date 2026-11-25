@@ -1,4 +1,5 @@
-import { Input, Button, Link, useDisclosure } from "@heroui/react"
+import { Input, Link, useDisclosure } from "@heroui/react"
+import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
@@ -9,6 +10,8 @@ import { fetchUserProfile } from "../../store/profileSlice"
 import { AppDispatch } from "../../store/store"
 import { SocialButtons } from "./SocialButtons"
 import { ForgotPasswordModal } from "./modal/ForgotPasswordModal"
+import { GlassButton } from "@/components/ui/GlassButton"
+import "./authForm.css"
 
 type LoginFormFields = {
   email: string
@@ -26,6 +29,7 @@ const loginSchema = yup.object().shape({
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const dispatch: AppDispatch = useDispatch()
+  const [serverError, setServerError] = useState("")
   const {
     isOpen: isForgotPasswordOpen,
     onOpen: onForgotPasswordOpen,
@@ -35,12 +39,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<LoginFormFields>({
     resolver: yupResolver(loginSchema),
   })
 
   const onSubmit = async (data: LoginFormFields) => {
+    setServerError("")
     try {
       const userData = await authService.login(data)
       localStorage.setItem("access_token", userData.access)
@@ -50,15 +55,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
       if (onLoginSuccess) {
         onLoginSuccess()
       }
-    } catch (error) {
-      console.error("Login failed:", error)
-      // Handle login error (e.g., show an error message)
+    } catch {
+      setServerError("ورود انجام نشد. دوباره تلاش کنید.")
     }
   }
 
   return (
     <>
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+      <form className="auth-form flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+        {serverError && <p className="auth-form__error" role="alert">{serverError}</p>}
         <Controller
           name="email"
           control={control}
@@ -71,6 +76,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               label="ایمیل"
               placeholder="ایمیل خود را وارد کنید"
               type="email"
+              autoComplete="username"
+              inputMode="email"
               isInvalid={!!errors.email}
               errorMessage={errors.email?.message}
               labelPlacement="outside"
@@ -95,6 +102,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
               label="رمز عبور"
               placeholder="رمز عبور خود را وارد کنید"
               type="password"
+              autoComplete="current-password"
               isInvalid={!!errors.password}
               errorMessage={errors.password?.message}
               labelPlacement="outside"
@@ -119,9 +127,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
             رمز عبور خود را فراموش کرده اید؟
           </Link>
         </div>
-        <Button color="primary" type="submit" radius="full">
-          ورود
-        </Button>
+        <GlassButton color="primary" type="submit" isLoading={isSubmitting} aria-busy={isSubmitting || undefined}>
+          {isSubmitting ? "در حال ورود…" : "ورود"}
+        </GlassButton>
         <div className="flex items-center gap-4">
           <hr className="w-full" />
           <span>یا</span>

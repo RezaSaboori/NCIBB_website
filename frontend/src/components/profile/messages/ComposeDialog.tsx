@@ -1,39 +1,43 @@
 import { SingleLineInput, SelectInput, MessageInput } from "@/components/ui/inputs"
 import { GlassButton } from "@/components/ui/GlassButton"
 import { StatefulGlassButton } from "@/components/ui/StatefulGlassButton"
-import { useCallback, useId, useState, type FormEvent } from "react"
+import { useId, useRef, useState, type FormEvent } from "react"
 import { ProfileModal } from "../shared/ProfileModal"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
 import type { Destination, Thread, ThreadMessage } from "@/types/account"
 import { AccountStatus } from "../shared/AccountStatus"
-import { useAccountQuery } from "../shared/useAccountQuery"
+import { MessageHistory } from "./MessageHistory"
+import { useMessagingSearch } from "./useMessagingSearch"
 
 const destinationKey = (destination: Destination) => [destination.kind, destination.recipient, destination.group].join(":")
+const destinationName = (destination: Destination) => destination.group
+  ? `${destination.label} · گروه ${destination.group}` : destination.label
 
-export function ComposeDialog({ isOpen, source, selected, onClose, onSent }: {
+export function ComposeDialog({ isOpen, source, selected, userId, onClose, onSent }: {
   isOpen: boolean
   source?: Thread
   selected: ThreadMessage[]
+  userId: number
   onClose: () => void
   onSent: (thread: Thread) => void
 }) {
   const formId = useId()
-  const [search, setSearch] = useState("")
-  const [recipient, setRecipient] = useState("")
+  const [recipient, setRecipient] = useState<Destination>()
   const [subject, setSubject] = useState(source ? `ارسال مجدد · ${source.subject}`.slice(0, 200) : "")
   const [content, setContent] = useState("")
   const [saving, setSaving] = useState(false)
+  const pending = useRef(false)
   const [error, setError] = useState("")
-  const destinations = useAccountQuery(useCallback(() => isOpen ? accountApi.destinations(search) : null, [isOpen, search]))
+  const destinations = useMessagingSearch(isOpen, "جستجوی گیرنده", accountApi.destinations)
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const destination = destinations.data?.find((option) => destinationKey(option) === recipient)
-    if (!destination || saving || !subject.trim() || (!source && !content.trim())) return
+    if (!recipient || pending.current || !subject.trim() || (!source && !content.trim())) return
     const payload = {
-      kind: destination.kind, recipient: destination.recipient, group: destination.group,
+      kind: recipient.kind, recipient: recipient.recipient, group: recipient.group,
       subject: subject.trim(), content: content.trim(),
     }
+    pending.current = true
     setSaving(true)
     setError("")
     try {
@@ -44,13 +48,14 @@ export function ComposeDialog({ isOpen, source, selected, onClose, onSent }: {
     } catch (error) {
       setError(accountError(error))
     } finally {
+      pending.current = false
       setSaving(false)
     }
   }
 
   return (
-    <ProfileModal isOpen={isOpen} size="lg" title={source ? "ارسال مجدد پیام" : "گفتگوی جدید"}
-      onOpenChange={(open) => { if (!open && !saving) onClose() }}
+    <ProfileModal isOpen={isOpen} size="lg" surface="glass" title={source ? "ارسال به دیگری" : "گفتگوی جدید"}
+      onOpenChange={(open) => { if (!open && !pending.current) onClose() }}
       footer={(
         <>
           <GlassButton variant="flat" isDisabled={saving} onPress={onClose}>انصراف</GlassButton>
@@ -60,25 +65,20 @@ export function ComposeDialog({ isOpen, source, selected, onClose, onSent }: {
         </>
       )}>
       <form id={formId} className="account-workspace__form" onSubmit={submit}>
-        <label htmlFor={`${formId}-search`}>جستجوی گیرنده<SingleLineInput id={`${formId}-search`} value={search} onChange={(event) => {
-          setSearch(event.target.value)
-          setRecipient("")
-        }} /></label>
-        <AccountStatus loading={destinations.loading} error={destinations.error} retry={destinations.refresh} />
         <label htmlFor={`${formId}-recipient`}>گیرنده
-          <SelectInput id={`${formId}-recipient`} required value={recipient} onChange={setRecipient} placeholder="انتخاب گیرنده"
-            options={(destinations.data ?? []).map((option) => ({
-              value: destinationKey(option),
-              label: option.group ? `${option.label} · گروه ${option.group}` : option.label,
-            }))} />
+          <SelectInput id={`${formId}-recipient`} required disabled={saving}
+            value={recipient && destinationKey(recipient)} selectedLabel={recipient && destinationName(recipient)}
+            onChange={(value) => setRecipient(destinations.options.find((option) => destinationKey(option) === value))}
+            placeholder="انتخاب گیرنده" remoteSearch={destinations.remoteSearch}
+            options={destinations.options.map((option) => ({ value: destinationKey(option), label: destinationName(option) }))} />
         </label>
-        <label htmlFor={`${formId}-subject`}>موضوع<SingleLineInput id={`${formId}-subject`} required maxLength={200} value={subject} onChange={(event) => setSubject(event.target.value)} /></label>
-        {source && <div className="account-workspace__stack">
-          <h3>پیش‌نمایش پیام‌های انتخاب‌شده</h3>
-          {selected.map((message) => <blockquote key={message.id}>{message.content}</blockquote>)}
-        </div>}
+        <label htmlFor={`${formId}-subject`}>موضوع<SingleLineInput id={`${formId}-subject`} required disabled={saving} maxLength={200} value={subject} onChange={(event) => setSubject(event.target.value)} /></label>
+        {source && <section className="account-messages__forward-preview" aria-labelledby={`${formId}-preview`}>
+          <h3 id={`${formId}-preview`}>پیش‌نمایش پیام‌های انتخاب‌شده</h3>
+          <MessageHistory messages={[...selected].sort((first, second) => second.id - first.id)} userId={userId} />
+        </section>}
         <label htmlFor={`${formId}-content`}>{source ? "یادداشت (اختیاری)" : "متن پیام"}
-          <MessageInput id={`${formId}-content`} required={!source} maxLength={6000} rows={5} value={content} onChange={(event) => setContent(event.target.value)} />
+          <MessageInput id={`${formId}-content`} required={!source} disabled={saving} maxLength={6000} rows={5} value={content} onChange={(event) => setContent(event.target.value)} />
         </label>
         <AccountStatus error={error} />
       </form>

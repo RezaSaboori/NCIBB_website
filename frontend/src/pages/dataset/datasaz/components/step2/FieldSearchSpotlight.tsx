@@ -16,7 +16,7 @@ interface FieldSearchSpotlightProps {
 }
 
 export const FieldSearchSpotlight = React.forwardRef<HTMLDivElement, FieldSearchSpotlightProps>(
-  ({ isOpen, query, suggestions, isLoading, error, onQueryChange, onSelect, onClose }, ref) => {
+  function FieldSearchSpotlight({ isOpen, query, suggestions, isLoading, error, onQueryChange, onSelect, onClose }, ref) {
     const inputRef = useRef<HTMLInputElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
 
@@ -57,14 +57,15 @@ export const FieldSearchSpotlight = React.forwardRef<HTMLDivElement, FieldSearch
       >
         <div ref={panelRef} className="s2-spotlight">
           {/* Search Row */}
-          <div className="glass-transparent s2-spotlight__search-row">
+          <div className="glass-transparent s2-spotlight__search-row" lang="en" dir="ltr">
             <input
               ref={inputRef}
               className="s2-spotlight__input"
-              type="text"
+              type="search"
               value={query}
               onChange={(e) => onQueryChange(e.target.value)}
               placeholder="Search fields…"
+              aria-label="Search fields"
               autoComplete="off"
               spellCheck={false}
             />
@@ -77,10 +78,10 @@ export const FieldSearchSpotlight = React.forwardRef<HTMLDivElement, FieldSearch
           {(suggestions.length > 0 || isLoading || error) && (
             <div className="s2-spotlight__suggestions">
               {isLoading && (
-                <span className="s2-spotlight__loading">Searching…</span>
+                <span className="s2-spotlight__loading" lang="en" dir="ltr" role="status">Searching…</span>
               )}
               {!isLoading && error && (
-                <span className="s2-spotlight__error">{error}</span>
+                <span className="s2-spotlight__error" dir="auto" role="alert">{error}</span>
               )}
               {!isLoading &&
                 !error &&
@@ -89,12 +90,9 @@ export const FieldSearchSpotlight = React.forwardRef<HTMLDivElement, FieldSearch
                     key={item.code}
                     type="button"
                     className="glass-transparent s2-spotlight__suggestion-tab"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      onSelect(item);
-                    }}
+                    onClick={() => onSelect(item)}
                   >
-                    <span className="s2-spotlight__suggestion-name">{item.name}</span>
+                    <span className="s2-spotlight__suggestion-name" dir="auto">{item.name}</span>
                   </button>
                 ))}
             </div>

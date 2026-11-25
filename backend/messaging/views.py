@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.db.models import Q
+from django.db.models import BooleanField, Case, Exists, OuterRef, Q, When
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import generics, serializers, status
@@ -9,14 +9,16 @@ from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
 from apps.user_management.access import is_admin, is_support
-from .models import Message, MessageThread, Notification, ThreadMessage
+from .models import Message, MessageThread, Notification, ThreadMessage, ThreadReadReceipt
 from .routing import (
     available_destinations, compose, mark_read, readable_threads, reply, thread_list, unread_messages,
 )
 from .serializers import (
     ComposeSerializer, ForwardSerializer, LegacySendSerializer, MessageSerializer,
     MessageThreadSerializer, NotificationSerializer, ReplySerializer, ThreadMessageSerializer,
+    TicketFilterSerializer, TicketUpdateSerializer,
 )
+from .tickets import ticket_assignees, update_ticket
 
 
 class MessageWriteThrottle(UserRateThrottle):
@@ -51,7 +53,22 @@ class MessageDetailView(generics.RetrieveAPIView):
         return own_legacy_messages(self.request.user)
 
 
-class MessageThreadListView(generics.ListAPIView):
+class ThreadQueryMixin:
+    def can_manage_tickets(self):
+        if not hasattr(self, "_can_manage_tickets"):
+            self._can_manage_tickets = is_support(self.request.user)
+        return self._can_manage_tickets
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context["can_manage_tickets"] = self.can_manage_tickets()
+        return context
+
+    def get_queryset(self):
+        return thread_list(self.request.user, include_ticket_owner=self.can_manage_tickets())
+
+
+class MessageThreadListView(ThreadQueryMixin, generics.ListAPIView):
     serializer_class = MessageThreadSerializer
     throttle_classes = [MessageWriteThrottle]
     filterset_fields = ["route"]
@@ -59,7 +76,23 @@ class MessageThreadListView(generics.ListAPIView):
     ordering_fields = ["updated_at", "created_at"]
 
     def get_queryset(self):
-        return thread_list(self.request.user)
+        filters = TicketFilterSerializer(data=self.request.query_params)
+        filters.is_valid(raise_exception=True)
+        queryset = super().get_queryset()
+        if not filters.validated_data:
+            return queryset
+        if not self.can_manage_tickets():
+            raise PermissionDenied()
+        queryset = queryset.filter(route=MessageThread.Route.SUPPORT_QUEUE)
+        ticket_status = filters.validated_data.get("ticket_status")
+        if ticket_status:
+            queryset = queryset.filter(ticket_status=ticket_status)
+        owner = filters.validated_data.get("ticket_owner")
+        if owner == "mine":
+            queryset = queryset.filter(ticket_has_owner=True, ticket_assignee=self.request.user)
+        elif owner == "unassigned":
+            queryset = queryset.filter(ticket_has_owner=False)
+        return queryset
 
     def post(self, request):
         serializer = ComposeSerializer(data=request.data)
@@ -68,11 +101,28 @@ class MessageThreadListView(generics.ListAPIView):
         return Response(self.get_serializer(thread).data, status=status.HTTP_201_CREATED)
 
 
-class MessageThreadDetailView(generics.RetrieveAPIView):
+class MessageThreadDetailView(ThreadQueryMixin, generics.RetrieveAPIView):
     serializer_class = MessageThreadSerializer
 
-    def get_queryset(self):
-        return thread_list(self.request.user)
+
+@api_view(["GET"])
+def ticket_assignees_view(request):
+    if not is_support(request.user):
+        raise PermissionDenied()
+    search = " ".join(request.query_params.get("search", "")[:120].split())
+    return Response(ticket_assignees(search))
+
+
+@api_view(["PATCH"])
+@throttle_classes([MessageWriteThrottle])
+def ticket_update_view(request, thread_id):
+    if not is_support(request.user):
+        raise PermissionDenied()
+    serializer = TicketUpdateSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    update_ticket(request.user, thread_id, serializer.validated_data)
+    ticket = get_object_or_404(thread_list(request.user, include_ticket_owner=True), pk=thread_id)
+    return Response(MessageThreadSerializer(ticket, context={"request": request, "can_manage_tickets": True}).data)
 
 
 class ThreadMessageListView(generics.ListAPIView):
@@ -81,13 +131,18 @@ class ThreadMessageListView(generics.ListAPIView):
     ordering_fields = ["id"]
 
     def get_queryset(self):
-        thread = get_object_or_404(readable_threads(self.request.user), pk=self.kwargs["thread_id"])
-        return ThreadMessage.objects.filter(thread=thread).select_related("sender").order_by("-pk")
+        user = self.request.user
+        thread = get_object_or_404(readable_threads(user), pk=self.kwargs["thread_id"])
+        other_reads = ThreadReadReceipt.objects.filter(message_id=OuterRef("pk")).exclude(user=user)
+        return ThreadMessage.objects.filter(thread=thread).select_related("sender", "reply_to__sender").annotate(
+            read_by_other=Case(When(sender=user, then=Exists(other_reads)), output_field=BooleanField()),
+        ).order_by("-pk")
 
     def post(self, request, thread_id):
         serializer = ReplySerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        entry = reply(request.user, thread_id, serializer.validated_data["content"])
+        entry = reply(request.user, thread_id, **serializer.validated_data)
+        entry.read_by_other = False
         return Response(self.get_serializer(entry).data, status=status.HTTP_201_CREATED)
 
 

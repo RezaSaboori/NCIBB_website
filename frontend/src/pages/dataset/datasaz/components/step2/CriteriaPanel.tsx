@@ -1,5 +1,5 @@
 /*CriteriaPanel.tsx*/
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, { useState, useCallback, useRef, useEffect, useId } from "react";
 import { DeleteConfirmModal } from "./DeleteConfirmModal";
 import "./step2.css";
 import { CriteriaButton } from "./CriteriaButton";
@@ -7,7 +7,7 @@ import { AddCriteriaTab } from "./AddCriteriaTab";
 import { CriteriaWindow } from "./CriteriaWindow";
 import { CriteriaWindowAdvanced } from "./CriteriaWindowAdvanced";
 import { FieldSearchSpotlight } from "./FieldSearchSpotlight";
-import { SearchIcon, QuestionIcon } from "./icons/Step2Icons";
+import { SearchIcon } from "./icons/Step2Icons";
 import { SearchInput } from "../../../../../components/ui/inputs";
 import { useFieldSearch } from "../../hooks/useFieldSearch";
 import { useCriteriaSearch } from "../../hooks/useCriteriaSearch";
@@ -25,6 +25,7 @@ interface CriteriaPanelProps {
 
 export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChange, initialDefinition, onDefinitionChange }) => {
   const isInclusion = type === "inclusion";
+  const headingId = useId();
 
   const titleClass = isInclusion
     ? "s2-panel-header__title--inclusion"
@@ -307,28 +308,25 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
   }, []);
 
   return (
-    <div className={`glass dz-glass-container dz-glass-container--md s2-criteria-panel${spotlightOpen ? " s2-criteria-panel--spotlight-open" : ""}`}>
+    <section dir="ltr" lang="en" aria-labelledby={headingId} className={`glass dz-glass-container dz-glass-container--md s2-criteria-panel${spotlightOpen ? " s2-criteria-panel--spotlight-open" : ""}`}>
       {/* Header */}
       <div className="dz-glass-container__header">
-        <span className={`s2-panel-header__title ${titleClass}`}>{title}</span>
+        <h2 id={headingId} className={`s2-panel-header__title ${titleClass}`}>{title}</h2>
 
         <div className="s2-panel-header__search">
           <SearchInput
             value={searchQuery}
             onChange={handleSearchChange}
             placeholder="Search criteria…"
+            ariaLabel={`Search ${title.toLowerCase()}`}
             multiline
             icon={
-              <button className="glass dz-icon-btn s2-icon-btn s2-icon-btn--search" aria-label="Search">
+              <span className="glass dz-icon-btn s2-icon-btn--search" aria-hidden="true">
                 <SearchIcon className="dz-icon-btn__icon dz-icon-btn__icon--search" />
-              </button>
+              </span>
             }
           />
         </div>
-
-        <button className="glass dz-icon-btn s2-icon-btn s2-icon-btn--help" aria-label="Help">
-          <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
-        </button>
       </div>
 
       {/* Tabs row */}
@@ -442,6 +440,6 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
           onCancel={handleCancelDelete}
         />
       )}
-    </div>
+    </section>
   );
 };
