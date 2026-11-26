@@ -1,10 +1,30 @@
+:where(.profile-detail-cards, .profile-detail-card-group, .profile-modal--with-navigation) {
+  --profile-detail-radius: var(--border-radius-2xl);
+}
+
+:where(.profile-detail-card-group--account, .profile-modal--with-navigation) {
+  --profile-account-group-padding: var(--spacing-md);
+}
+
+.profile-detail-card-group.dz-glass-container {
+  border-radius: calc(var(--profile-detail-radius) + var(--glass-card-padding));
+}
+
+.profile-detail-card-group--account.dz-glass-container {
+  --glass-card-padding: var(--profile-account-group-padding);
+}
+
 .profile-detail-cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--spacing-md);
 }
 
-.profile-detail-card { min-inline-size: 0; overflow-wrap: anywhere; }
+.profile-detail-card.dz-glass-container {
+  border-radius: var(--profile-detail-radius);
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
 
 .profile-detail-card > .dz-glass-container__header > h3 {
   color: var(--color-gray9);

@@ -7,27 +7,37 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
+from decouple import Config, RepositoryEmpty, RepositoryEnv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 PRODUCTION = os.getenv("NCIBB_ENV") == "production"
-SECRET_KEY = os.environ["SECRET_KEY"] if PRODUCTION else os.getenv(
+DEBUG = not PRODUCTION and os.getenv("DEBUG", "1").lower() in {"1", "true", "yes"}
+debug_config_path = BASE_DIR / ".env.debug-domain.local"
+debug_config = Config(
+    RepositoryEnv(debug_config_path) if DEBUG and debug_config_path.is_file() else RepositoryEmpty()
+)
+SECRET_KEY = os.environ["SECRET_KEY"] if PRODUCTION else debug_config(
     "SECRET_KEY", "django-insecure-ncibb-local-development-only"
 )
-DEBUG = not PRODUCTION and os.getenv("DEBUG", "1").lower() in {"1", "true", "yes"}
-ALLOWED_HOSTS = os.environ["ALLOWED_HOSTS"].split(",") if PRODUCTION else [
-    "localhost", "127.0.0.1", "0.0.0.0", "testserver"
-]
+if PRODUCTION:
+    ALLOWED_HOSTS = os.environ["ALLOWED_HOSTS"].split(",")
+else:
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0", "testserver"]
+    ALLOWED_HOSTS.extend(
+        host.strip() for host in debug_config("ALLOWED_HOSTS", "").split(",") if host.strip()
+    )
 SECURE_SSL_REDIRECT = PRODUCTION
-if PRODUCTION and os.getenv("TRUST_HTTPS_PROXY") == "1":
+if debug_config("TRUST_HTTPS_PROXY", "0") == "1":
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SESSION_COOKIE_SECURE = PRODUCTION
 CSRF_COOKIE_SECURE = PRODUCTION
 SECURE_HSTS_SECONDS = 31536000 if PRODUCTION else 0
 SECURE_HSTS_INCLUDE_SUBDOMAINS = PRODUCTION
 SECURE_HSTS_PRELOAD = PRODUCTION
-CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS", "").split()
+CSRF_TRUSTED_ORIGINS = debug_config("CSRF_TRUSTED_ORIGINS", "").split()
 
 # Application definition
 DJANGO_APPS = [
@@ -288,7 +298,7 @@ LOGGING = {
 }
 
 # Account verification and Beat Coin policy
-PUBLIC_SITE_URL = os.environ["PUBLIC_SITE_URL"] if PRODUCTION else os.getenv(
+PUBLIC_SITE_URL = os.environ["PUBLIC_SITE_URL"] if PRODUCTION else debug_config(
     "PUBLIC_SITE_URL", "http://localhost:5173"
 )
 EMAIL_BACKEND = (

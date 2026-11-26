@@ -79,7 +79,7 @@ const RegisterForm = ({ onRegisterSuccess }: RegisterFormProps) => {
     <form className="auth-form flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
       {serverError && (
         <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-[var(--border-radius-xs)] relative"
           role="alert"
         >
           <strong className="font-bold">خطا:</strong>

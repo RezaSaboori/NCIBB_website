@@ -19,7 +19,7 @@
   justify-content: center;
   align-items: center;
   padding-inline: var(--spacing-md);
-  block-size: var(--spacing-xl);
+  block-size: calc(var(--spacing-2xl) - 2 * var(--spacing-xs));
   box-sizing: border-box;
   border-radius: var(--border-radius-pill);
   color: var(--color-gray10);
@@ -49,8 +49,6 @@
   inline-size: fit-content;
   border-radius: var(--border-radius-pill);
 }
-.ui-glass-tabs::-webkit-scrollbar { height: var(--spacing-xs); }
-.ui-glass-tabs::-webkit-scrollbar-thumb { border: 0; }
 .ui-glass-tabs__placeholder { display: none; }
 .datasaz-step-tabs.ui-glass-tabs__list {
   background: transparent;

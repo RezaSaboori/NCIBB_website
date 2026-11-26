@@ -1,5 +1,4 @@
 import RegisterForm from "../../components/auth/RegisterForm"
-import "../../styles/glass.css"
 import "./auth.css"
 
 const SignupPage = () => {

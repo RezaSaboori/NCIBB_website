@@ -33,8 +33,8 @@
 
 @media (max-width: 960px), (max-height: 600px), (pointer: coarse) {
   .ncibb-layout__footer--home {
-    padding-left: max(var(--mobile-page-gutter), env(safe-area-inset-left, 0px));
-    padding-right: max(var(--mobile-page-gutter), env(safe-area-inset-right, 0px));
+    padding-left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--spacing-md), env(safe-area-inset-right, 0px));
     padding-block-end: max(var(--spacing-lg), env(safe-area-inset-bottom, 0px));
   }
 }

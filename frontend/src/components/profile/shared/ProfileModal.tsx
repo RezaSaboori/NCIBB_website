@@ -35,7 +35,7 @@ export function ProfileModal({
         backdrop: "profile-modal__backdrop",
         base: `${surface} profile-modal`,
         header: "profile-modal__title",
-        body: "profile-modal__body",
+        body: "profile-modal__body custom-scrollbar scrollbar-inline-start",
         footer: "profile-modal__footer",
       }}>
       <ModalContent dir="rtl" data-motion-surface data-estimated-size={estimatedBodySize ? "true" : undefined}

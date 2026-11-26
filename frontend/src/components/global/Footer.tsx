@@ -6,7 +6,7 @@ import "./footer.css"
 export const Footer: FC = () => {
   return (
     <footer
-      className="glass footer-nav text-gray12 py-12 rounded-[var(--border-radius-container-lg)] max-w-5xl mx-auto"
+      className="glass footer-nav text-gray12 py-12 max-w-5xl mx-auto"
       dir="rtl"
     >
       <div className="container mx-auto px-4 lg:px-8">
@@ -85,7 +85,7 @@ export const Footer: FC = () => {
                 تهران، ولیعصر، جنب پارک ملت، نبش نیایش، انستیتو ملی قلب و عروق
                 شهید رجایی
               </p>
-              <div className="relative h-[180px] rounded-3xl overflow-hidden w-full">
+              <div className="relative h-[180px] rounded-[var(--border-radius-2xl)] overflow-hidden w-full">
                 <iframe
                   src="https://balad.ir/embed?p=3A1CXreyL2L1RV"
                   title="مشاهده «بیمارستان تخصصی قلب رجایی» روی نقشه بلد"

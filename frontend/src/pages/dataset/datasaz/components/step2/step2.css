@@ -176,14 +176,19 @@
 
 .s2-add-criteria-tab__title {
   max-width: 7rem;
+  color: inherit;
 }
 
 /* ── Criteria action button colors ──────────────────────────────── */
 .dz-criteria-tab__actions .s2-icon-btn,
+.s2-criteria-window__header .s2-icon-btn {
+  color: var(--color-gray1);
+}
+
+.dz-criteria-tab__actions .s2-icon-btn,
 .s2-criteria-window__header .s2-icon-btn,
 .s2-add-criteria-tab__icon,
 .s2-add-criteria-tab__title {
-  color:var(--color-gray1);
   transition: opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
@@ -195,11 +200,8 @@
 }
 
 .dark .dz-criteria-tab__actions .s2-icon-btn,
-.dark .s2-criteria-window__header .s2-icon-btn,
-.dark .s2-add-criteria-tab__icon,
-.dark .s2-add-criteria-tab__title {
-  color:var(--color-gray12);
-  transition: opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
+.dark .s2-criteria-window__header .s2-icon-btn {
+  color: var(--color-gray12);
 }
 
 
@@ -249,7 +251,7 @@
 }
 
 .s2-criteria-window__title {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   color: var(--color-gray11);
   font-family: var(--font-family-base);
@@ -368,7 +370,7 @@
   transition: opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
-.dark .s2-criteria-window__btn {
+.dark .s2-criteria-window__btn:not(.blue-glass) {
   color: var(--color-gray12);
 }
 
@@ -507,8 +509,7 @@
 }
 
 .s2-counter-tab--errors .s2-counter-tab__value,
-.s2-counter-tab--errors .s2-counter-tab__label,
-.s2-counter-tab--start .s2-counter-tab__label {
+.s2-counter-tab--errors .s2-counter-tab__label {
   color: var(--color-gray1);
 }
 
@@ -559,7 +560,7 @@
   justify-content: center;
   width: 1rem;
   height: 1rem;
-  border-radius: 50%;
+  border-radius: var(--border-radius-circle);
   border: 1.5px solid var(--color-blue);
   font-size: var(--font-size-xs);
   line-height: 1;
@@ -569,21 +570,20 @@
 @media (max-width: 768px) {
   .s2-criteria-row {
     flex-direction: column;
-    gap: var(--mobile-section-gap, 20px);
+    gap: var(--spacing-lg);
     margin-block-start: 0;
   }
 
   .s2-criteria-row .s2-criteria-panel {
-    gap: var(--mobile-control-gap, 8px);
-    padding: var(--mobile-card-padding, 16px);
-    border-radius: var(--mobile-radius-card, 24px);
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
 
   .s2-criteria-panel .dz-glass-container__header { margin: 0; }
 
   .s2-criteria-panel > .dz-glass-container__header {
     flex-wrap: wrap;
-    gap: var(--mobile-control-gap, 8px);
+    gap: var(--spacing-sm);
   }
 
   .s2-panel-header__title {
@@ -601,15 +601,11 @@
     mask-image: none;
   }
 
-  .s2-criteria-window {
-    border-radius: var(--mobile-radius-compact, 20px);
-  }
-
   .s2-criteria-window .s2-criteria-window__header,
   .s2-criteria-window__footer,
   .s2-criteria-window__footer-left {
     flex-wrap: wrap;
-    gap: var(--mobile-control-gap, 8px);
+    gap: var(--spacing-sm);
   }
 
   .s2-criteria-window .s2-criteria-window__title {
@@ -620,7 +616,7 @@
   .s2-adv-group .s2-adv-group__name-input.ui-input-shell {
     flex: 1 0 100%;
     height: auto;
-    min-height: var(--mobile-touch-target, 44px);
+    min-height: var(--control-touch-target);
   }
 
   .s2-criteria-panel :is(.dz-criteria-tab__title, .s2-criteria-window__title, .dz-scroll-inner) {
@@ -638,8 +634,8 @@
   .s2-add-criteria-tab,
   .s2-criteria-window :is(.s2-icon-btn, .s2-criteria-window__btn, .s2-criteria-window__add-rule-btn),
   .s2-criteria-window .ui-radio-toggle {
-    min-block-size: var(--mobile-touch-target, 44px);
-    min-inline-size: var(--mobile-touch-target, 44px);
+    min-block-size: var(--control-touch-target);
+    min-inline-size: var(--control-touch-target);
   }
 
   .s2-criteria-tab,
@@ -649,12 +645,12 @@
   }
 
   .s2-criteria-tab__actions .s2-icon-btn {
-    inline-size: var(--mobile-touch-target, 44px);
-    block-size: var(--mobile-touch-target, 44px);
+    inline-size: var(--control-touch-target);
+    block-size: var(--control-touch-target);
   }
 
   .s2-criteria-tab--selected .s2-criteria-tab__actions {
-    max-width: calc(2 * var(--mobile-touch-target, 44px) + var(--spacing-xs));
+    max-width: calc(2 * var(--control-touch-target) + var(--spacing-xs));
   }
 
   .s2-criteria-tab__actions .s2-icon-btn:focus-visible { outline-offset: -2px; }
@@ -669,7 +665,7 @@
     flex-wrap: wrap;
     justify-content: start;
     align-items: end;
-    gap: var(--mobile-control-gap, 8px);
+    gap: var(--spacing-sm);
   }
 
   .s2-rule-label {
@@ -680,18 +676,18 @@
     margin-block-end: var(--spacing-xs);
     clip-path: none;
     color: var(--color-gray8);
-    font-size: var(--mobile-type-metadata, .8125rem);
+    font-size: var(--font-size-sm);
   }
 
   .s2-criteria-window__field { flex-basis: min(100%, 7rem); }
   .s2-criteria-window__operator { flex-basis: min(100%, 5rem); }
 
-  .s2-counters-bar { gap: var(--mobile-control-gap, 8px); }
+  .s2-counters-bar { gap: var(--spacing-sm); }
   .s2-counter-tab { height: auto; padding: var(--spacing-sm); }
   .s2-counter-tab--start {
     justify-content: center;
     flex: 0 0 100%;
-    min-block-size: var(--mobile-primary-action, 48px);
+    min-block-size: var(--spacing-3xl);
   }
 
 }

@@ -17,7 +17,7 @@
 .auth-modal-panel {
   background: transparent !important;
   box-shadow: none !important;
-  border-radius: var(--border-radius-container-sm);
+  border-radius: var(--border-radius-4xl);
   overflow: hidden;
   /*
     isolation: isolate creates a new stacking context so the ::before
@@ -106,8 +106,8 @@
 
 @media (max-width: 768px) {
   .auth-modal-close-btn {
-    min-block-size: var(--mobile-touch-target);
-    min-inline-size: var(--mobile-touch-target);
+    min-block-size: var(--control-touch-target);
+    min-inline-size: var(--control-touch-target);
   }
 
   .auth-modal-panel :is(.auth-modal-tab, .auth-modal-close-btn):focus-visible {

@@ -1,6 +1,3 @@
-/* Import theme variables from global theme.css */
-@import "../../../styles/theme.css";
-
 .header-container {
   position: fixed;
   z-index: 500;
@@ -21,8 +18,8 @@
 }
 
 .home-icon-wrapper {
-  inline-size: var(--spacing-lg);
-  block-size: var(--spacing-lg);
+  inline-size: 24px;
+  block-size: 24px;
 }
 
 .header-nav {
@@ -89,7 +86,7 @@
   border: none;
   border-radius: var(--border-radius-pill);
   background: transparent;
-  color: var(--color-gray7);
+  color: var(--color-gray12);
   cursor: pointer;
   font-family: var(--font-family-persian);
   transition: color var(--motion-duration-normal) var(--motion-easing-easeInOut);
@@ -206,7 +203,7 @@
 
 @media (max-width: 960px) {
   .header-container {
-    min-block-size: calc(var(--mobile-toolbar-height) + env(safe-area-inset-top, 0));
+    min-block-size: calc(var(--spacing-4xl) + env(safe-area-inset-top, 0));
     padding-block: env(safe-area-inset-top, 0) 0;
     gap: var(--spacing-sm);
   }
@@ -218,27 +215,19 @@
   }
 
   .profile-icon-wrapper {
-    inline-size: var(--mobile-icon-standard);
-    block-size: var(--mobile-icon-standard);
+    inline-size: 20px;
+    block-size: 20px;
     padding: 0;
   }
 
   #dark-mode-toggle {
-    font-size: var(--mobile-icon-standard);
+    font-size: 20px;
     margin: 0;
   }
-
-  .header-container .header-nav__control { color: var(--color-gray12); }
 
   .header-nav__menu .header-nav__item {
     padding-inline: calc(var(--spacing-sm) + var(--spacing-xs));
     white-space: nowrap;
-  }
-
-  .header-container .header-nav__item:not([aria-current="page"]):hover,
-  .header-container .header-nav__control:hover,
-  .header-container .header-nav__control--active {
-    color: var(--color-blue);
   }
 }
 

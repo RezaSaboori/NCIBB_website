@@ -1,4 +1,5 @@
-import { DatabaseInfo, DataType } from "../../../types/database"
+import catalogUrl from "../../data/databases_infos.csv?url"
+import { DatabaseInfo, DataType } from "../types/database"
 
 const parseCsvRow = (row: string): string[] => {
   const fields: string[] = []
@@ -58,7 +59,7 @@ const parseDatasetVariables = (variables: string): string[] => {
 
 export const getDatabases = async (): Promise<DatabaseInfo[]> => {
   try {
-    const response = await fetch("/data/databases_infos.csv")
+    const response = await fetch(catalogUrl)
     if (!response.ok) {
       throw new Error("Failed to fetch database infos")
     }

@@ -8,10 +8,16 @@ import { createGlowRenderer } from './glow-renderer.js';
 import heartVert from '../shaders/heart-particle.vert?raw';
 import heartFrag from '../shaders/heart-particle.frag?raw';
 
-export function createRenderer(gl, canvas, config, particles, PARTICLE_COUNT, center, maxSize, heartBounds, scrollProgressRef) {
+export function createRenderer(gl, canvas, config, particles, PARTICLE_COUNT, center, maxSize, heartBounds, scrollProgressRef, frameElement = canvas) {
     let program, uniforms, vao;
     let distance, rotationX, rotationY, isDragging, lastMouseX, lastMouseY;
     let mouseWorldPos, targetMousePos, isMouseActive;
+    let ambientMousePos, targetAmbientMousePos;
+    const inactivePointer = [0, 0, config.compact ? -10000 : -100];
+    const minTouchFeedbackMs = 120;
+    let touchPointerId = null;
+    let touchStartedAt = 0;
+    let touchReleaseAt = null;
     let portalMousePos = [0, 0]; // Normalized mouse position for portal (-1 to 1)
     let targetPortalMousePos = [0, 0]; // Target mouse position (updated on mousemove)
     let tiltX = 0, tiltY = 0;
@@ -46,6 +52,19 @@ export function createRenderer(gl, canvas, config, particles, PARTICLE_COUNT, ce
     function addEventListener(target, type, handler, options) {
         target.addEventListener(type, handler, options);
         eventListeners.push({ target, type, handler, options });
+    }
+
+    function resetPointer() {
+        touchPointerId = null;
+        touchReleaseAt = null;
+        isDragging = false;
+        canvas.style.cursor = config.enableDragRotation !== false ? 'grab' : 'default';
+        targetMousePos = inactivePointer;
+        targetAmbientMousePos = inactivePointer;
+        isMouseActive = false;
+        if (config.compact) targetPortalMousePos = [0, 0];
+        targetTiltX = 0;
+        targetTiltY = 0;
     }
 
     async function init() {
@@ -218,8 +237,10 @@ void main() {
           gl.uniform1f(uniforms.uHeartOpacity, 1.0);
         }
 
-        mouseWorldPos = [0, 0, -100];
-        targetMousePos = [0, 0, -100];
+        mouseWorldPos = [...inactivePointer];
+        targetMousePos = inactivePointer;
+        ambientMousePos = [...inactivePointer];
+        targetAmbientMousePos = inactivePointer;
         isMouseActive = false;
 
         distance = maxSize * 2.5;
@@ -252,10 +273,10 @@ void main() {
           }, { passive: true });
         }
 
-        // Mouse move handler - always needed for particle interaction
-        addEventListener(canvas,'mousemove', (e) => {
+        // Hover and direct touch use the same particle and camera effects.
+        function updatePointerPosition(e) {
           // Handle camera rotation when dragging (only if drag rotation is enabled)
-          if (config.enableDragRotation !== false && isDragging) {
+          if (e.pointerType !== 'touch' && config.enableDragRotation !== false && isDragging) {
             const deltaX = e.clientX - lastMouseX;
             const deltaY = e.clientY - lastMouseY;
             
@@ -270,6 +291,7 @@ void main() {
           
           // Mouse position for particle interaction (heart grow effect) - always active
           const rect = canvas.getBoundingClientRect();
+          if (!rect.width || !rect.height || !frameElement.clientHeight) return;
           const x = (e.clientX - rect.left) / rect.width * 2 - 1;
           const y = -((e.clientY - rect.top) / rect.height * 2 - 1);
           
@@ -278,9 +300,14 @@ void main() {
           targetPortalMousePos[0] = (e.clientX / window.innerWidth) * 2.0 - 1.0;
           targetPortalMousePos[1] = -((e.clientY / window.innerHeight) * 2.0 - 1.0);
           
+          const frameScale = frameElement.clientHeight / canvas.clientHeight;
+          const frameY = (y - (1 - frameScale)) / frameScale;
+          const heartScale = config.heartProjectionScale ?? 1;
+          const heartVerticalOffset = config.heartVerticalOffset ?? 0;
+
           // Set target for camera tilt
           if (config.cameraTiltEnabled) {
-            targetTiltX = y * config.cameraTiltStrength;
+            targetTiltX = Math.max(-1, Math.min(1, frameY)) * config.cameraTiltStrength;
             targetTiltY = -x * config.cameraTiltStrength;
           }
           
@@ -299,9 +326,13 @@ void main() {
               cameraOffsetY = config.contentOffset.y * visibleHeight;
           }
           
-          // Calculate mouse position relative to the shifted camera
-          const worldX = (x * distance * tanHalfFov * aspect) + cameraOffsetX;
-          const worldY = (y * distance * tanHalfFov) + cameraOffsetY;
+          // Undo the heart's compact projection before mapping the pointer to its focus plane.
+          const worldScale = distance * tanHalfFov;
+          const worldX = (x * worldScale * aspect) / (frameScale * heartScale) + cameraOffsetX;
+          const worldY = ((frameY + 2 * heartVerticalOffset) * worldScale) / heartScale + cameraOffsetY;
+          if (config.compact) {
+            targetAmbientMousePos = [x * worldScale * aspect, y * worldScale, 0];
+          }
           
           const cosY = Math.cos(-rotationY);
           const sinY = Math.sin(-rotationY);
@@ -332,21 +363,42 @@ void main() {
           const finalZ = rotatedZ;
 
           targetMousePos = [finalX, finalY, finalZ];
+          if (e.type === 'pointerdown' || (config.compact && !isMouseActive)) {
+            mouseWorldPos = [...targetMousePos];
+            ambientMousePos = [...targetAmbientMousePos];
+          }
           isMouseActive = true;
+        }
+
+        addEventListener(canvas, 'pointermove', (e) => {
+          if (e.pointerType === 'touch' ? e.pointerId !== touchPointerId : touchPointerId !== null) return;
+          touchReleaseAt = null;
+          updatePointerPosition(e);
         }, { passive: true });
 
-        addEventListener(canvas,'mouseleave', () => {
-          isDragging = false;
-          canvas.style.cursor = config.enableDragRotation !== false ? 'grab' : 'default';
-          targetMousePos = [0, 0, -100];
-          isMouseActive = false;
-          
-          // Reset camera tilt
-          if (config.cameraTiltEnabled) {
-            targetTiltX = 0;
-            targetTiltY = 0;
-          }
+        addEventListener(canvas, 'pointerdown', (e) => {
+          if (e.pointerType !== 'touch' || !e.isPrimary) return;
+          touchPointerId = e.pointerId;
+          touchStartedAt = performance.now();
+          touchReleaseAt = null;
+          updatePointerPosition(e);
         }, { passive: true });
+
+        addEventListener(canvas, 'pointerup', (e) => {
+          if (e.pointerId !== touchPointerId) return;
+          touchPointerId = null;
+          // A quick tap still needs time to reach a rendered frame at the compact frame rate.
+          touchReleaseAt = touchStartedAt + minTouchFeedbackMs;
+        }, { passive: true });
+
+        addEventListener(canvas, 'pointercancel', (e) => {
+          if (e.pointerId === touchPointerId) resetPointer();
+        }, { passive: true });
+
+        addEventListener(canvas, 'pointerleave', (e) => {
+          if (e.pointerType !== 'touch' && touchPointerId === null) resetPointer();
+        }, { passive: true });
+        addEventListener(window, 'blur', resetPointer);
 
         // Mouse wheel zoom - only if enabled
         if (config.enableWheelZoom !== false) {
@@ -629,9 +681,12 @@ void main() {
         const canvasHeight = canvas.clientHeight;
         const aspect = canvas.clientWidth / canvasHeight;
         if (!Number.isFinite(aspect) || aspect <= 0) return;
+        const frameHeight = frameElement.clientHeight;
+        if (!frameHeight) return;
+        const frameScale = frameHeight / canvasHeight;
 
         // Scale GPU point sizes with the compact scene using a 384 CSS pixel reference height.
-        const pointSizeScale = gl.drawingBufferHeight / (config.compact ? 384 : canvasHeight);
+        const pointSizeScale = (gl.drawingBufferHeight / canvasHeight) * (config.compact ? frameHeight / 384 : 1);
         
         // Get scroll progress
         const scrollProgress = config.compact && !portalInitialized ? 0 : (scrollProgressRef?.current ?? 0);
@@ -644,10 +699,13 @@ void main() {
           rotationY += 0.003;
         }
         
+        if (touchReleaseAt !== null && time >= touchReleaseAt) resetPointer();
         const lerpFactor = 0.15;
-        mouseWorldPos[0] += (targetMousePos[0] - mouseWorldPos[0]) * lerpFactor;
-        mouseWorldPos[1] += (targetMousePos[1] - mouseWorldPos[1]) * lerpFactor;
-        mouseWorldPos[2] += (targetMousePos[2] - mouseWorldPos[2]) * lerpFactor;
+        for (let axis = 0; axis < 3; axis++) {
+          mouseWorldPos[axis] += (targetMousePos[axis] - mouseWorldPos[axis]) * lerpFactor;
+          ambientMousePos[axis] += (targetAmbientMousePos[axis] - ambientMousePos[axis]) * lerpFactor;
+        }
+        const ambientPointer = config.compact ? ambientMousePos : mouseWorldPos;
         
         // Smoothly interpolate tilt
         tiltX += (targetTiltX - tiltX) * lerpFactor;
@@ -729,15 +787,22 @@ void main() {
         }
         
         const projection = mat.perspective4(config.fov, aspect, maxSize * 0.01, maxSize * 100);
+        const frameProjection = frameScale === 1 ? projection : projection.slice();
+        if (frameScale !== 1) {
+          // Keep the heart and portal framed in the top scene while ambient particles fill the viewport.
+          frameProjection[0] *= frameScale;
+          frameProjection[5] *= frameScale;
+          frameProjection[9] -= 1 - frameScale;
+        }
         const heartProjectionScale = config.heartProjectionScale ?? 1;
         const heartVerticalOffset = config.heartVerticalOffset ?? 0;
         const hasHeartFraming = heartProjectionScale !== 1 || heartVerticalOffset !== 0;
-        const heartProjection = hasHeartFraming ? projection.slice() : projection;
+        const heartProjection = hasHeartFraming ? frameProjection.slice() : frameProjection;
         if (hasHeartFraming) {
           // Frame the heart for compact viewports with its own projection.
           heartProjection[0] *= heartProjectionScale;
           heartProjection[5] *= heartProjectionScale;
-          heartProjection[9] += heartVerticalOffset * 2;
+          heartProjection[9] += heartVerticalOffset * 2 * frameScale;
         }
         
         // ========================================
@@ -761,7 +826,7 @@ void main() {
           
           const portalDistance = effectiveDistance * 0.5; // Fixed distance from camera
           const portalVisibleHeight = 2.0 * portalDistance * tanHalfFov;
-          const portalVisibleWidth = portalVisibleHeight * aspect;
+          const portalVisibleWidth = portalVisibleHeight * (aspect / frameScale);
           
           // Base portal position
           const targetX = config.compact ? 0 : desktopPortalTargetX;
@@ -1025,7 +1090,7 @@ void main() {
             ambientRenderer.updateConfig(config);
             
             ambientRenderer.update(timeInSeconds);
-            ambientRenderer.render(animatedModel, view, projection, pointSizeScale, mouseWorldPos, ambientOpacity);
+            ambientRenderer.render(animatedModel, view, projection, pointSizeScale, ambientPointer, ambientOpacity);
             
             // Restore original config values
             config.dofEnabled = originalDofEnabled;
@@ -1039,7 +1104,7 @@ void main() {
             config.dofAtmosphericFade = originalAtmosphericFade;
           } else {
             ambientRenderer.update(timeInSeconds);
-            ambientRenderer.render(animatedModel, view, projection, pointSizeScale, mouseWorldPos, ambientOpacity);
+            ambientRenderer.render(animatedModel, view, projection, pointSizeScale, ambientPointer, ambientOpacity);
           }
         }
 
@@ -1071,9 +1136,9 @@ void main() {
             ? effectiveDistance - portalWorldZ
             : Math.abs(portalWorldZ);
           const targetSize = config.compact
-            ? Math.min(canvas.clientWidth, canvas.clientHeight) * 0.85
+            ? Math.min(canvas.clientWidth, frameHeight) * 0.85
             : desktopPortalSize;
-          const worldSizeAtTarget = (targetSize * tanHalfFov * portalDistanceFromCamera) / canvas.clientHeight;
+          const worldSizeAtTarget = (targetSize * tanHalfFov * portalDistanceFromCamera) / frameHeight;
           
           // Portal starts at 0 size and grows to target size based on scroll progress
           const minPortalSize = 0;
@@ -1097,7 +1162,7 @@ void main() {
           // Set uniforms - use separate portal view matrix (no heart rotation)
           gl.uniformMatrix4fv(portalUniforms.u_model, false, portalModel);
           gl.uniformMatrix4fv(portalUniforms.u_view, false, portalView);
-          gl.uniformMatrix4fv(portalUniforms.u_projection, false, projection);
+          gl.uniformMatrix4fv(portalUniforms.u_projection, false, frameProjection);
           gl.uniform1f(portalUniforms.u_time, portalAnimationTime);
           gl.uniform1f(portalUniforms.u_zoomProgress, scrollProgress);
           

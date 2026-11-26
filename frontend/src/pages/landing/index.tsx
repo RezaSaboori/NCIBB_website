@@ -6,7 +6,7 @@ import FloatingContentWrapper from "../../components/landing/FloatingContentWrap
 import LoadingScreen from "../../components/landing/LoadingScreen/LoadingScreen"
 import ServicesSection from "../../components/landing/ServicesSection/ServicesSection"
 import { useAuroraStyles } from "../../hooks/landing/useAuroraStyles"
-import { useCanvasMouseForwarding } from "../../hooks/landing/useCanvasMouseForwarding"
+import { useCanvasPointerForwarding } from "../../hooks/landing/useCanvasPointerForwarding"
 import { useCompactCardioProgress } from "../../hooks/landing/useCompactCardioProgress"
 import { useInView } from "../../hooks/landing/useInView"
 import { useLandingEntrance } from "../../hooks/landing/useLandingEntrance"
@@ -45,7 +45,7 @@ const LandingPage = () => {
   const compactProgress = useCompactCardioProgress(visualRef, introRef, detailsRef, flow && !reducedMotion)
   const animateWords = !reducedMotion && (flow ? detailsInView : scrollProgress > 0.535)
 
-  useCanvasMouseForwarding(heroRef, canvasRef, animated)
+  useCanvasPointerForwarding(heroRef, canvasRef, animated)
 
   const colors = THEME_COLORS[theme] || THEME_COLORS.dark
   const themeStyles = {
@@ -82,6 +82,7 @@ const LandingPage = () => {
               <CardioScene
                 key={reducedMotion ? "static" : flow ? "compact" : "desktop"}
                 canvasRef={canvasRef}
+                frameRef={visualRef}
                 compact={flow}
                 staticScene={reducedMotion}
                 visible={visualInView}

@@ -63,7 +63,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   border: var(--ui-stroke);
-  border-radius: var(--border-radius-container-md);
+  border-radius: var(--border-radius-2xl);
   padding: var(--spacing-xs);
   margin: 0;
   position: relative;
@@ -79,7 +79,7 @@
   flex-shrink: 0;
   width: 2rem;
   height: 2rem;
-  border-radius: 50%;
+  border-radius: var(--border-radius-circle);
 }
 
 .s2-spotlight__search-icon {
@@ -96,7 +96,7 @@
   border: none;
   outline: none;
   color: var(--color-gray12);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   font-family: var(--font-family-base);
   padding-inline-start: var(--spacing-sm);
   text-align: start;
@@ -180,16 +180,15 @@
 
 @media (max-width: 768px) {
   .s2-spotlight { margin-inline: var(--spacing-xs); }
-  .s2-spotlight__search-row { border-radius: var(--mobile-radius-compact, 20px); }
   .s2-spotlight__input {
-    min-block-size: var(--mobile-touch-target, 44px);
-    font-size: var(--mobile-type-body, 1rem);
-    line-height: var(--mobile-line-body, 1.6);
+    min-block-size: var(--control-touch-target);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
   }
   .s2-spotlight__suggestion-tab {
     align-items: center;
-    min-block-size: var(--mobile-touch-target, 44px);
-    min-inline-size: var(--mobile-touch-target, 44px);
+    min-block-size: var(--control-touch-target);
+    min-inline-size: var(--control-touch-target);
     max-inline-size: 100%;
   }
 }

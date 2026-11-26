@@ -1,5 +1,3 @@
-@import "../../styles/theme.css";
-
 .holistic-page-wrapper {
   position: relative;
   width: 100%;
@@ -63,7 +61,7 @@
   justify-content: center;
   align-items: center;
   padding-inline: var(--spacing-md);
-  block-size: var(--spacing-xl);
+  block-size: calc(var(--spacing-2xl) - 2 * var(--spacing-xs));
   box-sizing: border-box;
   border-radius: var(--border-radius-pill);
   color: var(--color-gray10);
@@ -251,7 +249,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 9999px;
+  border-radius: var(--border-radius-pill);
   background-color: var(--color-gray1);
   color: var(--color-gray11);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
@@ -301,6 +299,6 @@
 
 @media (max-width: 768px) {
   .holistic-input-container.datasaz-expanded {
-    width: calc(100% - 2 * var(--mobile-page-gutter));
+    width: calc(100% - 2 * var(--spacing-md));
   }
 }

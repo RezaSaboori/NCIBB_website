@@ -1,7 +1,7 @@
 .primary-content-wrapper {
   flex: 0 0 40vw;
   width: 40vw;
-  border-radius: var(--border-radius-container-xl);
+  border-radius: var(--border-radius-10xl);
   transition:
     transform 0.08s ease-out,
     opacity 0.1s linear,
@@ -66,13 +66,14 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 3rem;
+  padding: clamp(var(--spacing-lg), 3vw, var(--spacing-3xl));
+  container-type: inline-size;
   width: 100%;
   min-height: 60vh;
   max-height: 80vh;
   background: transparent;
   border: none;
-  border-radius: var(--border-radius-container-xl);
+  border-radius: var(--border-radius-10xl);
   color: var(--text-primary);
   font-family: var(--font-family-persian);
   position: relative;
@@ -82,6 +83,7 @@
 
 .primary-content-title {
   font-size: clamp(var(--font-size-2xl), 4.25vw, 4rem);
+  font-size: clamp(var(--font-size-2xl), 10cqi, 4rem);
   font-family: "IRANSansXV", "IRANSansX", sans-serif;
   font-weight: 1000;
   display: flex;
@@ -91,12 +93,17 @@
 
 .title-logos {
   display: flex;
-  gap: 1.5rem;
+  gap: var(--spacing-sm);
   align-items: center;
+  margin-inline-start: auto;
+}
+
+@container (min-width: 24rem) {
+  .title-logos { gap: var(--spacing-md); }
 }
 
 .title-logo {
-  height: 3rem;
+  block-size: clamp(24px, 8cqi, var(--spacing-2xl));
   width: auto;
   filter: brightness(1);
   transition: transform 0.3s ease;
@@ -115,6 +122,8 @@
 .justified-title {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  column-gap: var(--spacing-xs);
   width: 100%;
   white-space: nowrap;
 }
@@ -143,18 +152,21 @@
 
 .primary-content-buttons {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: var(--spacing-md);
+  gap: var(--spacing-md) var(--spacing-sm);
   width: 100%;
 }
 
 .primary-content-buttons-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: var(--spacing-sm);
   align-items: center;
+}
+
+.primary-content-buttons-group .rotating-border-btn {
+  padding-inline: clamp(calc(var(--spacing-sm) + var(--spacing-xs)), 4cqi, var(--spacing-xl));
 }
 
 .button-text-secondary,
@@ -185,8 +197,18 @@
   inline-size: 100%;
   min-block-size: 0;
   max-block-size: none;
-  border-radius: var(--border-radius-container-lg);
+  border-radius: var(--border-radius-8xl);
   padding: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+  :is(.primary-content-wrapper, .primary-content-container) {
+    border-radius: var(--border-radius-8xl);
+  }
+
+  .landing-container--flow :is(.primary-content-wrapper, .primary-content-container) {
+    border-radius: var(--border-radius-6xl);
+  }
 }
 
 .landing-container--flow .primary-content-wrapper {
@@ -198,7 +220,7 @@
 
 .landing-container--flow .primary-content-container {
   gap: var(--spacing-md);
-  padding: clamp(var(--mobile-card-padding), 5vw, var(--spacing-2xl));
+  padding: clamp(var(--spacing-lg), 5vw, var(--spacing-2xl));
 }
 
 /* Framer Motion can retain inline entrance styles when the viewport changes. */
@@ -225,35 +247,36 @@
 }
 
 .landing-container--flow .primary-content-description {
-  font-size: var(--mobile-type-body);
-  line-height: var(--mobile-line-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
 }
 
 .landing-container--flow .primary-content-buttons {
   flex-direction: column;
   align-items: stretch;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
 }
 
 .landing-container--flow .primary-content-buttons-group {
   flex-wrap: wrap;
-  gap: var(--mobile-control-gap);
+  gap: var(--spacing-sm);
 }
 
 .landing-container--flow .title-logos {
   justify-content: center;
   flex-wrap: wrap;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-xl);
+  margin-inline-start: 0;
 }
 
 .landing-container--flow .rotating-border-btn {
   flex: 1 1 auto;
-  min-block-size: var(--mobile-primary-action);
+  min-block-size: var(--spacing-3xl);
   padding: var(--spacing-sm) var(--spacing-md);
 }
 
 .landing-container--flow .title-logo {
-  block-size: var(--spacing-xl);
+  block-size: 32px;
 }
 
 .landing-container--flow .aurora-blob {

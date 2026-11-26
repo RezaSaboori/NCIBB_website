@@ -8,45 +8,51 @@
  *
  * The `glass` class (from glass.css) provides the visual frosted effect.
  * These classes provide only structure: display, radius, padding, gap.
- *
- * Sizes:
- *   --lg  → border-radius-container-lg  | padding-xl  | header mb-md
- *   --md  → border-radius-container-md  | padding-lg  | header mb-sm  (mirrors s1-glass-card)
- *   --sm  → border-radius-container-sm  | padding-md  | header mb-sm
  */
 
 .dz-glass-container {
+  --glass-card-padding: 0px;
   display: flex;
   flex-direction: column;
   overflow: clip;
   width: 100%;
   box-sizing: border-box;
+  padding: var(--glass-card-padding);
 }
 
 /* ── Size variants ─────────────────────────────────────────────── */
 
 .dz-glass-container--lg {
-  border-radius: var(--border-radius-container-lg);
-  padding: var(--spacing-xl);
+  --glass-card-padding: var(--spacing-xl);
+  border-radius: var(--border-radius-8xl);
   gap: var(--spacing-lg);
 }
 
 .dz-glass-container--md {
-  border-radius: var(--border-radius-container-md);
-  padding: var(--spacing-lg);
+  --glass-card-padding: var(--spacing-lg);
+  border-radius: var(--border-radius-6xl);
   gap: var(--spacing-lg);
 }
 
 .dz-glass-container--sm {
-  border-radius: var(--border-radius-container-sm);
-  padding: var(--spacing-md);
+  --glass-card-padding: var(--spacing-md);
+  border-radius: var(--border-radius-4xl);
   gap: var(--spacing-sm);
 }
 
 .dz-glass-container--xs {
-  border-radius: var(--border-radius-container-xs);
-  padding: var(--spacing-sm);
+  --glass-card-padding: var(--spacing-sm);
+  border-radius: var(--border-radius-2xl);
   gap: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+  .dz-glass-container--lg {
+    --glass-card-padding: var(--spacing-md);
+    border-radius: var(--border-radius-6xl);
+  }
+
+  .dz-glass-container--md { border-radius: var(--border-radius-5xl); }
 }
 
 /* ── Header ────────────────────────────────────────────────────── */
@@ -112,16 +118,3 @@
 }
 
 .ui-glass-card > :is(header, footer):empty { display: none; }
-
-@media (max-width: 768px) {
-  .dz-glass-container:is(.dz-glass-container--sm, .dz-glass-container--md, .dz-glass-container--lg) {
-    padding: var(--mobile-card-padding);
-    border-radius: var(--mobile-radius-card);
-  }
-
-  .dz-glass-container:is(.dz-glass-container--md, .dz-glass-container--lg) {
-    gap: var(--mobile-section-gap);
-  }
-
-  .dz-glass-container--xs { border-radius: var(--mobile-radius-compact); }
-}

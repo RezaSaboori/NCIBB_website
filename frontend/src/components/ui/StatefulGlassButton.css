@@ -1,5 +1,6 @@
 .ui-state-button[aria-disabled="true"] { cursor: default; }
 .ui-state-button[aria-disabled="true"]:not([aria-busy="true"]):not(.ui-state-button--success) { opacity: 0.55; }
+.ui-glass-button.ui-state-button--primary { color: var(--color-on-blue-glass); }
 
 .ui-state-button__surfaces,
 .ui-state-button .ui-state-button__surfaces > span {
@@ -37,8 +38,8 @@
   .ui-state-button__size { inline-size: auto; }
   .ui-state-button__content { flex: 0 1 auto; max-inline-size: 100%; }
   .ui-state-button__content svg {
-    inline-size: var(--mobile-icon-compact);
-    block-size: var(--mobile-icon-compact);
+    inline-size: 18px;
+    block-size: 18px;
   }
 }
 

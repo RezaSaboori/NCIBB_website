@@ -2,9 +2,9 @@
 
 @media (max-width: 620px) {
   .header-mobile-nav {
-    --menu-button-size: calc(var(--mobile-touch-target) + 2 * var(--spacing-xs));
+    --menu-button-size: calc(var(--control-touch-target) + 2 * var(--spacing-xs));
     --menu-width: min(17rem, calc(100vw - var(--header-mobile-left) - var(--header-mobile-right)));
-    --menu-radius: var(--border-radius-container-xs);
+    --menu-radius: var(--border-radius-2xl);
     --menu-morph-time: var(--motion-duration-slow);
     --menu-morph-easing: cubic-bezier(0.2, 0.82, 0.24, 1);
     position: relative;
@@ -27,8 +27,8 @@
   .header-mobile-nav__glyph {
     display: grid;
     place-items: center;
-    inline-size: var(--mobile-icon-standard);
-    block-size: var(--mobile-icon-standard);
+    inline-size: 20px;
+    block-size: 20px;
     transition: scale var(--motion-duration-fast) var(--motion-easing-settle);
   }
 
@@ -36,7 +36,7 @@
 
   .header-mobile-nav__glyph > span {
     grid-area: 1 / 1;
-    inline-size: var(--mobile-icon-compact);
+    inline-size: 18px;
     border-block-start: calc(var(--border-width-normal) + var(--border-width-thin)) solid currentColor;
     border-radius: var(--border-radius-pill);
     transition:
@@ -121,7 +121,7 @@
 
   .header-mobile-nav__links .header-nav__item {
     justify-content: flex-start;
-    min-block-size: var(--mobile-touch-target);
+    min-block-size: var(--control-touch-target);
     padding: var(--spacing-xs) var(--spacing-sm);
     color: var(--color-gray12);
     font-size: var(--font-size-sm);

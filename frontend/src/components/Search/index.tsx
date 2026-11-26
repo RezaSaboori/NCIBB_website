@@ -1,4 +1,4 @@
-import { getDatabases } from "../../pages/dataset/utils/csv"
+import { getDatabases } from "../../dataset_services/databaseCatalog"
 import { DatabaseInfo } from "../../types/database"
 
 export const searchInCsv = async (

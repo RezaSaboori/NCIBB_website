@@ -49,7 +49,7 @@
   gap: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-sm);
   width: 100%;
-  border-radius: var(--border-radius-container-sm);
+  border-radius: var(--border-radius-4xl);
 }
 
 .project-card__date-label {

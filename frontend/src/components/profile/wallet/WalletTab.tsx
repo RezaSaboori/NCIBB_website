@@ -21,7 +21,7 @@ export function WalletTab() {
 
   return (
     <div className="account-workspace__stack">
-      <GlassCard size="lg"
+      <GlassCard size="lg" className="profile-detail-card-group"
         heading={<div className="account-workspace__heading"><Icon icon={coinIcon} width={24} aria-hidden /><h2>اعتبار شخصی</h2></div>}>
         <AccountStatus loading={!wallet && !error} error={error ? "موجودی کیف پول دریافت نشد." : ""}
           retry={() => void dispatch(fetchWallet())} />

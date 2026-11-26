@@ -9,7 +9,7 @@ const PortaledTabRail = forwardRef<HTMLDivElement, ComponentPropsWithoutRef<"div
   function PortaledTabRail(props, ref) {
     const target = useContext(TabRailTarget)
     return target ? createPortal(
-      <div className="ui-glass-tabs glass-navigation glass-transparent glass-transparent--scroll"><div {...props} ref={ref} /></div>,
+      <div className="ui-glass-tabs glass-navigation glass-transparent glass-transparent--scroll custom-scrollbar"><div {...props} ref={ref} /></div>,
       target,
     ) : null
   },
@@ -68,7 +68,7 @@ export function GlassTabs({ railTarget, animatePanel, ...props }: TabsProps & { 
         ref={railRef}
         radius="full"
         classNames={{
-          base: railTarget ? "ui-glass-tabs__placeholder" : "ui-glass-tabs glass-navigation glass-transparent glass-transparent--scroll",
+          base: railTarget ? "ui-glass-tabs__placeholder" : "ui-glass-tabs glass-navigation glass-transparent glass-transparent--scroll custom-scrollbar",
           tabList: `datasaz-step-tabs ui-glass-tabs__list glass-navigation__indicator${animatePanel ? " ui-glass-tabs__list--animated" : ""}`,
           tab: "datasaz-step-tab ui-glass-tabs__tab glass-navigation__item",
           cursor: "ui-glass-tabs__cursor",

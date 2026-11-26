@@ -1,4 +1,5 @@
-.auth-form__error { color: var(--mobile-error-color); }
+.auth-form__error { color: var(--color-error); }
+.auth-form a { color: var(--color-blue); }
 
 :is(.auth-form, .modal-container) [data-slot="input-wrapper"] {
   border: var(--ui-stroke);
@@ -13,19 +14,18 @@
   .auth-form__names { flex-direction: column; }
 
   :is(.auth-form, .modal-container) input {
-    font-size: var(--mobile-type-body);
-    line-height: var(--mobile-line-body);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
   }
 
   :is(.auth-form, .modal-container) :is([data-slot="input-wrapper"], button) {
-    min-block-size: var(--mobile-touch-target);
+    min-block-size: var(--control-touch-target);
   }
 
   .auth-form a {
     display: inline-flex;
     align-items: center;
-    min-block-size: var(--mobile-touch-target);
-    color: var(--color-blue);
+    min-block-size: var(--control-touch-target);
   }
 
   :is(.auth-form, .modal-container) :is(a, button):focus-visible {

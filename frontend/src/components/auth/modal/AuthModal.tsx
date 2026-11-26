@@ -10,7 +10,6 @@ import { Icon } from "@iconify/react"
 import LoginForm from "../LoginForm"
 import RegisterForm from "../RegisterForm"
 import "./modal.css"
-import "../../../styles/glass.css"
 
 interface AuthModalProps {
   isOpen: boolean

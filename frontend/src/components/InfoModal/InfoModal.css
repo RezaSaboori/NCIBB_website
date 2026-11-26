@@ -1,7 +1,12 @@
 .glass-modal-effect {
+  border-radius: var(--border-radius-8xl);
   backdrop-filter: blur(10px) saturate(1.8) brightness(1.2);
   -webkit-backdrop-filter: blur(10px) saturate(1.8) brightness(1.2);
   animation: backdropBlur 2s ease-in-out forwards;
+}
+
+@media (max-width: 768px) {
+  .glass-modal-effect { border-radius: var(--border-radius-6xl); }
 }
 
 @keyframes backdropBlur {

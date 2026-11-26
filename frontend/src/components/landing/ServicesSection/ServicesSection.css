@@ -18,7 +18,7 @@
   align-items: center;
   gap: 4rem;
   padding: 2.5rem;
-  border-radius: var(--border-radius-container-xl);
+  border-radius: var(--border-radius-10xl);
 }
 
 .services-header {
@@ -69,7 +69,7 @@
   justify-content: center;
   align-items: center;
   padding-inline: var(--spacing-md);
-  block-size: var(--spacing-xl);
+  block-size: calc(var(--spacing-2xl) - 2 * var(--spacing-xs));
   border-radius: var(--border-radius-pill);
   cursor: pointer;
   color: var(--color-gray10);
@@ -106,7 +106,7 @@
 .service-card {
   grid-column: span min(var(--service-card-span), var(--services-columns));
   padding: 2.5rem;
-  border-radius: var(--border-radius-container-lg);
+  border-radius: var(--border-radius-8xl);
   text-align: right;
   opacity: 1;
   display: flex;
@@ -159,8 +159,8 @@
 .landing-container--flow .services-container {
   inline-size: 100%;
   gap: var(--spacing-md);
-  padding: clamp(var(--mobile-card-padding), 5vw, var(--spacing-2xl));
-  border-radius: var(--border-radius-container-lg);
+  padding: clamp(var(--spacing-lg), 5vw, var(--spacing-2xl));
+  border-radius: var(--border-radius-8xl);
 }
 
 .landing-container--flow .services-header {
@@ -171,12 +171,12 @@
 }
 
 .landing-container--flow .services-title {
-  font-size: var(--mobile-type-title);
+  font-size: var(--font-size-2xl);
 }
 
 .landing-container--flow .services-nav {
   inline-size: 100%;
-  block-size: calc(var(--mobile-touch-target) + 2 * var(--spacing-xs));
+  block-size: calc(var(--control-touch-target) + 2 * var(--spacing-xs));
 }
 
 .landing-container--flow .services-nav__menu {
@@ -185,8 +185,8 @@
 
 .landing-container--flow .services-nav__item {
   flex: 1;
-  block-size: var(--mobile-touch-target);
-  min-inline-size: var(--mobile-touch-target);
+  block-size: var(--control-touch-target);
+  min-inline-size: var(--control-touch-target);
   padding-inline: var(--spacing-xs);
 }
 
@@ -197,20 +197,26 @@
 }
 
 .landing-container--flow .service-card {
-  padding: var(--mobile-card-padding);
-  border-radius: var(--mobile-radius-card);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  border-radius: var(--border-radius-4xl);
   overflow-wrap: anywhere;
 }
 
 .landing-container--flow .service-card-title {
-  font-size: var(--mobile-type-section);
-  line-height: var(--mobile-line-title);
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-normal);
   margin-block-end: var(--spacing-xs);
 }
 
 .landing-container--flow .service-card-description {
-  font-size: var(--mobile-type-body);
-  line-height: var(--mobile-line-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+}
+
+@media (max-width: 768px) {
+  .services-container { border-radius: var(--border-radius-8xl); }
+  .service-card,
+  .landing-container--flow .services-container { border-radius: var(--border-radius-6xl); }
 }
 
 @media (max-width: 600px) {

@@ -13,6 +13,7 @@ const compactSceneConfig = {
 
 interface CardioSceneProps {
   canvasRef: RefObject<HTMLCanvasElement>
+  frameRef: RefObject<HTMLDivElement>
   compact: boolean
   staticScene: boolean
   visible: boolean
@@ -26,6 +27,7 @@ interface CardioSceneProps {
 
 export function CardioScene({
   canvasRef,
+  frameRef,
   compact,
   staticScene,
   visible,
@@ -51,9 +53,10 @@ export function CardioScene({
         <Suspense fallback={null}>
           <CardioBackground
             ref={canvasRef}
+            frameRef={compact ? frameRef : undefined}
             quality={compact ? "medium" : CARDIO_BACKGROUND_CONFIG.QUALITY}
             autoRotate={CARDIO_BACKGROUND_CONFIG.AUTO_ROTATE}
-            interactive={!compact && CARDIO_BACKGROUND_CONFIG.INTERACTIVE}
+            interactive={CARDIO_BACKGROUND_CONFIG.INTERACTIVE}
             enableDragRotation={CARDIO_BACKGROUND_CONFIG.ENABLE_DRAG_ROTATION}
             enableWheelZoom={CARDIO_BACKGROUND_CONFIG.ENABLE_WHEEL_ZOOM}
             backgroundColor={backgroundColor}

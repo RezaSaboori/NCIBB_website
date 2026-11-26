@@ -42,6 +42,7 @@ function hexToRgbNormalized(hex) {
  * @property {import('react').CSSProperties} [style]
  * @property {object} [configOverrides]
  * @property {boolean} [compact]
+ * @property {import('react').RefObject<HTMLDivElement>} [frameRef]
  * @property {boolean} [paused]
  * @property {number} [scrollProgress]
  * @property {(progress: number) => void} [onLoadingProgress]
@@ -63,6 +64,7 @@ const CardioBackground = forwardRef(({
   style = {},
   configOverrides = DEFAULT_CONFIG_OVERRIDES,
   compact = false,
+  frameRef,
   paused = false,
   scrollProgress = 0,
   onLoadingProgress,
@@ -347,7 +349,8 @@ const CardioBackground = forwardRef(({
           center,
           maxSize,
           heartBounds,
-          scrollProgressRef
+          scrollProgressRef,
+          frameRef?.current ?? canvas
         );
 
         rendererInstance = renderer;
@@ -458,6 +461,7 @@ const CardioBackground = forwardRef(({
   }, [
     quality,
     compact,
+    frameRef,
     interactive,
     autoRotate,
     enableDragRotation,
@@ -470,7 +474,7 @@ const CardioBackground = forwardRef(({
     <canvas
       ref={canvasRef}
       className={className}
-      tabIndex={interactive ? 0 : -1}
+      tabIndex={compact ? undefined : interactive ? 0 : -1}
       style={{
         position: 'absolute',
         top: 0,
@@ -480,17 +484,17 @@ const CardioBackground = forwardRef(({
         maxWidth: '100%',
         zIndex: 0,
         pointerEvents: interactive ? 'auto' : 'none',
-        touchAction: enableDragRotation ? 'none' : 'auto',
+        touchAction: compact && interactive ? 'pan-y pinch-zoom' : enableDragRotation ? 'none' : 'auto',
         outline: 'none',
         ...style
       }}
       onMouseDown={() => {
-        if (interactive) {
+        if (interactive && !compact) {
           canvasRef.current?.focus();
         }
       }}
       onContextMenu={(event) => {
-        if (!enableDragRotation && interactive) {
+        if (!enableDragRotation && interactive && !compact) {
           event.preventDefault();
         }
       }}

@@ -19,7 +19,7 @@ export default function ProfileSidebar({ primary, bottom, activeTab, onLogout, i
 
   return (
     <div className="sidebar-nav-frame glass-navigation glass-transparent">
-      <nav ref={navigation} aria-label="بخش‌های پروفایل" dir="rtl" className={`glass sidebar-nav${isCollapsed ? " sidebar-nav--collapsed" : ""}`}
+      <nav ref={navigation} aria-label="بخش‌های پروفایل" dir="rtl" className={`glass custom-scrollbar sidebar-nav${isCollapsed ? " sidebar-nav--collapsed" : ""}`}
         onFocus={(event) => revealItem(event.currentTarget, event.target)}>
         <button type="button" className="sidebar-nav__toggle" aria-expanded={!isCollapsed} onClick={onToggleCollapse}
           aria-label={isCollapsed ? "باز کردن منو" : "جمع کردن منو"}>

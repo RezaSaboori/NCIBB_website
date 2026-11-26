@@ -27,7 +27,7 @@
 }
 
 .landing-container--flow :is(.primary-content-wrapper, .secondary-content-wrapper) {
-  grid-column: 1;
+  grid-column: 2;
   z-index: 1;
 }
 

@@ -152,7 +152,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
       backdrop="blur"
       classNames={{
         backdrop: "bg-gray6/70 backdrop-opacity-95",
-        base: "overflow-visible p-10 rounded-[var(--border-radius-container-lg)] glass-modal-effect w-full max-w-5xl modal-offset-down",
+        base: "overflow-visible p-10 glass-modal-effect w-full max-w-5xl modal-offset-down",
         closeButton:
           "absolute top-[-2.5rem] right-[-2.5rem] z-1 text-[30px] flex items-center justify-center w-12 h-12 text-white bg-[var(--color-red)]/80 hover:bg-[var(--color-red)] cursor-pointer active:bg-[var(--color-red)]",
         header: "p-0 pb-8",
@@ -161,13 +161,13 @@ export const InfoModal: React.FC<InfoModalProps> = ({
       }}
     >
       <ModalContent className="bg-transparent">
-        <ModalHeader className="w-full bg-[var(--color-gray1)]/80 align-middle rounded-[var(--border-radius-container-xs)] font-medium p-8 mb-6 force-ltr">
+        <ModalHeader className="w-full bg-[var(--color-gray1)]/80 align-middle rounded-[var(--border-radius-2xl)] font-medium p-8 mb-6 force-ltr">
           {database.name}
         </ModalHeader>
         <ModalBody>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-3 flex flex-col">
-              <div className="flex flex-col gap-2 bg-[var(--color-gray1)]/50 p-4 rounded-[var(--border-radius-container-xs)] mb-4">
+              <div className="flex flex-col gap-2 bg-[var(--color-gray1)]/50 p-4 rounded-[var(--border-radius-2xl)] mb-4">
                 <h3 className="text-md font-semibold">امتیاز</h3>
                 <div className="flex flex-col">
                   <p className="flex justify-between force-ltr w-full">
@@ -181,7 +181,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
               </div>
               <div className="flex flex-row gap-2 mb-4">
                 <div
-                  className="flex flex-row w-full bg-[var(--color-gray1)]/50  p-2.5 rounded-[var(--border-radius-container-xs)] justify-between"
+                  className="flex flex-row w-full bg-[var(--color-gray1)]/50  p-2.5 rounded-[var(--border-radius-2xl)] justify-between"
                   style={{ backgroundColor: yearColor }}
                 >
                   <p className="text-sm font-medium text-[var(--color-gray12)] force-ltr pr-2">
@@ -190,7 +190,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
                   <Icon icon="lets-icons:date-fill" width={16} height={16} />
                 </div>
                 <div
-                  className="flex flex-row w-full bg-[var(--color-gray1)]/50 p-2.5 rounded-[var(--border-radius-container-xs)] justify-between"
+                  className="flex flex-row w-full bg-[var(--color-gray1)]/50 p-2.5 rounded-[var(--border-radius-2xl)] justify-between"
                   style={{ backgroundColor: sizeColor }}
                 >
                   <p className="text-sm font-medium text-[var(--color-gray12)] force-ltr pr-2">
@@ -203,7 +203,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
                   />
                 </div>
               </div>
-              <div className="flex flex-col gap-2 bg-[var(--color-gray1)]/50 p-4 rounded-[var(--border-radius-container-xs)]">
+              <div className="flex flex-col gap-2 bg-[var(--color-gray1)]/50 p-4 rounded-[var(--border-radius-2xl)]">
                 <h3 className="text-md font-semibold">انواع داده</h3>
                 <div className="flex flex-wrap gap-4 force-ltr">
                   {database.dataTypes.map((type) => {
@@ -231,13 +231,13 @@ export const InfoModal: React.FC<InfoModalProps> = ({
                   })}
                 </div>
               </div>
-              <div className="mt-4 flex flex-col gap-2 bg-[var(--color-gray1)]/50 p-4 rounded-[var(--border-radius-container-xs)]">
+              <div className="mt-4 flex flex-col gap-2 bg-[var(--color-gray1)]/50 p-4 rounded-[var(--border-radius-2xl)]">
                 <h3 className="text-md font-semibold">متغیرها</h3>
                 <div className="flex flex-wrap gap-1 force-ltr">
                   {database.datasetVariables.map((variable) => (
                     <span
                       key={variable}
-                      className="px-2 pb-0.5 pt-1 rounded-[15px] bg-[var(--color-indigo)]/10 text-[var(--color-indigo)] force-ltr border border-[var(--color-indigo)]"
+                      className="px-2 pb-0.5 pt-1 rounded-[var(--border-radius-lg)] bg-[var(--color-indigo)]/10 text-[var(--color-indigo)] force-ltr border border-[var(--color-indigo)]"
                       style={{ fontSize: "var(--font-size-xs)" }}
                     >
                       {variable}
@@ -246,13 +246,13 @@ export const InfoModal: React.FC<InfoModalProps> = ({
                 </div>
               </div>
               {database.topics && database.topics.length > 0 && (
-                <div className="mt-4 flex flex-col gap-2 bg-[var(--color-gray1)]/50 p-4 rounded-[var(--border-radius-container-xs)]">
+                <div className="mt-4 flex flex-col gap-2 bg-[var(--color-gray1)]/50 p-4 rounded-[var(--border-radius-2xl)]">
                   <h3 className="text-md font-semibold">موضوعات</h3>
                   <div className="flex flex-wrap gap-1 force-ltr">
                     {database.topics.map((topic) => (
                       <span
                         key={topic}
-                        className="px-2 pb-0.5 pt-1 rounded-[15px] bg-[var(--color-blue)]/10 text-[var(--color-blue)] force-ltr border border-[var(--color-blue)]"
+                        className="px-2 pb-0.5 pt-1 rounded-[var(--border-radius-lg)] bg-[var(--color-blue)]/10 text-[var(--color-blue)] force-ltr border border-[var(--color-blue)]"
                         style={{ fontSize: "var(--font-size-xs)" }}
                       >
                         {topic}
@@ -262,7 +262,7 @@ export const InfoModal: React.FC<InfoModalProps> = ({
                 </div>
               )}
             </div>
-            <div className="col-span-9 bg-[var(--color-gray1)]/50 p-6 rounded-[var(--border-radius-container-xs)]">
+            <div className="col-span-9 bg-[var(--color-gray1)]/50 p-6 rounded-[var(--border-radius-2xl)]">
               <p className="force-ltr">{database.description}</p>
             </div>
           </div>

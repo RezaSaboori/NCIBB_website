@@ -28,7 +28,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm);
-  border-radius: var(--border-radius-container-xs);
+  border-radius: var(--border-radius-2xl);
   background-color: color-mix(in srgb, var(--color-gray1) 82%, transparent);
   color: var(--color-gray12);
   font-family: var(--font-family-persian);

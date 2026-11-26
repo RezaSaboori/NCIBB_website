@@ -123,7 +123,7 @@
   display: inline-block;
   inline-size: .625rem;
   block-size: .625rem;
-  border-radius: 50%;
+  border-radius: var(--border-radius-circle);
 }
 
 .account-messages__unread {
@@ -158,7 +158,7 @@
   align-items: start;
   padding: var(--spacing-sm) var(--spacing-md);
   border: var(--ui-stroke);
-  border-radius: var(--border-radius-container-xs);
+  border-radius: var(--border-radius-2xl);
   background-color: color-mix(in srgb, var(--color-gray1) 45%, transparent);
 }
 .account-messages__triage-status .ui-dropdown__trigger {
@@ -201,7 +201,7 @@
   align-items: stretch;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
-  border-radius: var(--border-radius-container-xs);
+  border-radius: var(--border-radius-2xl);
   color: var(--color-gray12);
   text-align: start;
 }
@@ -249,7 +249,7 @@
   display: block;
   max-inline-size: 100%;
   padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-container-xs);
+  border-radius: var(--border-radius-2xl);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -279,14 +279,14 @@
   gap: var(--spacing-sm);
   max-inline-size: min(94%, 46rem);
   min-inline-size: 0;
-  border-radius: var(--border-radius-container-xs);
+  border-radius: var(--border-radius-2xl);
 }
 .account-messages__message--mine { align-self: flex-start; }
 .account-messages__bubble {
   min-inline-size: 0;
   max-inline-size: 100%;
   padding: .75rem var(--spacing-lg);
-  border-radius: var(--border-radius-container-xs);
+  border-radius: var(--border-radius-2xl);
   color: var(--color-gray12);
 }
 .account-messages__sender {
@@ -341,7 +341,7 @@
   margin-block-end: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-inline-start: 2px solid currentColor;
-  border-radius: var(--border-radius-item-sm);
+  border-radius: var(--border-radius-sm);
   color: var(--color-gray11);
   background: color-mix(in srgb, currentColor 8%, transparent);
   font-size: var(--font-size-xs);
@@ -385,7 +385,7 @@
   min-block-size: 2rem;
   max-block-size: var(--reply-collapsed-limit);
   background-color: transparent;
-  border-radius: var(--border-radius-item-xl);
+  border-radius: var(--border-radius-xl);
 }
 .account-messages__composer-input.ui-input-field:not(:placeholder-shown) { background-color: var(--color-gray3); }
 .account-messages__composer-actions {
@@ -412,28 +412,28 @@
 @media (max-width: 760px) {
   .account-messages,
   .account-messages--active.account-messages--with-list {
-    --messages-header-control-size: var(--mobile-touch-target);
+    --messages-header-control-size: var(--control-touch-target);
     --messages-panel-limit: max(21rem, min(44rem, calc(100dvh - var(--site-header-height, 3.5rem) - 4rem)));
     grid-template-columns: minmax(0, 1fr);
-    gap: var(--mobile-section-gap);
+    gap: var(--spacing-lg);
   }
   .account-messages--active .account-messages__list-pane { display: none; }
 
-  .account-messages__bubble { padding-inline: var(--mobile-card-padding); }
+  .account-messages__bubble { padding-inline: var(--spacing-md); }
   .account-messages__bubble p,
   .account-messages__composer-input.ui-input-field {
-    font-size: var(--mobile-type-body);
-    line-height: var(--mobile-line-body);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
   }
 
   .account-messages__meta, .account-messages__preview,
   .account-messages__preview-row time, .account-messages__reopen,
-  .account-messages__composer-error { font-size: var(--mobile-type-metadata); }
+  .account-messages__composer-error { font-size: var(--font-size-sm); }
 
   .account-messages__detail-heading .account-messages__panel-heading {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas: "counterpart actions" "subject subject";
-    gap: var(--mobile-control-gap);
+    gap: var(--spacing-sm);
   }
   .account-messages__detail-heading .account-messages__panel-heading--selecting {
     grid-template-areas: "counterpart counterpart" "subject subject" "actions actions";
@@ -451,39 +451,39 @@
   }
   .account-messages__panel-heading .account-messages__subject .dz-scroll-inner { display: none; }
 
-  .account-messages__heading-actions, .account-messages__composer-actions { gap: var(--mobile-control-gap); }
-  .account-messages__detail-heading .account-messages__forward { min-block-size: var(--mobile-primary-action); }
+  .account-messages__heading-actions, .account-messages__composer-actions { gap: var(--spacing-sm); }
+  .account-messages__detail-heading .account-messages__forward { min-block-size: var(--spacing-3xl); }
   .account-messages__meta .ui-glass-button.account-messages__message-action {
     block-size: auto;
-    min-block-size: var(--mobile-touch-target);
-    min-inline-size: var(--mobile-touch-target);
-    padding-inline: var(--mobile-control-gap);
+    min-block-size: var(--control-touch-target);
+    min-inline-size: var(--control-touch-target);
+    padding-inline: var(--spacing-sm);
   }
-  .account-messages__quote--link { min-block-size: var(--mobile-touch-target); }
+  .account-messages__quote--link { min-block-size: var(--control-touch-target); }
   .account-messages__list .ui-input-shell:has(.account-messages__search-button) {
-    min-block-size: calc(var(--mobile-touch-target) + 2 * var(--border-width-thin));
+    min-block-size: calc(var(--control-touch-target) + 2 * var(--border-width-thin));
   }
   .account-messages__list .account-messages__search-button,
   .account-messages__composer .account-messages__composer-icon {
-    inline-size: var(--mobile-touch-target);
-    min-inline-size: var(--mobile-touch-target);
-    block-size: var(--mobile-touch-target);
+    inline-size: var(--control-touch-target);
+    min-inline-size: var(--control-touch-target);
+    block-size: var(--control-touch-target);
   }
   .account-messages__composer .account-messages__composer-send {
-    inline-size: var(--mobile-primary-action);
-    min-inline-size: var(--mobile-primary-action);
-    block-size: var(--mobile-primary-action);
+    inline-size: var(--spacing-3xl);
+    min-inline-size: var(--spacing-3xl);
+    block-size: var(--spacing-3xl);
   }
   html[data-profile-keyboard]:not(:has(.profile-modal__viewport)) .account-messages--active:has(.account-messages__composer) {
     min-block-size: var(--messages-panel-limit);
   }
   html[data-profile-keyboard]:not(:has(.profile-modal__viewport)) .account-messages__detail:has(.account-messages__composer) {
-    --messages-panel-limit: calc(var(--profile-viewport-height) - 2 * var(--mobile-dialog-inset));
+    --messages-panel-limit: calc(var(--profile-viewport-height) - 2 * var(--spacing-sm));
     position: fixed;
     z-index: 600;
-    inset-block-start: calc(var(--profile-viewport-top) + var(--mobile-dialog-inset));
-    left: max(var(--mobile-page-gutter), env(safe-area-inset-left, 0px));
-    right: max(var(--mobile-page-gutter), env(safe-area-inset-right, 0px));
+    inset-block-start: calc(var(--profile-viewport-top) + var(--spacing-sm));
+    left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
+    right: max(var(--spacing-md), env(safe-area-inset-right, 0px));
     inline-size: auto;
     block-size: var(--messages-panel-limit);
     overflow-y: auto;

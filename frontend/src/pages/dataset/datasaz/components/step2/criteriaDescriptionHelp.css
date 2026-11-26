@@ -16,7 +16,7 @@
   max-height: inherit;
   padding: var(--spacing-md);
   border: none;
-  border-radius: var(--border-radius-container-xs);
+  border-radius: var(--border-radius-2xl);
   box-sizing: border-box;
   background: transparent;
   color: var(--color-gray11);
@@ -44,7 +44,7 @@
   margin: 0;
   min-width: 0;
   color: var(--color-gray12);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   line-height: var(--line-height-normal);
   overflow-wrap: anywhere;

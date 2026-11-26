@@ -1,4 +1,5 @@
 import type { Key, ReactNode } from "react"
+import "../GlassCard.css"
 import "./GlassTable.css"
 
 export interface GlassTableColumn<Row> {
@@ -19,9 +20,10 @@ interface GlassTableProps<Row> {
 
 export function GlassTable<Row>({ label, columns, rows, rowKey, controls, footer, empty }: GlassTableProps<Row>) {
   return (
-    <section className="glass u-container u-container--md audit-panel">
+    <section className="glass dz-glass-container dz-glass-container--md audit-panel">
       <header className="audit-panel__header">{controls}</header>
-      <div className="audit-panel__body" tabIndex={rows.length ? 0 : undefined} role="region" aria-label={label}>
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- The table scroll region needs a keyboard tab stop. */}
+      <div className="audit-panel__body custom-scrollbar scrollbar-inline-start" tabIndex={rows.length ? 0 : undefined} role="region" aria-label={label}>
         {rows.length ? (
           <table className="audit-table" aria-label={label}>
             <thead><tr>{columns.map((column) => <th key={column.key} scope="col">{column.label}</th>)}</tr></thead>

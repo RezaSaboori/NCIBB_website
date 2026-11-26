@@ -61,7 +61,7 @@
   inset-inline-start: var(--switch-inset);
   inline-size: var(--switch-thumb-size);
   block-size: var(--switch-thumb-size);
-  border-radius: 50%;
+  border-radius: var(--border-radius-circle);
   transition: inset-inline-start var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
@@ -84,7 +84,7 @@
 }
 
 @media (max-width: 768px) {
-  .ui-glass-switch { min-block-size: var(--mobile-touch-target); }
+  .ui-glass-switch { min-block-size: var(--control-touch-target); }
 }
 
 @media (prefers-reduced-motion: reduce) {

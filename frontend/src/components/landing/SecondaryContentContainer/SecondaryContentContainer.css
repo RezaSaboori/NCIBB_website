@@ -1,7 +1,7 @@
 .secondary-content-wrapper {
   flex: 0 0 40vw;
   width: 40vw;
-  border-radius: var(--border-radius-container-xl);
+  border-radius: var(--border-radius-10xl);
   transition:
     opacity 0.08s linear,
     transform 0.08s ease-out,
@@ -67,7 +67,7 @@
   min-height: 50vh;
   background: transparent;
   border: none;
-  border-radius: var(--border-radius-container-xl);
+  border-radius: var(--border-radius-10xl);
   color: var(--text-primary);
   text-align: right;
   font-family: var(--font-family-persian);
@@ -103,8 +103,18 @@
 .landing-container--flow :is(.secondary-content-wrapper, .secondary-content-container) {
   inline-size: 100%;
   min-block-size: 0;
-  border-radius: var(--border-radius-container-lg);
+  border-radius: var(--border-radius-8xl);
   padding: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+  :is(.secondary-content-wrapper, .secondary-content-container) {
+    border-radius: var(--border-radius-8xl);
+  }
+
+  .landing-container--flow :is(.secondary-content-wrapper, .secondary-content-container) {
+    border-radius: var(--border-radius-6xl);
+  }
 }
 
 .landing-container--flow .secondary-content-wrapper {
@@ -113,25 +123,25 @@
 }
 
 .landing-container--flow .secondary-content-container {
-  padding: clamp(var(--mobile-card-padding), 5vw, var(--spacing-2xl));
+  padding: clamp(var(--spacing-xl), 5vw, var(--spacing-2xl));
 }
 
 .landing-container--flow .morph-container {
   height: auto;
-  min-block-size: calc(var(--mobile-type-title) * var(--mobile-line-title));
+  min-block-size: calc(var(--font-size-2xl) * var(--line-height-normal));
   margin-block-start: 0;
   margin-block-end: var(--spacing-sm);
 }
 
 .landing-container--flow .morph-container .secondary-content-title {
   margin-block-start: 0;
-  font-size: var(--mobile-type-title);
-  line-height: var(--mobile-line-title);
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-normal);
 }
 
 .landing-container--flow .morph-container .secondary-content-title--static {
   position: relative;
-  font-size: var(--mobile-type-section);
+  font-size: var(--font-size-lg);
   font-weight: var(--font-weight-bold);
 }
 
@@ -149,8 +159,8 @@
 
 .landing-container--flow .secondary-content-description {
   margin-block-start: 0;
-  font-size: var(--mobile-type-body);
-  line-height: var(--mobile-line-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
   text-align: start;
   text-align-last: auto;
 }
@@ -169,7 +179,7 @@
 .blue-highlight {
   display: inline-block;
   padding: 0 4px;
-  border-radius: 4px;
+  border-radius: var(--border-radius-xs);
   background-repeat: no-repeat;
   background-size: 0% 100%;
   background-position: right center;

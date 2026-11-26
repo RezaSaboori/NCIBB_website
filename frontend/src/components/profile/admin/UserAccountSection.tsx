@@ -26,7 +26,7 @@ export function UserAccountSection({
 }: UserAccountSectionProps) {
   return (
     <div className="profile-user-account">
-      <GlassCard>
+      <GlassCard size="sm" className="profile-detail-card-group profile-detail-card-group--account">
         <ProfileDetailCards items={[
           { label: "ایمیل", value: <bdi>{user.email}</bdi>, fullWidthOnMobile: true },
           { label: "تأیید ایمیل", value: user.is_email_verified ? "تأیید شده" : "تأیید نشده" },
@@ -39,7 +39,7 @@ export function UserAccountSection({
         ]} />
       </GlassCard>
       <form className="profile-user-account__form" onSubmit={onSave}>
-        <GlassCard heading={<h3>دسترسی حساب</h3>} footer={(
+        <GlassCard size="sm" heading={<h3>دسترسی حساب</h3>} footer={(
           <div className="profile-user-account__actions">
             <GlassSwitch label="حساب فعال" checked={active} onChange={(event) => onActiveChange(event.target.checked)} />
             <GlassButton color="primary" type="submit" isLoading={saving} isDisabled={!roles}>ذخیره دسترسی حساب</GlassButton>

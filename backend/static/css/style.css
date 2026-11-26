@@ -69,6 +69,12 @@ body {
 }
 
 /* Feature Cards */
+.feature-icon,
+.expertise-icon,
+.contact-icon {
+  border-radius: var(--bs-border-radius-pill);
+}
+
 .feature-icon {
   width: 80px;
   height: 80px;
@@ -80,7 +86,7 @@ body {
 
 .card {
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border-radius: 10px;
+  border-radius: var(--bs-border-radius-lg);
 }
 
 .card:hover {
@@ -117,7 +123,7 @@ body {
 
 /* Form Styles */
 .form-control {
-  border-radius: 8px;
+  border-radius: var(--bs-border-radius-lg);
   border: 1px solid #dee2e6;
   padding: 0.75rem 1rem;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -129,7 +135,7 @@ body {
 }
 
 .btn {
-  border-radius: 8px;
+  border-radius: var(--bs-border-radius-lg);
   font-weight: 500;
   padding: 0.75rem 1.5rem;
   transition: all 0.3s ease;
@@ -142,7 +148,7 @@ body {
 
 /* Map Placeholder */
 .map-placeholder {
-  border-radius: 10px;
+  border-radius: var(--bs-border-radius-lg);
   min-height: 300px;
   display: flex;
   flex-direction: column;

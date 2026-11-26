@@ -1,6 +1,5 @@
 import LoginForm from "../../components/auth/LoginForm"
 import { useNavigate } from "react-router-dom"
-import "../../styles/glass.css"
 import "./auth.css"
 
 const LoginPage = () => {

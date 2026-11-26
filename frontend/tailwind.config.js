@@ -31,9 +31,9 @@ export default {
           large: "calc(1rem * var(--line-height-relaxed))",
         },
         radius: {
-          small: "var(--border-radius-item-sm)",
-          medium: "var(--border-radius-item-md)",
-          large: "var(--border-radius-item-lg)",
+          small: "var(--border-radius-sm)",
+          medium: "var(--border-radius-md)",
+          large: "var(--border-radius-lg)",
         },
         borderWidth: {
           small: "var(--border-width-thin)",

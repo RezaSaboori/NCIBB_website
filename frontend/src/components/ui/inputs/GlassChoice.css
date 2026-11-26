@@ -45,14 +45,13 @@
   inline-size: 1rem;
   block-size: 1rem;
   border: var(--ui-stroke);
-  border-radius: 50%;
+  border-radius: var(--border-radius-circle);
   background: var(--color-gray2);
 }
 
 .ui-glass-choice__label { overflow-wrap: anywhere; text-align: start; }
 
-.ui-glass-choice:has(> .ui-glass-choice__input:checked) { color: var(--color-gray1); }
-.dark .ui-glass-choice:has(> .ui-glass-choice__input:checked) { color: var(--color-gray12); }
+.ui-glass-choice:has(> .ui-glass-choice__input:checked) { color: var(--color-on-blue-glass); }
 .ui-glass-choice__input:checked ~ .ui-glass-choice__mark {
   border-color: currentColor;
   background: color-mix(in srgb, currentColor 12%, transparent);
@@ -87,8 +86,8 @@
 
 @media (max-width: 768px) {
   .ui-glass-choice {
-    min-block-size: var(--mobile-touch-target);
-    min-inline-size: var(--mobile-touch-target);
+    min-block-size: var(--control-touch-target);
+    min-inline-size: var(--control-touch-target);
   }
 
 }

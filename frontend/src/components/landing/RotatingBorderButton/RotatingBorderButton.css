@@ -8,7 +8,7 @@
 .gradient-border-mask {
   position: absolute;
   inset: 0;
-  border-radius: 9999px;
+  border-radius: var(--border-radius-pill);
   padding: 2px;
   --angle: 0deg;
   background: linear-gradient(

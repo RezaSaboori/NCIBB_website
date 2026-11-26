@@ -249,7 +249,7 @@ export const DropdownInput = forwardRef<HTMLButtonElement, SingleDropdownProps |
                 />
               </div>
             )}
-            <div className="ui-dropdown__list" id={listId} ref={listRef} role="listbox" aria-labelledby={triggerId}
+            <div className="ui-dropdown__list custom-scrollbar" id={listId} ref={listRef} role="listbox" aria-labelledby={triggerId}
               tabIndex={searchable ? -1 : 0} aria-required={required} aria-multiselectable={props.multiple || undefined}
               aria-activedescendant={searchable ? undefined : activeId} aria-busy={remoteSearch?.loading || undefined}
               aria-invalid={searchable ? undefined : props["aria-invalid"]} onKeyDown={handlePanelKey}>

@@ -128,7 +128,7 @@
     rgba(208, 0, 117, 0.2) 0%,
     transparent 70%
   );
-  border-radius: 50%;
+  border-radius: var(--border-radius-circle);
   filter: blur(15px);
   opacity: 0;
   z-index: -1;

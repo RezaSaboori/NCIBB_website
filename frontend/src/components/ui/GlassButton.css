@@ -21,8 +21,8 @@
 .ui-glass-button[data-size="sm"] { min-block-size: 2rem; padding-inline: var(--spacing-sm); }
 .ui-glass-button.ui-glass-button--icon { min-block-size: 0; padding-inline: 0; }
 .ui-glass-button.indigo-glass,
-.dark .ui-glass-button:is(.blue-glass, .green-glass, .red-glass) {
-  color: var(--mobile-on-glass-accent);
+.dark .ui-glass-button:is(.green-glass, .red-glass) {
+  color: #fff;
 }
 
 .dark .ui-glass-button.blue-glass {
@@ -50,34 +50,34 @@
   .ui-glass-button[data-size="sm"],
   .ui-glass-button.ui-glass-button--icon {
     block-size: auto;
-    min-block-size: var(--mobile-touch-target);
-    min-inline-size: var(--mobile-touch-target);
+    min-block-size: var(--control-touch-target);
+    min-inline-size: var(--control-touch-target);
     max-inline-size: 100%;
-    line-height: var(--mobile-line-title);
+    line-height: var(--line-height-normal);
     white-space: normal;
     overflow-wrap: anywhere;
     text-align: center;
   }
 
   .ui-glass-button.ui-glass-button--icon {
-    inline-size: var(--mobile-touch-target);
+    inline-size: var(--control-touch-target);
   }
 
   .ui-glass-button:not(.ui-glass-button--icon) { padding-block: var(--spacing-xs); }
 
-  .ui-glass-button > svg { inline-size: var(--mobile-icon-standard); block-size: var(--mobile-icon-standard); }
+  .ui-glass-button > svg { inline-size: 20px; block-size: 20px; }
   .ui-glass-button.ui-glass-button--icon > svg {
-    inline-size: var(--mobile-icon-compact);
-    block-size: var(--mobile-icon-compact);
+    inline-size: 18px;
+    block-size: 18px;
   }
   .ui-glass-button.ui-glass-button--icon:is(.blue-glass, .indigo-glass) > svg {
-    inline-size: var(--mobile-icon-prominent);
-    block-size: var(--mobile-icon-prominent);
+    inline-size: 24px;
+    block-size: 24px;
   }
 
   .ui-glass-button:is(.blue-glass, .indigo-glass, .green-glass):not(.ui-glass-button--icon),
   .ui-glass-button.ui-state-button {
-    min-block-size: var(--mobile-primary-action);
+    min-block-size: var(--spacing-3xl);
   }
 }
 

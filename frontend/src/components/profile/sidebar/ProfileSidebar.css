@@ -11,10 +11,9 @@
   display: flex;
   flex-direction: column;
   overflow: auto;
-  scrollbar-width: thin;
   padding: var(--spacing-md) var(--spacing-sm);
   gap: var(--spacing-lg);
-  border-radius: var(--border-radius-container-lg);
+  border-radius: var(--border-radius-8xl);
   transition: width var(--motion-duration-slow) var(--motion-easing-easeInOut);
 }
 
@@ -27,7 +26,7 @@
   align-items: center;
   flex-shrink: 0;
   gap: var(--spacing-md);
-  min-block-size: var(--mobile-touch-target);
+  min-block-size: var(--control-touch-target);
   padding-inline: var(--spacing-md);
   border-radius: var(--border-radius-pill);
   color: var(--color-gray11);
@@ -41,14 +40,14 @@
 .sidebar-nav__item.sidebar-nav__item--danger:hover { color: var(--color-red); }
 .sidebar-nav__icon {
   flex: none;
-  inline-size: var(--mobile-icon-standard);
-  block-size: var(--mobile-icon-standard);
+  inline-size: 20px;
+  block-size: 20px;
 }
-.sidebar-nav__toggle { align-self: flex-end; inline-size: var(--mobile-touch-target); padding: 0; justify-content: center; }
+.sidebar-nav__toggle { align-self: flex-end; inline-size: var(--control-touch-target); padding: 0; justify-content: center; }
 .sidebar-nav--collapsed :is(.sidebar-nav__item, .sidebar-nav__toggle) {
   align-self: center;
-  inline-size: var(--mobile-touch-target);
-  block-size: var(--mobile-touch-target);
+  inline-size: var(--control-touch-target);
+  block-size: var(--control-touch-target);
   aspect-ratio: 1;
   border-radius: var(--border-radius-pill);
   justify-content: center;
@@ -66,8 +65,8 @@
     display: block;
     position: fixed;
     inset-block-end: var(--profile-island-bottom);
-    left: max(var(--mobile-page-gutter), env(safe-area-inset-left, 0px));
-    right: max(var(--mobile-page-gutter), env(safe-area-inset-right, 0px));
+    left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
+    right: max(var(--spacing-md), env(safe-area-inset-right, 0px));
     z-index: 10;
     max-inline-size: 34rem;
     block-size: var(--profile-island-height);
@@ -115,7 +114,7 @@
 
   :root .sidebar-nav.glass .sidebar-nav__item {
     /* A fractional tab stays visible at the edge whenever the rail starts in overflow. */
-    flex: 1 0 max(var(--mobile-touch-target), calc((100% + var(--spacing-xs)) / var(--visible-profile-tabs) - var(--spacing-xs)));
+    flex: 1 0 max(var(--control-touch-target), calc((100% + var(--spacing-xs)) / var(--visible-profile-tabs) - var(--spacing-xs)));
     flex-direction: column;
     justify-content: center;
     gap: var(--spacing-xs);
@@ -142,13 +141,4 @@
 
 @media (min-width: 580px) and (max-width: 960px) {
   .sidebar-nav.glass, .sidebar-nav.glass.sidebar-nav--collapsed { --visible-profile-tabs: 5.56; }
-}
-
-@media (max-width: 960px) and (prefers-reduced-transparency: reduce) {
-  .sidebar-nav-frame.glass-transparent::before {
-    background-color: var(--color-gray1);
-    background-image: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
 }

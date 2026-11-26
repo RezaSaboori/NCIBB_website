@@ -14,7 +14,7 @@ import { useTheme } from "../../components/theme/ThemeContext"
 import { ChatInput } from "../../components/ChatInput"
 import { DataCard } from "../../components/DataCard"
 import { useDataFinderModeIndicator } from "./hooks/useDataFinderModeIndicator"
-import { getDatabases } from "./utils/csv"
+import { getDatabases } from "../../dataset_services/databaseCatalog"
 import { DatabaseInfo } from "../../types/database"
 import { searchInCsv } from "../../components/Search"
 import { searchDatayabStream } from "../../dataset_services/datayabService"
@@ -335,7 +335,7 @@ export const PortalPage = () => {
                 <Dropdown
                   showArrow={true}
                   classNames={{
-                    content: "rounded-3xl",
+                    content: "rounded-[var(--border-radius-2xl)]",
                   }}
                 >
                   <DropdownTrigger>
@@ -386,7 +386,7 @@ export const PortalPage = () => {
                 <Dropdown
                   showArrow={true}
                   classNames={{
-                    content: "rounded-3xl bg-gray1",
+                    content: "rounded-[var(--border-radius-2xl)] bg-gray1",
                   }}
                 >
                   <DropdownTrigger>
@@ -455,7 +455,7 @@ export const PortalPage = () => {
                 <Dropdown
                   showArrow={true}
                   classNames={{
-                    content: "rounded-3xl",
+                    content: "rounded-[var(--border-radius-2xl)]",
                   }}
                 >
                   <DropdownTrigger>

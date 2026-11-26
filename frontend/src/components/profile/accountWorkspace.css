@@ -1,4 +1,9 @@
-.account-workspace { color: var(--color-gray12); min-inline-size: 0; }
+.account-workspace {
+  color: var(--color-gray12);
+  min-inline-size: 0;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-relaxed);
+}
 
 .account-workspace__stack, .account-workspace__section, .account-workspace__form, .account-workspace__page-heading {
   display: flex;
@@ -10,11 +15,11 @@
 .account-workspace__stack { gap: var(--spacing-lg); }
 .account-workspace__page-heading { gap: var(--spacing-xs); }
 
-.account-workspace h1 { font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); }
-.account-workspace h2 { font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); }
+.account-workspace h1 { font-size: var(--font-size-2xl); line-height: var(--line-height-normal); font-weight: var(--font-weight-bold); }
+.account-workspace h2 { font-size: var(--font-size-lg); line-height: var(--line-height-normal); font-weight: var(--font-weight-semibold); }
 .account-workspace h3 { font-size: var(--font-size-base); font-weight: var(--font-weight-semibold); }
 .account-workspace__muted { color: var(--color-gray9); }
-.account-workspace__error { color: var(--color-red); }
+.account-workspace__error { color: var(--color-error); }
 
 .account-workspace__toolbar, .account-workspace__heading, .account-workspace__actions, .account-workspace__status,
 .account-workspace__identity-body {
@@ -45,7 +50,7 @@
   flex-shrink: 0;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--border-radius-circle);
   background: transparent;
   cursor: pointer;
 }
@@ -82,24 +87,6 @@
 }
 
 @media (max-width: 760px) {
-  :is(.account-workspace, .profile-modal) {
-    font-size: var(--mobile-type-body);
-    line-height: var(--mobile-line-body);
-    color: var(--mobile-body-color);
-  }
-  .account-workspace.page-content { padding-inline: var(--mobile-page-gutter); }
-  .account-workspace__stack { gap: var(--mobile-section-gap); }
-  .account-workspace h1 { font-size: var(--mobile-type-title); line-height: var(--mobile-line-title); }
-  .account-workspace h2 { font-size: var(--mobile-type-section); line-height: var(--mobile-line-title); }
-  .account-workspace__muted { color: var(--mobile-muted-color); }
-  .account-workspace__error { color: var(--mobile-error-color); }
-  .account-workspace .ui-glass-card, .profile-modal .ui-glass-card {
-    padding: var(--mobile-card-padding);
-    gap: var(--mobile-section-gap);
-  }
-  :is(.account-workspace__toolbar, .account-workspace__heading, .account-workspace__actions, .account-workspace__status) {
-    gap: var(--mobile-control-gap);
-  }
   .account-workspace :focus-visible:not(:where(.ui-input-shell, .ui-input-field, .ui-dropdown__list)) {
     outline-width: var(--border-width-normal);
     outline-offset: var(--border-width-normal);

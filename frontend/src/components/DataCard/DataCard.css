@@ -1,7 +1,11 @@
 .data-card {
   border: none;
-  border-radius: var(--border-radius-container-lg);
+  border-radius: var(--border-radius-8xl);
   font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .data-card { border-radius: var(--border-radius-6xl); }
 }
 
 .data-container {

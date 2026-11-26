@@ -29,6 +29,7 @@
 
 :root {
   --glass-backdrop-filter: blur(4px) saturate(1.8) brightness(1.2);
+  --color-on-blue-glass: rgb(248, 248, 248);
 }
 
 .glass::before,
@@ -193,7 +194,7 @@
         0px 6px 16px 0px color-mix(in srgb, #000 12%, transparent);
 }
 
-@media (max-width: 768px) and (prefers-reduced-transparency: reduce) {
+@media (prefers-reduced-transparency: reduce) {
     :root .glass-transparent:not(:where(.glass-transparent--scroll))::before,
     :root .glass-transparent--scroll {
         background-color: var(--color-gray1);
@@ -204,12 +205,10 @@
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    @media (max-width: 768px) {
-        :root .glass-transparent:not(:where(.glass-transparent--scroll))::before,
-        :root .glass-transparent--scroll {
-            background-color: var(--color-gray1);
-            background-image: none;
-        }
+    :root .glass-transparent:not(:where(.glass-transparent--scroll))::before,
+    :root .glass-transparent--scroll {
+        background-color: var(--color-gray1);
+        background-image: none;
     }
 }
 
@@ -235,9 +234,9 @@
         opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
-/* Blue glass uses the same foreground across selected navigation controls. */
-:root .glass-navigation__item:is([aria-current], [aria-selected="true"], [aria-pressed="true"]) {
-    color: var(--color-gray12);
+:root :is(.blue-glass, .blue-glass-transparent),
+:root .glass-navigation__item:is([aria-current]:not([aria-current="false"]), [aria-selected="true"], [aria-pressed="true"]) {
+    color: var(--color-on-blue-glass);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -247,8 +246,8 @@
 @media (max-width: 960px) {
     :root .glass-navigation {
         box-sizing: border-box;
-        block-size: calc(var(--mobile-touch-target) + 2 * var(--spacing-xs));
-        min-block-size: calc(var(--mobile-touch-target) + 2 * var(--spacing-xs));
+        block-size: calc(var(--control-touch-target) + 2 * var(--spacing-xs));
+        min-block-size: calc(var(--control-touch-target) + 2 * var(--spacing-xs));
         border-radius: var(--border-radius-pill);
     }
 
@@ -262,8 +261,8 @@
 
     :root .glass-navigation .glass-navigation__item {
         box-sizing: border-box;
-        block-size: var(--mobile-touch-target);
-        min-inline-size: var(--mobile-touch-target);
+        block-size: var(--control-touch-target);
+        min-inline-size: var(--control-touch-target);
         padding-block: 0;
     }
 }
