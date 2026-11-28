@@ -44,7 +44,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-md) clamp(var(--spacing-md), 2vw, var(--spacing-3xl));
+  min-block-size: var(--control-height);
+  padding: var(--spacing-xs) clamp(var(--spacing-md), 2vw, var(--spacing-3xl));
   border-radius: var(--border-radius-pill);
   overflow: hidden;
   text-align: center;

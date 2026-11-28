@@ -5,6 +5,8 @@
   align-items: center;
   justify-content: center;
   background-color: var(--color-gray2);
-  padding: var(--spacing-xl) var(--spacing-md);
+  padding-block: var(--spacing-xl);
+  padding-left: var(--page-gutter-left);
+  padding-right: var(--page-gutter-right);
   box-sizing: border-box;
 }

@@ -67,15 +67,15 @@ export function TicketControls({ thread, userId, onUpdated, onConflict }: {
         <div className="account-messages__triage-owner">
           <bdi>{assignee?.name ?? "بدون مسئول"}</bdi>
           <div className="account-workspace__actions">
-            {!editor && <GlassButton size="sm" variant="flat" isDisabled={busy}
+            {!editor && <GlassButton variant="flat" isDisabled={busy}
               onPress={() => setEditor({ expectedId: assigneeId, choice: assignee ?? undefined })}>
               {assignee ? "تغییر مسئول" : "تعیین مسئول"}
             </GlassButton>}
             {assignee ? (
-              <GlassButton size="sm" variant="flat" isDisabled={busy}
+              <GlassButton variant="flat" isDisabled={busy}
                 onPress={() => void update({ assignee_id: null, expected_assignee_id: assigneeId })}>برداشتن مسئول</GlassButton>
             ) : (
-              <GlassButton size="sm" color="primary" isDisabled={busy}
+              <GlassButton color="primary" isDisabled={busy}
                 onPress={() => void update({ assignee_id: userId, expected_assignee_id: null })}>به عهده می‌گیرم</GlassButton>
             )}
           </div>
@@ -90,13 +90,13 @@ export function TicketControls({ thread, userId, onUpdated, onConflict }: {
               onChange={(value) => setEditor({ ...editor, choice: assignees.options.find(({ id }) => id === Number(value)) })} />
           </label>
           <div className="account-workspace__actions">
-            <StatefulGlassButton type="button" size="sm" color={busy ? "pending" : "primary"} state={busy ? "saving" : "ready"}
+            <StatefulGlassButton type="button" color={busy ? "pending" : "primary"} state={busy ? "saving" : "ready"}
               label={busy ? "در حال ذخیره…" : "تعیین مسئول"} busy={busy}
               disabled={!editor.choice || editor.choice.id === editor.expectedId}
               onPress={() => {
                 if (editor.choice) void update({ assignee_id: editor.choice.id, expected_assignee_id: editor.expectedId })
               }} />
-            <GlassButton size="sm" variant="flat" isDisabled={busy} onPress={() => setEditor(undefined)}>انصراف</GlassButton>
+            <GlassButton variant="flat" isDisabled={busy} onPress={() => setEditor(undefined)}>انصراف</GlassButton>
           </div>
         </div>
       )}

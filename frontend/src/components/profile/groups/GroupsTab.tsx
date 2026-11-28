@@ -1,6 +1,6 @@
 import { GlassCard } from "@/components/ui/GlassCard"
 import { GlassTable, type GlassTableColumn } from "@/components/ui/tables/GlassTable"
-import { SingleLineInput } from "@/components/ui/inputs"
+import { SearchInput } from "@/components/ui/inputs"
 import { GlassButton } from "@/components/ui/GlassButton"
 import { useCallback, useState } from "react"
 import { accountApi } from "@/dataset_services/accountApi"
@@ -44,8 +44,8 @@ export function GroupsTab({ admin, memberships }: { admin: boolean; memberships:
         </GlassCard>}
         <GlassTable label="گروه‌ها" rows={groups ?? []} columns={columns} rowKey={(group) => group.id}
           controls={<>
-            {admin && <label className="account-workspace__form">جستجوی گروه<SingleLineInput type="search" value={search}
-              onChange={(event) => { setSearch(event.target.value); setPage(1) }} /></label>}
+            {admin && <label className="account-workspace__form">جستجوی گروه<SearchInput className="ui-input-shell--persian" inputProps={{ type: "search" }} value={search}
+              onChange={(value) => { setSearch(value); setPage(1) }} /></label>}
             <AccountStatus loading={results.loading} error={results.error} retry={results.refresh} />
           </>}
           footer={<PageControls data={results.data} page={page} onPage={setPage} />}

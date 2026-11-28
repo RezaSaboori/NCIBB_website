@@ -1,12 +1,11 @@
-import { getDatabases } from "../../dataset_services/databaseCatalog"
 import { DatabaseInfo } from "../../types/database"
 
-export const searchInCsv = async (
+export const searchInCsv = (
+  data: readonly DatabaseInfo[],
   query: string,
-  searchSubject: string = "همه"
-): Promise<DatabaseInfo[]> => {
-  const data = await getDatabases()
-  const searchTerms = query.toLowerCase().split(" ")
+  searchSubject: string = "همه",
+): DatabaseInfo[] => {
+  const searchTerms = query.trim().toLowerCase().split(/\s+/u)
 
   return data.filter((row) => {
     let searchableString = ""

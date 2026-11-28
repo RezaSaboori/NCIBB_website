@@ -2,24 +2,33 @@
  * Anchored field description shared by all criteria window variants.
  * HeroUI positions the portal from the actual trigger coordinates.
  */
-import React, { useId, useState } from "react";
+import React, { useEffect, useId, useState } from "react";
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/react";
-import { QuestionIcon } from "./icons/Step2Icons";
+import { CloseButton, QuestionButton } from "@/components/ui/iconButtons";
 import "./criteriaDescriptionHelp.css";
 
 interface CriteriaDescriptionHelpProps {
   label: string;
   description?: string | null;
   onOpen?: () => void;
+  disabled?: boolean;
+  renderPreview?: () => React.ReactNode;
 }
 
 export const CriteriaDescriptionHelp: React.FC<CriteriaDescriptionHelpProps> = ({
   label,
   description,
   onOpen,
+  disabled = false,
+  renderPreview,
 }) => {
   const descriptionId = useId();
   const [isOpen, setIsOpen] = useState(false);
+  const title = renderPreview ? "Criteria details" : "Description";
+
+  useEffect(() => {
+    if (disabled) setIsOpen(false);
+  }, [disabled]);
 
   const handleOpenChange = (open: boolean) => {
     setIsOpen(open);
@@ -28,10 +37,9 @@ export const CriteriaDescriptionHelp: React.FC<CriteriaDescriptionHelpProps> = (
 
   return (
     <Popover
-      isOpen={isOpen}
+      isOpen={isOpen && !disabled}
       onOpenChange={handleOpenChange}
       placement="bottom-end"
-      shouldFlip={false}
       offset={8}
       shouldBlockScroll={false}
       shouldCloseOnScroll={false}
@@ -44,16 +52,21 @@ export const CriteriaDescriptionHelp: React.FC<CriteriaDescriptionHelpProps> = (
       }}
     >
       <PopoverTrigger>
-        <button
-          className="teal-glass dz-icon-btn s2-icon-btn"
-          aria-label={`Show description for ${label}`}
-          type="button"
-        >
-          <QuestionIcon className="dz-icon-btn__icon dz-icon-btn__icon--question" />
-        </button>
+        <QuestionButton
+          size="var(--s2-criteria-action-target)"
+          className="s2-criteria-icon"
+          inset
+          disabled={disabled}
+          aria-label={`Show ${renderPreview ? "rules" : "description"} for ${label}`}
+        />
       </PopoverTrigger>
 
-      <PopoverContent dir="ltr" aria-describedby={descriptionId}>
+      <PopoverContent
+        dir="ltr"
+        lang="en"
+        aria-describedby={renderPreview ? undefined : descriptionId}
+        data-criteria-preview={renderPreview ? "" : undefined}
+      >
         {(titleProps) => (
           <>
             <div className="s2-criteria-description__header">
@@ -62,27 +75,23 @@ export const CriteriaDescriptionHelp: React.FC<CriteriaDescriptionHelpProps> = (
                 className="s2-criteria-description__title"
                 dir="ltr"
               >
-                Description
+                {renderPreview ? label : title}
               </h3>
-              <button
-                className="red-glass dz-icon-btn s2-criteria-description__close"
-                aria-label="Close description"
+              <CloseButton
+                size="var(--s2-criteria-action-target)"
+                className="s2-criteria-icon"
+                inset
+                aria-label={`Close ${title.toLowerCase()}`}
                 onClick={() => setIsOpen(false)}
-                type="button"
-              >
-                <span aria-hidden="true">×</span>
-              </button>
+              />
             </div>
 
             <div className="s2-criteria-description__body">
-              {/* Preserve graph paragraph breaks while rendering plain text. */}
-              <p
-                id={descriptionId}
-                className="s2-criteria-description__text"
-                dir="ltr"
-              >
-                {description?.trim() || "No description is available for this field."}
-              </p>
+              {renderPreview ? renderPreview() : (
+                <p id={descriptionId} className="s2-criteria-description__text">
+                  {description?.trim() || "No description is available for this field."}
+                </p>
+              )}
             </div>
           </>
         )}

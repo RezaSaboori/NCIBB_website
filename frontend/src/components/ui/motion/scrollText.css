@@ -1,37 +1,30 @@
-.dz-scroll-wrapper {
+.ui-scroll-text {
   --dz-scroll-direction: -1;
+  position: relative;
+  display: block;
   min-inline-size: 0;
   overflow: hidden;
   white-space: nowrap;
+  touch-action: manipulation;
 }
 
-.dz-scroll-wrapper:dir(rtl) { --dz-scroll-direction: 1; }
-.dz-scroll-inner { display: inline-block; white-space: nowrap; }
-
-@keyframes dz-text-scroll {
-  0%, 15% { transform: translateX(0); }
-  85%, 100% { transform: translateX(calc(var(--dz-scroll-direction) * (var(--scroll-distance, 0px) + var(--dz-scroll-padding, 0px)))); }
+.ui-scroll-text:dir(rtl) { --dz-scroll-direction: 1; }
+.ui-scroll-text__label {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.ui-scroll-text { position: relative; display: block; }
-.ui-scroll-text__label { display: block; overflow: hidden; text-overflow: ellipsis; }
 .ui-scroll-text[data-scroll-overflow="true"] .ui-scroll-text__label { text-align: start; }
 
-.ui-scroll-text .dz-scroll-inner {
+.ui-scroll-text__reveal {
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: 0;
   inline-size: max-content;
   visibility: hidden;
+  pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  :is(.ui-scroll-text:hover, .ui-scroll-text-trigger:focus-visible .ui-scroll-text)[data-scroll-overflow="true"] .ui-scroll-text__label {
-    opacity: 0;
-  }
-
-  :is(.ui-scroll-text:hover, .ui-scroll-text-trigger:focus-visible .ui-scroll-text)[data-scroll-overflow="true"] .dz-scroll-inner {
-    visibility: visible;
-    animation: dz-text-scroll 3s linear forwards;
-  }
-}
+.ui-scroll-text[data-scroll-playing="true"] .ui-scroll-text__label { opacity: 0; }
+.ui-scroll-text[data-scroll-playing="true"] .ui-scroll-text__reveal { visibility: visible; }

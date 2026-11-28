@@ -35,8 +35,8 @@ export function createRenderer(gl, canvas, config, particles, PARTICLE_COUNT, ce
     let portalVideoTexture, portalNoiseTexture;
     let portalVideo, portalInitialized = false;
     const PORTAL_SIZE = maxSize * 0.4; // 50% of original width (0.8 * 0.5 = 0.4)
-    const desktopPortalTargetX = -0.8;
-    const desktopPortalSize = 1500;
+    const desktopPortalTargetX = -0.5;
+    const desktopPortalMaxSize = 500;
     
     // Event listeners storage for cleanup
     const eventListeners = [];
@@ -825,7 +825,8 @@ void main() {
           portalView = mat.lookAt4(portalEye, portalCameraCenter, portalUp);
           
           const portalDistance = effectiveDistance * 0.5; // Fixed distance from camera
-          const portalVisibleHeight = 2.0 * portalDistance * tanHalfFov;
+          const framingDistance = config.compact ? portalDistance : effectiveDistance + portalDistance;
+          const portalVisibleHeight = 2.0 * framingDistance * tanHalfFov;
           const portalVisibleWidth = portalVisibleHeight * (aspect / frameScale);
           
           // Base portal position
@@ -1058,7 +1059,8 @@ void main() {
              ambientOpacity = Math.max(0.0, 1.0 - scrollProgress);
           }
 
-          if (scrollProgress > 0.01) {
+          // Keep the desktop card readable as the ambient particles fade beside it.
+          if (config.compact && scrollProgress > 0.01) {
             // Temporarily update config DOF values for portal growth blur effect
             const originalDofEnabled = config.dofEnabled;
             const originalFocalDistance = config.dofFocalDistance;
@@ -1132,12 +1134,10 @@ void main() {
           
           // Portal grows from 0 to target size independently (2D scale, not camera zoom)
           // Calculate scale needed to achieve target pixel size at portal's distance from camera
-          const portalDistanceFromCamera = config.compact
-            ? effectiveDistance - portalWorldZ
-            : Math.abs(portalWorldZ);
+          const portalDistanceFromCamera = effectiveDistance - portalWorldZ;
           const targetSize = config.compact
             ? Math.min(canvas.clientWidth, frameHeight) * 0.85
-            : desktopPortalSize;
+            : Math.min(desktopPortalMaxSize, canvas.clientWidth * 0.4, frameHeight * 0.85);
           const worldSizeAtTarget = (targetSize * tanHalfFov * portalDistanceFromCamera) / frameHeight;
           
           // Portal starts at 0 size and grows to target size based on scroll progress
@@ -1157,7 +1157,10 @@ void main() {
               0, 0, 0, 1
           ]);
           
-          const portalModel = mat.multiply4(translateMatrix, scaleMatrix);
+          // Scale the desktop portal around its left-side anchor throughout the zoom.
+          const portalModel = config.compact
+            ? mat.multiply4(translateMatrix, scaleMatrix)
+            : mat.multiply4(scaleMatrix, translateMatrix);
           
           // Set uniforms - use separate portal view matrix (no heart rotation)
           gl.uniformMatrix4fv(portalUniforms.u_model, false, portalModel);

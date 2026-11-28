@@ -25,15 +25,18 @@
 .landing-content-visible {
   opacity: 1;
   visibility: visible;
-  filter: blur(40px);
   transition: 
     opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.landing-content-visible:not(.landing-content-revealed) {
+  filter: blur(40px);
 }
 
 /* New class for the final reveal transition */
 .landing-content-revealed {
   animation: 
-    clear-blur 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    clear-blur 2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes clear-blur {

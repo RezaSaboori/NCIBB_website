@@ -16,7 +16,7 @@ export const CallToAction: React.FC<CallToActionProps> = ({
 }) => {
   return (
     <div className="py-20">
-      <div className="container mx-auto px-6 text-center">
+      <div className="page-container text-center">
         <h2 className="text-4xl font-bold text-gray-800 dark:text-white">
           آماده شروع هستید؟
         </h2>
@@ -25,7 +25,7 @@ export const CallToAction: React.FC<CallToActionProps> = ({
         </p>
         <div className="mt-8">
           <Link to={action.link}>
-            <Button color="primary" size="lg">
+            <Button className="ui-control-button" color="primary" size="lg">
               ثبت نام کنید
             </Button>
           </Link>

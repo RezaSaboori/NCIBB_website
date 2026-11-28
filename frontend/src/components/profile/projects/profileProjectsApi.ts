@@ -19,7 +19,7 @@ function mapDatasazProject(p: DatasazProject): UserProject {
     id: p.id,
     name: p.name,
     serviceName: "datasaz",
-    serviceLabel: "داده‌ساز",
+    serviceLabel: "دیتابیس",
     stageLabel: STEP_LABELS[p.current_step] ?? `مرحله ${p.current_step}`,
     statusLabel: p.status,
     openUrl: `/dataset?project=${p.id}`,

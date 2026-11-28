@@ -6,9 +6,11 @@
  *   - header shows field label + unit + action icons
  */
 import React, { useState } from "react";
-import { TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
+import { DeleteButton, MinimizeButton } from "@/components/ui/iconButtons";
 import { CriteriaDescriptionHelp } from "./CriteriaDescriptionHelp";
+import { CriteriaWindowButton } from "./CriteriaWindowButton";
 import { CriteriaWindowRow, RowState } from "./CriteriaWindowRow";
+import { AddIcon } from "./icons/Step2Icons";
 import type { EnumValues } from "../../types";
 import { getEnumOptions } from "../../utils/enumOptions";
 
@@ -93,22 +95,20 @@ export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
             description={description}
             onOpen={onHelp}
           />
-          <button
-            className="orange-glass dz-icon-btn s2-icon-btn"
-            aria-label="Close"
+          <MinimizeButton
+            size="var(--s2-criteria-action-target)"
+            className="s2-criteria-icon"
+            inset
+            aria-label="Minimize"
             onClick={onClose}
-            type="button"
-          >
-            <MinimizeIcon className="dz-icon-btn__icon dz-icon-btn__icon--minimize" />
-          </button>
-          <button
-            className="red-glass dz-icon-btn s2-icon-btn"
+          />
+          <DeleteButton
+            size="var(--s2-criteria-action-target)"
+            className="s2-criteria-icon"
+            inset
             aria-label="Delete"
             onClick={onDelete}
-            type="button"
-          >
-            <TrashIcon className="dz-icon-btn__icon dz-icon-btn__icon--trash" />
-          </button>
+          />
         </div>
       </div>
 
@@ -142,7 +142,7 @@ export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
               return next;
             })}
           >
-            <span className="s2-criteria-window__add-rule-btn-icon">+</span>
+            <span className="s2-criteria-window__add-rule-btn-icon" aria-hidden="true"><AddIcon /></span>
             Add more rule
           </button>
         )}
@@ -151,12 +151,12 @@ export const CriteriaWindowMini: React.FC<CriteriaWindowMiniProps> = ({
       {/* Footer — Submit + Delete only, no Advanced toggle */}
       <div className="s2-criteria-window__footer">
         <div className="s2-criteria-window__footer-left">
-          <button className="blue-glass s2-criteria-window__btn" type="button" onClick={onClose}>
+          <CriteriaWindowButton surface="blue-glass" onClick={onClose}>
             Submit
-          </button>
-          <button className="red-glass s2-criteria-window__btn" type="button" onClick={onDelete}>
+          </CriteriaWindowButton>
+          <CriteriaWindowButton surface="red-glass" onClick={onDelete}>
             Delete
-          </button>
+          </CriteriaWindowButton>
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+@import "./inter/Inter.css";
 @import "./glass.css";
 
+/* Balance IRANSansX within each line while keeping its 1.5em total font height. */
 @font-face {
   font-family: "IRANSansXV";
   src:
@@ -10,6 +11,8 @@
   /* for the other supporting browsers */
   font-weight: 100 1000;
   font-display: fallback;
+  ascent-override: 96%;
+  descent-override: 54%;
 }
 
 /* Local Persian font faces */
@@ -19,6 +22,8 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
+  ascent-override: 96%;
+  descent-override: 54%;
 }
 
 @font-face {
@@ -27,6 +32,8 @@
   font-weight: 700;
   font-style: normal;
   font-display: swap;
+  ascent-override: 96%;
+  descent-override: 54%;
 }
 
 :root {
@@ -76,6 +83,8 @@
   --spacing-5xl: 64px;
 
   --control-touch-target: 44px;
+  --control-height: 40px;
+  --control-height-compact: 32px;
 
   /* * ========================================
     * Border Radius
@@ -128,11 +137,10 @@
     */
   /* Font Family */
   --font-family-system:
-    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  --font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
-  --font-family-persian: "IRANSansX", "IRANSansXV", sans-serif;
+  --font-family-base: "Inter", "IRANSansX", "IRANSansXV", var(--font-family-system);
+  --font-family-persian: "IRANSansX", "IRANSansXV", "Inter", var(--font-family-system);
   --font-family-mono: "Courier New", monospace;
 
   /* Font Size */
@@ -183,6 +191,13 @@
   --motion-easing-easeIn: cubic-bezier(0.4, 0, 1, 1);
   --motion-easing-easeInOut: cubic-bezier(0.4, 0, 0.2, 1);
   --motion-easing-settle: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  :root {
+    --control-height: var(--control-touch-target);
+    --control-height-compact: var(--control-touch-target);
+  }
 }
 
 @media (max-width: 768px) {
@@ -244,13 +259,21 @@ html {
     -webkit-font-smoothing: antialiased;
 }
 
+:where(html, [lang]:not([lang=""])) {
+  --font-family-content: var(--font-family-base);
+  font-family: var(--font-family-content);
+}
+
+:where([lang]:lang(fa), [lang]:lang(ar), [lang]:lang(ur), [lang]:lang(ps), [lang]:lang(ckb)) {
+  --font-family-content: var(--font-family-persian);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
 }
 
 body {
   margin: 0;
-  font-family: var(--font-family-persian);
   transition:
     background-color var(--motion-duration-normal)
       var(--motion-easing-easeInOut),
@@ -266,43 +289,51 @@ body {
 
 /*
  * ========================================
- * Page Content Wrapper
+ * Page containers
  * ========================================
- * Single source of truth for page-level
- * horizontal padding and max-width.
- *
- * Usage: wrap every page's root element with
- *   <div className="page-content"> ... </div>
- *
- * Do NOT add extra px-* / padding / mx-auto
- * on top of this. Let the layout breathe.
  */
-.page-content {
-  --page-padding-x: var(--spacing-xl);
-  --page-padding-y: var(--spacing-xl);
-  --page-max-width: 1200px;
+:root {
+  --page-max-width: 96rem;
+  /* Grow from 16px at 768px to 32px at 1024px. */
+  --page-gutter: clamp(var(--spacing-md), calc(var(--spacing-md) + (100vw - 768px) / 16), var(--spacing-xl));
+  --page-gutter-left: max(var(--page-gutter), env(safe-area-inset-left, 0px));
+  --page-gutter-right: max(var(--page-gutter), env(safe-area-inset-right, 0px));
+}
 
-  width: 100%;
-  max-width: var(--page-max-width);
+@media (width > 1280px) {
+  :root {
+    /* Grow from 32px at 1280px to 48px at 1440px. */
+    --page-gutter: clamp(var(--spacing-xl), calc(var(--spacing-xl) + (100vw - 1280px) / 10), var(--spacing-3xl));
+  }
+}
+
+.page-container,
+.page-content {
+  inline-size: 100%;
+  max-inline-size: calc(var(--page-max-width) + var(--page-gutter-left) + var(--page-gutter-right));
   box-sizing: border-box;
-  padding: var(--page-padding-y) var(--page-padding-x);
-  margin-inline: auto;   /* centres when narrower than viewport */
+  margin-inline: auto;
+  padding-left: var(--page-gutter-left);
+  padding-right: var(--page-gutter-right);
+}
+
+.page-content {
+  padding-block: var(--spacing-xl);
 }
 
 /* Fluid variant — no max-width cap, for full-bleed sections */
 .page-content--fluid {
-  --page-max-width: none;
+  max-inline-size: none;
 }
 
 /* Narrow variant — for forms, single-column reading content */
 .page-content--narrow {
-  --page-max-width: 760px;
+  max-inline-size: 760px;
 }
 
 @media (max-width: 768px) {
   .page-content {
-    --page-padding-x: var(--spacing-md);
-    --page-padding-y: var(--spacing-lg);
+    padding-block: var(--spacing-lg);
   }
 
   :where(.page-content, .profile-modal) a:focus-visible {

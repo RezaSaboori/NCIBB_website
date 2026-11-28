@@ -1,4 +1,6 @@
-import React, { useLayoutEffect, useRef, useState } from "react"
+import { Tab } from "@heroui/react"
+import { useState } from "react"
+import { GlassTabs } from "@/components/ui/GlassTabs"
 import "./ServicesSection.css"
 
 const servicesData = {
@@ -82,28 +84,7 @@ const servicesData = {
 }
 
 const ServicesSection = ({ isVisible }) => {
-  const [activeTab, setActiveTab] = useState("داده")
-  const railRef = useRef(null)
-
-  const tabs = ["داده", "پردازش", "منابع"]
-
-  useLayoutEffect(() => {
-    const rail = railRef.current
-    const activeElement = rail?.querySelector('[aria-pressed="true"]')
-    if (!activeElement) return
-
-    const measureIndicator = () => {
-      rail.style.setProperty("--active-indicator-width", `${activeElement.offsetWidth}px`)
-      rail.style.setProperty("--active-indicator-left", `${activeElement.offsetLeft}px`)
-      rail.style.setProperty("--active-indicator-opacity", "1")
-    }
-
-    measureIndicator()
-    const resize = new ResizeObserver(measureIndicator)
-    resize.observe(rail)
-    for (const button of rail.children) resize.observe(button)
-    return () => resize.disconnect()
-  }, [activeTab])
+  const [tabRail, setTabRail] = useState(null)
 
   return (
     <div
@@ -112,41 +93,32 @@ const ServicesSection = ({ isVisible }) => {
       <div className="services-container glass">
         <div className="services-header">
           <h2 className="services-title">خدمات</h2>
-
-          <div className="services-tabs-container">
-            <div className="services-nav glass-navigation glass-transparent">
-              <div ref={railRef} className="services-nav__menu glass-navigation__indicator" role="group" aria-label="دسته‌بندی خدمات">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab}
-                    type="button"
-                    className="services-nav__item glass-navigation__item"
-                    aria-pressed={activeTab === tab}
-                    onClick={() => setActiveTab(tab)}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+          <div ref={setTabRail} className="services-tabs-container" />
         </div>
 
-        <div className="services-bento-grid">
-          {servicesData[activeTab].map((card, index) => (
-            <div
-              key={card.id}
-              className={`service-card glass ${isVisible ? "reveal" : ""}`}
-              style={{
-                animationDelay: `${index * 150}ms`,
-                "--service-card-span": card.span || 1,
-              }}
-            >
-              <h3 className="service-card-title">{card.title}</h3>
-              <p className="service-card-description">{card.description}</p>
-            </div>
-          ))}
-        </div>
+        {tabRail && (
+          <GlassTabs aria-label="دسته‌بندی خدمات" railTarget={tabRail}>
+            {Object.entries(servicesData).map(([category, cards]) => (
+              <Tab key={category} title={category}>
+                <div className="services-bento-grid">
+                  {cards.map((card, index) => (
+                    <div
+                      key={card.id}
+                      className={`service-card glass ${isVisible ? "reveal" : ""}`}
+                      style={{
+                        animationDelay: `${index * 150}ms`,
+                        "--service-card-span": card.span || 1,
+                      }}
+                    >
+                      <h3 className="service-card-title">{card.title}</h3>
+                      <p className="service-card-description">{card.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </Tab>
+            ))}
+          </GlassTabs>
+        )}
       </div>
     </div>
   )

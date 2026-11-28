@@ -62,7 +62,7 @@ const datayabStatusMessage = (event: DatayabStatusEvent): string => {
   }
 }
 
-const postSearch = (query: string, withAuth: boolean) => {
+const postSearch = (query: string, withAuth: boolean, signal?: AbortSignal) => {
   const headers: Record<string, string> = { "Content-Type": "application/json" }
   const token = localStorage.getItem("access_token")
   if (withAuth && token) headers["Authorization"] = `Bearer ${token}`
@@ -70,17 +70,19 @@ const postSearch = (query: string, withAuth: boolean) => {
     method: "POST",
     headers,
     body: JSON.stringify({ query }),
+    signal,
   })
 }
 
 export const searchDatayabStream = async (
   query: string,
-  onStatus: (message: string, content?: string) => void
+  onStatus: (message: string, content?: string) => void,
+  signal?: AbortSignal,
 ): Promise<DatayabSearchResponse> => {
   // Public endpoint: an expired JWT 401s before AllowAny runs, so retry anonymously.
-  let response = await postSearch(query, true)
+  let response = await postSearch(query, true, signal)
   if (response.status === 401) {
-    response = await postSearch(query, false)
+    response = await postSearch(query, false, signal)
   }
   if (!response.ok || !response.body) {
     throw new Error(`Datayab search failed with status ${response.status}`)
@@ -89,30 +91,29 @@ export const searchDatayabStream = async (
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
   let buffer = ""
-  let payload: DatayabSearchResponse | null = null
-
-  for (;;) {
-    const { done, value } = await reader.read()
-    if (done) break
-    buffer += decoder.decode(value, { stream: true })
-    const events = buffer.split("\n\n")
-    buffer = events.pop() ?? ""
-    for (const event of events) {
-      const line = event.trim()
-      if (!line.startsWith("data:")) continue
-      const data = JSON.parse(line.slice(5))
-      if (data.type === "status") {
-        onStatus(datayabStatusMessage(data), data.content)
-      } else if (data.type === "result") {
-        payload = { results: data.results, count: data.count, trace: data.trace }
-      } else if (data.type === "error") {
-        throw new Error(data.detail)
+  try {
+    for (;;) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      const events = buffer.split("\n\n")
+      buffer = events.pop() ?? ""
+      for (const event of events) {
+        const line = event.trim()
+        if (!line.startsWith("data:")) continue
+        const data = JSON.parse(line.slice(5))
+        if (data.type === "status") {
+          onStatus(datayabStatusMessage(data), data.content)
+        } else if (data.type === "result") {
+          return { results: data.results, count: data.count, trace: data.trace }
+        } else if (data.type === "error") {
+          throw new Error(data.detail)
+        }
       }
     }
-  }
-
-  if (!payload) {
     throw new Error("Datayab search returned no result")
+  } finally {
+    void reader.cancel().catch(() => undefined)
+    reader.releaseLock()
   }
-  return payload
 }

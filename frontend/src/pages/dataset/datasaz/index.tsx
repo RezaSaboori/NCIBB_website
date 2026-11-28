@@ -126,29 +126,31 @@ export const DatasazMode: React.FC = () => {
 
   return (
     <div className="datasaz-mode-wrapper">
-      <div className="datasaz-tabs-row">
-        <DatasazStepTabs
-          activeStep={activeStep}
-          onStepChange={handleStepChange}
-          isStepDisabled={(step) => !activeProject && step !== 1}
-        />
-        {showSaveSpinner && (
-          <div className="datasaz-save-spinner-container glass">
-            <SaveSpinner visible />
-          </div>
+      <div className="datasaz-toolbar">
+        <div className="datasaz-tabs-row">
+          <DatasazStepTabs
+            activeStep={activeStep}
+            onStepChange={handleStepChange}
+            isStepDisabled={(step) => !activeProject && step !== 1}
+          />
+          {showSaveSpinner && (
+            <div className="datasaz-save-spinner-container glass">
+              <SaveSpinner visible />
+            </div>
+          )}
+        </div>
+        {activeStep === 2 && (
+          <DefinitionCounters
+            inclusionCount={inclusionCount}
+            exclusionCount={exclusionCount}
+            errorCount={0}
+            onStartProcessing={handleStartProcessing}
+            isStarting={isStarting}
+            isSaving={saving}
+            processError={processError}
+          />
         )}
       </div>
-      {activeStep === 2 && (
-        <DefinitionCounters
-          inclusionCount={inclusionCount}
-          exclusionCount={exclusionCount}
-          errorCount={0}
-          onStartProcessing={handleStartProcessing}
-          isStarting={isStarting}
-          isSaving={saving}
-          processError={processError}
-        />
-      )}
       {renderStep()}
     </div>
   );

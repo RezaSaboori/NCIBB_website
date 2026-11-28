@@ -1,0 +1,68 @@
+.ui-glass-icon-button {
+  --glass-icon-button-diameter: var(--glass-icon-button-size);
+  --glass-icon-button-surface-size: var(--glass-icon-button-diameter);
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  box-sizing: border-box;
+  inline-size: var(--glass-icon-button-diameter);
+  block-size: var(--glass-icon-button-diameter);
+  padding: 0;
+  border: 0;
+  border-radius: var(--border-radius-circle);
+  background-color: transparent;
+  color: var(--color-gray1);
+  cursor: pointer;
+  transition: scale var(--motion-duration-normal) var(--motion-easing-settle),
+    opacity var(--motion-duration-fast) ease-out;
+}
+
+.dark .ui-glass-icon-button { color: var(--color-gray12); }
+
+.ui-glass-icon-button--inset {
+  --glass-icon-button-surface-size: calc(var(--glass-icon-button-diameter) - 2 * var(--spacing-xs));
+}
+
+.ui-glass-icon-button__inset {
+  display: grid;
+  place-items: center;
+  inline-size: var(--glass-icon-button-surface-size);
+  block-size: var(--glass-icon-button-surface-size);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ui-glass-icon-button svg {
+  display: block;
+  inline-size: calc(var(--glass-icon-button-surface-size) * 0.6);
+  block-size: calc(var(--glass-icon-button-surface-size) * 0.6);
+  pointer-events: none;
+}
+
+.ui-glass-icon-button svg > path {
+  vector-effect: non-scaling-stroke;
+  stroke-width: calc(var(--glass-icon-button-surface-size) * 0.06);
+}
+
+.ui-glass-icon-button:focus-visible {
+  outline: var(--border-width-normal) solid var(--color-blue);
+  outline-offset: var(--border-width-normal);
+}
+
+.ui-glass-icon-button:not(:disabled):active { scale: 0.96; }
+.ui-glass-icon-button:disabled { cursor: default; opacity: 0.5; }
+
+@media (hover: hover) {
+  .ui-glass-icon-button:not(:disabled):hover { opacity: 0.88; }
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  .ui-glass-icon-button--touch {
+    --glass-icon-button-diameter: max(var(--glass-icon-button-size), var(--control-touch-target));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-glass-icon-button { transition: none; }
+  .ui-glass-icon-button:not(:disabled):active { scale: 1; }
+}

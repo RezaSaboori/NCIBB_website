@@ -55,7 +55,7 @@ export const DatasazStepTabs: React.FC<DatasazStepTabsProps> = ({
   }, [activeStep]);
 
   return (
-    <nav ref={viewportRef} className="datasaz-step-viewport glass-navigation glass-transparent glass-transparent--scroll" aria-label="مراحل داده‌ساز">
+    <nav ref={viewportRef} className="datasaz-step-viewport glass-navigation glass-transparent glass-transparent--scroll" aria-label="مراحل دیتابیس">
       <div ref={railRef} className="datasaz-step-tabs glass-navigation__indicator">
         {STEPS.map((step) => {
           const current = activeStep === step.id;

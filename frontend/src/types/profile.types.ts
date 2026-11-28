@@ -4,7 +4,7 @@ export interface UserProject {
   id: number;
   name: string;
   serviceName: string;       // e.g. "datasaz", "portal"
-  serviceLabel: string;      // human-readable label, e.g. "داده‌ساز"
+  serviceLabel: string;      // human-readable label, e.g. "دیتابیس"
   stageLabel: string;        // e.g. "مرحله ۲"
   statusLabel: string;       // e.g. "در حال انجام"
   openUrl: string;           // route to navigate on "Open"

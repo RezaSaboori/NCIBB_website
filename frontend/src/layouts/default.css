@@ -28,14 +28,17 @@
 
 .ncibb-layout__footer {
   margin-block-start: auto;
-  padding-inline-start: calc(var(--layout-sidebar-offset) + 1.5rem);
+  padding-inline-start: var(--layout-sidebar-offset);
+  padding-block-end: calc(2 * var(--spacing-md));
 }
 
-@media (max-width: 960px), (max-height: 600px), (pointer: coarse) {
+.ncibb-layout__footer-content {
+  container: footer / inline-size;
+}
+
+@media (max-width: 960px), (pointer: coarse) {
   .ncibb-layout__footer--home {
-    padding-left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
-    padding-right: max(var(--spacing-md), env(safe-area-inset-right, 0px));
-    padding-block-end: max(var(--spacing-lg), env(safe-area-inset-bottom, 0px));
+    padding-block-end: calc(max(var(--spacing-lg), env(safe-area-inset-bottom, 0px)) + var(--spacing-sm));
   }
 }
 

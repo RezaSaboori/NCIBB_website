@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
+import { CloseButton } from "@/components/ui/iconButtons";
 
 interface DeleteConfirmModalProps {
   itemLabel: string;
@@ -46,14 +47,11 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           <h2 id={titleId} className="dz-modal__title">
             Confirm Delete
           </h2>
-          <button
-            className="glass dz-modal__close-btn"
+          <CloseButton
+            size="var(--control-height-compact)"
             aria-label="Close"
             onClick={onCancel}
-            type="button"
-          >
-            ✕
-          </button>
+          />
         </div>
 
         {/* Body */}

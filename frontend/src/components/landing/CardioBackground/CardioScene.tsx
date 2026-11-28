@@ -60,6 +60,7 @@ export function CardioScene({
             enableDragRotation={CARDIO_BACKGROUND_CONFIG.ENABLE_DRAG_ROTATION}
             enableWheelZoom={CARDIO_BACKGROUND_CONFIG.ENABLE_WHEEL_ZOOM}
             backgroundColor={backgroundColor}
+            style={ready ? undefined : { visibility: "hidden" }}
             theme={theme}
             contentOffset={compact ? centered : CARDIO_BACKGROUND_CONFIG.CONTENT_OFFSET}
             configOverrides={compact ? compactSceneConfig : undefined}

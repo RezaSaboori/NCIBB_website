@@ -1,14 +1,25 @@
+.ui-control-button,
+.ui-glass-button {
+  --glass-button-size: var(--control-height);
+  padding: max(var(--spacing-xs), calc((var(--glass-button-size) - 1lh) / 2));
+  box-sizing: border-box;
+  block-size: auto;
+  min-block-size: var(--glass-button-size);
+  max-inline-size: 100%;
+  line-height: var(--line-height-normal);
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
 .ui-glass-button {
   display: inline-flex;
   gap: var(--spacing-xs);
   align-items: center;
   justify-content: center;
   border-radius: var(--border-radius-pill);
-  padding-inline: var(--spacing-md);
-  min-block-size: 2.25rem;
-  font-family: var(--font-family-persian);
+  font-family: var(--font-family-content);
   font-size: var(--font-size-sm);
-  white-space: nowrap;
   color: var(--color-gray12);
   text-decoration: none;
   transition:
@@ -18,14 +29,46 @@
     opacity var(--motion-duration-fast) ease-out;
 }
 
-.ui-glass-button[data-size="sm"] { min-block-size: 2rem; padding-inline: var(--spacing-sm); }
-.ui-glass-button.ui-glass-button--icon { min-block-size: 0; padding-inline: 0; }
-.ui-glass-button.indigo-glass,
-.dark .ui-glass-button:is(.green-glass, .red-glass) {
+.ui-glass-button[data-control-size="compact"] {
+  --glass-button-size: var(--control-height-compact);
+}
+
+.ui-glass-button.ui-glass-button--icon {
+  inline-size: var(--glass-button-size);
+  min-inline-size: var(--glass-button-size);
+  block-size: var(--glass-button-size);
+  padding: 0;
+}
+.ui-glass-button.ui-glass-button--inset {
+  padding: var(--spacing-xs);
+  background: transparent;
+  overflow: visible;
+}
+
+.ui-glass-button__inset {
+  --glass-button-inset-size: calc(var(--glass-button-size) - 2 * var(--spacing-xs));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: inherit;
+  padding: max(var(--spacing-xs), calc((var(--glass-button-inset-size) - 1lh) / 2));
+  min-block-size: var(--glass-button-inset-size);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ui-glass-button--icon > .ui-glass-button__inset {
+  inline-size: 100%;
+  block-size: 100%;
+  padding: 0;
+}
+
+:is(.ui-glass-button, .ui-glass-button__inset).indigo-glass,
+.dark :is(.ui-glass-button, .ui-glass-button__inset):is(.green-glass, .red-glass) {
   color: #fff;
 }
 
-.dark .ui-glass-button.blue-glass {
+.dark :is(.ui-glass-button, .ui-glass-button__inset).blue-glass {
   --blue-glass-transparency: calc(var(--glass-opacity-light) * 100%);
   background-color: var(--color-gray2);
 }
@@ -45,39 +88,22 @@
   .ui-glass-button[data-pressed="true"]:not([aria-disabled="true"]) { scale: 0.96; }
 }
 
-@media (max-width: 768px) {
-  .ui-glass-button,
-  .ui-glass-button[data-size="sm"],
-  .ui-glass-button.ui-glass-button--icon {
-    block-size: auto;
-    min-block-size: var(--control-touch-target);
+@media (max-width: 768px), (pointer: coarse) {
+  .ui-control-button,
+  .ui-glass-button {
     min-inline-size: var(--control-touch-target);
-    max-inline-size: 100%;
-    line-height: var(--line-height-normal);
-    white-space: normal;
-    overflow-wrap: anywhere;
-    text-align: center;
   }
-
-  .ui-glass-button.ui-glass-button--icon {
-    inline-size: var(--control-touch-target);
-  }
-
-  .ui-glass-button:not(.ui-glass-button--icon) { padding-block: var(--spacing-xs); }
 
   .ui-glass-button > svg { inline-size: 20px; block-size: 20px; }
-  .ui-glass-button.ui-glass-button--icon > svg {
+  .ui-glass-button--icon > svg,
+  .ui-glass-button--icon > .ui-glass-button__inset > svg {
     inline-size: 18px;
     block-size: 18px;
   }
-  .ui-glass-button.ui-glass-button--icon:is(.blue-glass, .indigo-glass) > svg {
+  .ui-glass-button--icon:is(.blue-glass, .indigo-glass) > svg,
+  .ui-glass-button--icon > .ui-glass-button__inset:is(.blue-glass, .indigo-glass) > svg {
     inline-size: 24px;
     block-size: 24px;
-  }
-
-  .ui-glass-button:is(.blue-glass, .indigo-glass, .green-glass):not(.ui-glass-button--icon),
-  .ui-glass-button.ui-state-button {
-    min-block-size: var(--spacing-3xl);
   }
 }
 

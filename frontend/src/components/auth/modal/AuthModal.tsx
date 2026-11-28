@@ -4,9 +4,8 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
-  Button,
 } from "@heroui/react"
-import { Icon } from "@iconify/react"
+import { CloseButton } from "@/components/ui/iconButtons"
 import LoginForm from "../LoginForm"
 import RegisterForm from "../RegisterForm"
 import "./modal.css"
@@ -65,16 +64,12 @@ export const AuthModal = ({ isOpen, onOpenChange }: AuthModalProps) => {
           <>
             <ModalHeader className="auth-modal-header">
               <span className="auth-modal-title">ورود یا ثبت نام</span>
-              <Button
-                isIconOnly
-                size="sm"
-                variant="flat"
-                onPress={onClose}
-                className="red-glass auth-modal-close-btn"
+              <CloseButton
+                size="var(--spacing-xl)"
+                className="auth-modal-close-btn ui-glass-icon-button--touch"
                 aria-label="بستن"
-              >
-                <Icon icon="mdi:close" width={18} />
-              </Button>
+                onClick={onClose}
+              />
             </ModalHeader>
             <ModalBody className="auth-modal-body">
               <div className="auth-modal-tablist glass-navigation glass-transparent" role="tablist" aria-label="ورود و ثبت نام" onKeyDown={moveTabFocus}>

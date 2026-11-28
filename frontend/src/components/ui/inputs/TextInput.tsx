@@ -1,4 +1,5 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
+import { useAutosizeTextarea } from "./useAutosizeTextarea";
 import "../inputs.css";
 
 interface TextInputProps {
@@ -26,14 +27,7 @@ export const TextInput: React.FC<TextInputProps> = ({
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Auto-resize: collapse to 1px to measure scrollHeight, then apply it.
-  // CSS max-height + overflow-y:auto on the textarea handles the scroll lock.
-  useEffect(() => {
-    if (!multiline || !textareaRef.current) return;
-    const el = textareaRef.current;
-    el.style.height = "1px";
-    el.style.height = `${el.scrollHeight}px`;
-  }, [value, multiline]);
+  useAutosizeTextarea(textareaRef, value, multiline);
 
   const shellClass = `ui-input-shell${multiline ? " ui-input-shell--grow" : ""} ${className}`.trim();
 

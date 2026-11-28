@@ -1,5 +1,6 @@
 import React from "react";
 import { createPortal } from "react-dom";
+import { CloseButton } from "@/components/ui/iconButtons";
 import type { UserProject } from "../../../types/profile.types";
 
 interface ProjectDeleteConfirmModalProps {
@@ -27,14 +28,11 @@ export const ProjectDeleteConfirmModal: React.FC<ProjectDeleteConfirmModalProps>
           <span id="profile-modal-title" className="dz-modal__title">
             تأیید حذف
           </span>
-          <button
-            className="glass dz-modal__close-btn"
+          <CloseButton
+            size="var(--control-height-compact)"
             aria-label="بستن"
             onClick={onCancel}
-            type="button"
-          >
-            ✕
-          </button>
+          />
         </div>
 
         {/* Body */}

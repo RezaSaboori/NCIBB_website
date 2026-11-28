@@ -5,15 +5,6 @@
 @import "../../../components/ui/GlassCard.css";
 @import "../../../components/ui/GlassTabs.css";
 
-/* ── Datasaz Unified Control Height Token ──────────────────────── */
-/*
- * All interactive shells (inputs, dropdowns) and icon buttons
- * in datasaz must render at this height for visual consistency.
- * Panels that host inputs must set this on their subtree.
- */
-:root {
-  --dz-input-h: 2.25rem;
-}
 /* ── Step Content Panel ────────────────────────────────────────── */
 
 .datasaz-step-panel {
@@ -40,12 +31,10 @@
 /*
  * Usage:
  *   <button className="dz-icon-btn [variant]" aria-label="...">
- *     <SomeIcon className="dz-icon-btn__icon [dz-icon-btn__icon--trash|--question|...]" />
+ *     <SomeIcon className="dz-icon-btn__icon [dz-icon-btn__icon--search]" />
  *   </button>
  *
- * The button height is driven by the parent container (height: 100%).
- * Width is kept square via aspect-ratio: 1 / 1.
- * The SVG icon fills the button fully; per-icon offsets use modifier classes.
+ * Both sides use --dz-icon-btn-size. Icon modifiers provide optical offsets.
  */
 
 .dz-icon-btn {
@@ -53,8 +42,8 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  width: var(--dz-icon-btn-size, 1.75rem);
-  height: var(--dz-icon-btn-size, 1.75rem);
+  width: var(--dz-icon-btn-size, var(--control-height-compact));
+  height: var(--dz-icon-btn-size, var(--control-height-compact));
   border: none;
   border-radius: var(--border-radius-pill);
   background-color: transparent;
@@ -72,26 +61,8 @@
 
 /* ── Per-icon optical adjustments ──────────────────────────────── */
 
-.dz-icon-btn__icon--trash {
-  margin-bottom: 1.5px;
-  margin-right:0.5px;
-}
-
-.dz-icon-btn__icon--expand {
-  margin-bottom: 1.5px;
-  margin-right:1px;
-}
-
-.dz-icon-btn__icon--question {
-  margin-bottom: 1.5px;
-}
-
 .dz-icon-btn__icon--search {
   margin-left:1.5px; 
-}
-
-.dz-icon-btn__icon--add {
-  margin-bottom: 1.5px;
 }
 
 
@@ -154,35 +125,6 @@
   color: var(--color-gray1);
 }
 
-/* Windows-style single close button */
-.dz-modal__close-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  border-radius: var(--border-radius-circle);
-  border: none;
-  cursor: pointer;
-  font-size: 0.75rem;
-  color: var(--color-gray10);
-  padding: 0;
-  flex-shrink: 0;
-  transition: color var(--motion-duration-fast) ease;
-}
-
-.dz-modal__close-btn:hover {
-  color: var(--color-gray12);
-}
-
-.dark .dz-modal__close-btn {
-  color: var(--color-gray6);
-}
-
-.dark .dz-modal__close-btn:hover {
-  color: var(--color-gray1);
-}
-
 /* Body */
 .dz-modal__body {
   padding: var(--spacing-lg);
@@ -224,8 +166,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 var(--spacing-lg);
-  height: var(--dz-input-h);
+  padding: max(var(--spacing-xs), calc((var(--control-height) - 1lh) / 2));
+  min-block-size: var(--control-height);
   border: none;
   border-radius: var(--border-radius-pill);
   font-family: var(--font-family-base);
@@ -306,6 +248,14 @@
 }
 
 /* Save spinner container — sits beside the step tabs */
+.datasaz-toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  inline-size: 100%;
+}
+
 /* Tabs row: step tabs + save spinner side by side */
 .datasaz-tabs-row {
   display: flex;
@@ -336,9 +286,19 @@
 }
 
 @media (max-width: 768px) {
-  .datasaz-page { padding-inline: var(--spacing-md); }
-  .datasaz-mode-wrapper { --dz-input-h: var(--control-touch-target); }
-  .datasaz-tabs-row { gap: var(--spacing-sm); }
+  .datasaz-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    inline-size: fit-content;
+    max-inline-size: 100%;
+  }
+  .datasaz-tabs-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-sm);
+  }
+  .datasaz-save-spinner-container { justify-self: center; }
   .datasaz-step-viewport .datasaz-step-tab {
     padding-inline: var(--spacing-sm);
   }
@@ -353,9 +313,7 @@
   .dz-modal { width: min(100%, 26.25rem); border-radius: var(--border-radius-4xl); }
   .dz-modal :is(.dz-modal__header, .dz-modal__body, .dz-modal__footer) { padding: var(--spacing-md); }
   .dz-modal__footer { flex-wrap: wrap; }
-  .dz-modal :is(.dz-modal__close-btn, .dz-modal__btn) {
+  .dz-modal .dz-modal__btn {
     min-inline-size: var(--control-touch-target);
-    min-block-size: var(--control-touch-target);
   }
-  .dz-modal__btn--delete { min-block-size: var(--spacing-3xl); }
 }

@@ -117,7 +117,7 @@ export default function MessagesTab({ userId, queue = false }: { userId: number;
   }
 
   const newConversation = (
-    <GlassButton color="primary" size={showList ? "sm" : undefined} onPress={() => openComposer()}
+    <GlassButton color="primary" onPress={() => openComposer()}
       startContent={<Icon icon="tabler:message-plus" />}>گفتگوی جدید</GlassButton>
   )
 

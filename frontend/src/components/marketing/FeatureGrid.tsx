@@ -34,7 +34,7 @@ const features_fa: Feature[] = [
 export const FeatureGrid: React.FC<FeatureGridProps> = () => {
   return (
     <div className="bg-gray-50 dark:bg-gray-900 py-20">
-      <div className="container mx-auto px-6">
+      <div className="page-container">
         <h2 className="text-4xl font-bold text-center text-gray-800 dark:text-white mb-12">
           ویژگی های ما
         </h2>

@@ -1,25 +1,24 @@
 .floating-content-outer {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
   pointer-events: none;
   z-index: 12;
-  padding: 0;
+  padding-block: calc(var(--site-header-height, 3.5rem) + var(--spacing-sm));
 }
 
 .floating-content-inner {
-  width: 100%;
-  display: flex;
-  flex-direction: row-reverse;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: [right-panel] minmax(0, 42%) 1fr [left-panel] minmax(0, 42%);
   align-items: center;
-  gap: 2rem;
-  flex-wrap: nowrap;
+  direction: rtl;
+}
+
+.floating-content-inner > .primary-content-wrapper { grid-column: left-panel; }
+
+.floating-content-inner > .secondary-content-wrapper { grid-column: right-panel; }
+
+.floating-content-inner > :is(.primary-content-wrapper, .secondary-content-wrapper) {
+  grid-row: 1;
   pointer-events: auto;
-  margin: 0 auto 0 0;
-  padding: 0 3vw;
 }
 
 .landing-container--flow :is(.floating-content-outer, .floating-content-inner) {

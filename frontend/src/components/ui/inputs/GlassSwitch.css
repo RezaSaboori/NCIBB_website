@@ -7,7 +7,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-sm);
-  min-block-size: 2.75rem;
+  min-block-size: var(--control-height);
   min-inline-size: 0;
   border-radius: var(--border-radius-pill);
   color: var(--color-gray12);
@@ -81,10 +81,6 @@
 .ui-glass-switch:has(> .ui-glass-switch__input:disabled) {
   opacity: .55;
   cursor: not-allowed;
-}
-
-@media (max-width: 768px) {
-  .ui-glass-switch { min-block-size: var(--control-touch-target); }
 }
 
 @media (prefers-reduced-motion: reduce) {

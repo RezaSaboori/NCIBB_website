@@ -21,36 +21,48 @@
     z-index: 2;
     inline-size: 100%;
     block-size: 100%;
-    padding: var(--spacing-xs);
+    padding: 0;
   }
 
   .header-mobile-nav__glyph {
-    display: grid;
-    place-items: center;
-    inline-size: 20px;
-    block-size: 20px;
+    inline-size: var(--spacing-xl);
+    block-size: var(--spacing-xl);
+    color: var(--color-gray12);
     transition: scale var(--motion-duration-fast) var(--motion-easing-settle);
   }
 
-  .header-mobile-nav__toggle:active .header-mobile-nav__glyph { scale: 0.86; }
+  .header-mobile-nav__toggle:active .header-mobile-nav__glyph { scale: 0.9; }
 
-  .header-mobile-nav__glyph > span {
-    grid-area: 1 / 1;
-    inline-size: 18px;
-    border-block-start: calc(var(--border-width-normal) + var(--border-width-thin)) solid currentColor;
-    border-radius: var(--border-radius-pill);
-    transition:
-      transform var(--menu-morph-time) var(--menu-morph-easing),
-      opacity var(--motion-duration-fast) var(--motion-easing-easeOut);
+  .header-mobile-nav__glyph > path {
+    transform-box: view-box;
+    transform-origin: center;
+    transition: transform var(--menu-morph-time) var(--menu-morph-easing);
   }
 
-  .header-mobile-nav__glyph > :first-child { transform: translateY(-5px); }
-  .header-mobile-nav__glyph > :last-child { transform: translateY(5px); }
-  .header-mobile-nav[data-open="true"] .header-mobile-nav__glyph > :first-child { transform: rotate(45deg); }
-  .header-mobile-nav[data-open="true"] .header-mobile-nav__glyph > :nth-child(2) { transform: scaleX(0); opacity: 0; }
-  .header-mobile-nav[data-open="true"] .header-mobile-nav__glyph > :last-child { transform: rotate(-45deg); }
+  .header-mobile-nav__glyph > :first-child { transform: translateY(-4px) rotate(0deg); }
+  .header-mobile-nav__glyph > :last-child { transform: translateY(4px) rotate(0deg); }
 
-  /* The button and panel share one glass surface with a fixed top-right anchor. */
+  .header-mobile-nav__glyph > :nth-child(2) {
+    transform: scaleX(1);
+    transition:
+      transform var(--motion-duration-fast) var(--motion-easing-settle),
+      opacity var(--motion-duration-fast) var(--motion-easing-settle);
+  }
+
+  .header-mobile-nav__toggle[aria-expanded="true"] .header-mobile-nav__glyph > :first-child {
+    transform: translateY(0) rotate(45deg);
+  }
+
+  .header-mobile-nav__toggle[aria-expanded="true"] .header-mobile-nav__glyph > :nth-child(2) {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+
+  .header-mobile-nav__toggle[aria-expanded="true"] .header-mobile-nav__glyph > :last-child {
+    transform: translateY(0) rotate(-45deg);
+  }
+
+  /* The panel grows from the button's fixed anchor. */
   .header-mobile-nav__surface.glass-transparent {
     position: absolute;
     inset-block-start: 0;
@@ -150,12 +162,12 @@
 @media (max-width: 620px) and (prefers-reduced-motion: reduce) {
   .header-mobile-nav { --menu-morph-time: 0s; }
 
+  .header-mobile-nav__toggle:active .header-mobile-nav__glyph { scale: none; }
+
   .header-mobile-nav__glyph,
-  .header-mobile-nav__glyph > span {
+  .header-mobile-nav__glyph > :nth-child(2) {
     transition: none;
   }
-
-  .header-mobile-nav__toggle:active .header-mobile-nav__glyph { scale: none; }
 
   .header-mobile-nav__panel,
   .header-mobile-nav[data-open="true"] .header-mobile-nav__panel {

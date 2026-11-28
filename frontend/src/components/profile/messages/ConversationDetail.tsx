@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { GlassButton } from "@/components/ui/GlassButton"
 import { GlassCard } from "@/components/ui/GlassCard"
+import { CloseButton } from "@/components/ui/iconButtons"
 import { ScrollText } from "@/components/ui/motion/ScrollText"
 import { accountApi } from "@/dataset_services/accountApi"
 import type { Thread, ThreadMessage } from "@/types/account"
@@ -9,7 +10,6 @@ import { PageControls } from "../shared/PageControls"
 import { formatCoins } from "../shared/accountFormat"
 import { useAccountQuery } from "../shared/useAccountQuery"
 import { MessageHistory } from "./MessageHistory"
-import { MessagingIcon } from "./MessagingIcon"
 import { ReplyComposer } from "./ReplyComposer"
 import { TicketBadge } from "./TicketBadge"
 import { TicketControls } from "./TicketControls"
@@ -116,8 +116,9 @@ export function ConversationDetail({
     <div className="account-messages__detail-heading">
       <div className={`account-messages__panel-heading${forwarding ? " account-messages__panel-heading--selecting" : ""}`}>
         <bdi className="account-messages__counterpart" title={current?.counterpart}>{current?.counterpart}</bdi>
-        <h2 className="account-messages__subject ui-scroll-text-trigger" tabIndex={-1} ref={heading}>
-          <ScrollText text={current?.subject ?? "گفتگو"} />
+        <h2 className="account-messages__subject" tabIndex={-1} ref={heading}>
+          <span className="account-messages__subject-label">موضوع:</span>
+          <ScrollText text={current?.subject ?? "گفتگو"} focusable />
         </h2>
         <div className="account-messages__heading-actions">
           <TicketBadge ticket={ticket} number={id} />
@@ -125,10 +126,7 @@ export function ConversationDetail({
             {current && forwarding && <GlassButton size="sm" color="primary" className="account-messages__forward"
               aria-label={`ارسال به دیگری (${formatCoins(selection.length)})`}
               onPress={() => onForward(current, selection)}>ارسال به دیگری</GlassButton>}
-            <GlassButton type="button" size="sm" color="danger" isIconOnly className="account-messages__close"
-              aria-label="بستن گفتگو" onPress={onBack}>
-              <MessagingIcon name="close" />
-            </GlassButton>
+            <CloseButton size="var(--control-height)" inset aria-label="بستن گفتگو" onClick={onBack} />
           </div>
         </div>
       </div>

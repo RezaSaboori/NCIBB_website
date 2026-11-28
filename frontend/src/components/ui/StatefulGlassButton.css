@@ -34,7 +34,7 @@
 
 .ui-state-button__content svg { inline-size: 1rem; block-size: 1rem; flex: none; }
 
-@media (max-width: 768px) {
+@media (max-width: 768px), (pointer: coarse) {
   .ui-state-button__size { inline-size: auto; }
   .ui-state-button__content { flex: 0 1 auto; max-inline-size: 100%; }
   .ui-state-button__content svg {

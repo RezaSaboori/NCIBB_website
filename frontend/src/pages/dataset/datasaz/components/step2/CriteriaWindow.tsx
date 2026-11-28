@@ -1,11 +1,13 @@
 /* CriteriaWindow.tsx */
 import React, { useState } from "react";
-import { TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
+import { DeleteButton, MinimizeButton } from "@/components/ui/iconButtons";
 import { CriteriaDescriptionHelp } from "./CriteriaDescriptionHelp";
+import { CriteriaWindowButton } from "./CriteriaWindowButton";
 import { CriteriaWindowRow, RowState } from "./CriteriaWindowRow";
+import { AddIcon } from "./icons/Step2Icons";
 import type { EnumValues } from "../../types";
 import { getEnumOptions } from "../../utils/enumOptions";
-import { useScrollText } from "@/components/ui/motion/useScrollText";
+import { ScrollText } from "@/components/ui/motion/ScrollText";
 
 interface CriteriaWindowProps {
   label: string;
@@ -50,7 +52,6 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
   initialRows,
   onRowsChange,
 }) => {
-  const { wrapperRef, innerRef } = useScrollText<HTMLSpanElement, HTMLSpanElement>();
   const [rows, setRows] = useState<RowState[]>(() => {
     const init = initialRows && initialRows.length > 0 ? initialRows : [makeRow()];
     // Keep the module row-id counter ahead of restored ids to prevent key collisions
@@ -96,34 +97,28 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
     >
       {/* Header */}
       <div className="dz-glass-container__header s2-criteria-window__header">
-        <span ref={wrapperRef} className="s2-criteria-window__title dz-scroll-wrapper" dir="auto">
-          <span ref={innerRef} className="dz-scroll-inner">
-            {label}
-            {unit && <span className="s2-criteria-window__unit">{unit}</span>}
-          </span>
-        </span>
+        <ScrollText className="s2-criteria-window__title" text={label} focusable
+          suffix={unit && <span className="s2-criteria-window__unit">{unit}</span>} />
         <div className="s2-criteria-window__header-actions">
           <CriteriaDescriptionHelp
             label={label}
             description={description}
             onOpen={onHelp}
           />
-          <button
-            className="orange-glass dz-icon-btn s2-icon-btn"
+          <MinimizeButton
+            size="var(--s2-criteria-action-target)"
+            className="s2-criteria-icon"
+            inset
             aria-label="Minimize"
             onClick={onMinimize}
-            type="button"
-          >
-            <MinimizeIcon className="dz-icon-btn__icon dz-icon-btn__icon--minimize" />
-          </button>
-          <button
-            className="red-glass dz-icon-btn s2-icon-btn"
+          />
+          <DeleteButton
+            size="var(--s2-criteria-action-target)"
+            className="s2-criteria-icon"
+            inset
             aria-label="Delete"
             onClick={onDelete}
-            type="button"
-          >
-            <TrashIcon className="dz-icon-btn__icon dz-icon-btn__icon--trash" />
-          </button>
+          />
         </div>
       </div>
 
@@ -156,7 +151,7 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
             type="button"
             onClick={handleAddRow}
           >
-            <span className="s2-criteria-window__add-rule-btn-icon">+</span>
+            <span className="s2-criteria-window__add-rule-btn-icon" aria-hidden="true"><AddIcon /></span>
             Add more rule
           </button>
         )}
@@ -165,20 +160,16 @@ export const CriteriaWindow: React.FC<CriteriaWindowProps> = ({
       {/* Footer */}
       <div className="s2-criteria-window__footer">
         <div className="s2-criteria-window__footer-left">
-          <button className="blue-glass s2-criteria-window__btn" type="button" onClick={onMinimize}>
+          <CriteriaWindowButton surface="blue-glass" onClick={onMinimize}>
             Submit
-          </button>
-          <button className="red-glass s2-criteria-window__btn" type="button" onClick={onDelete}>
+          </CriteriaWindowButton>
+          <CriteriaWindowButton surface="red-glass" onClick={onDelete}>
             Delete
-          </button>
+          </CriteriaWindowButton>
         </div>
-        <button
-          className={`${isAdvanced ? "glass" : "opal-glass"} s2-criteria-window__btn s2-criteria-window__btn--advanced${isAdvanced ? " s2-criteria-window__btn--advanced-active" : ""}`}
-          type="button"
-          onClick={onToggleAdvanced}
-        >
+        <CriteriaWindowButton surface={isAdvanced ? "glass" : "opal-glass"} onClick={onToggleAdvanced}>
           {isAdvanced ? "Enter Simple Mode" : "Enter Advanced Mode"}
-        </button>
+        </CriteriaWindowButton>
       </div>
     </div>
   );

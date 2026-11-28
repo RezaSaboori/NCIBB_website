@@ -1,4 +1,4 @@
-import { SingleLineInput, SelectInput } from "@/components/ui/inputs"
+import { SearchInput, SingleLineInput, SelectInput } from "@/components/ui/inputs"
 import { GlassButton } from "@/components/ui/GlassButton"
 import { useCallback, useState, type FormEvent } from "react"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
@@ -34,7 +34,7 @@ export function GroupForm({ group, close, onSaved }: { group: Group | null; clos
     <form className="account-workspace__form" onSubmit={submit}>
       <div className="account-workspace__fields">
         <label>نام گروه<SingleLineInput required value={name} maxLength={150} onChange={(event) => setName(event.target.value)} /></label>
-        <label>جستجوی گروه بالادست<SingleLineInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+        <label>جستجوی گروه بالادست<SearchInput className="ui-input-shell--persian" inputProps={{ type: "search" }} value={search} onChange={setSearch} /></label>
         <label>گروه بالادست<SelectInput value={parent} onChange={(value) => setParent(Number(value))} options={[
           { value: "0", label: "گروه اصلی" },
           ...(parent && !options.some((option) => option.id === parent) ? [{ value: String(parent), label: `گروه ${parent}` }] : []),

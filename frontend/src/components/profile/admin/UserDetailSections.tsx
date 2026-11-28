@@ -26,7 +26,7 @@ const projectStatusLabels: Record<string, string> = {
 
 const projectColumns: GlassTableColumn<AdminProject>[] = [
   { key: "name", label: "نام پروژه", render: (project) => <strong><bdi>{project.name}</bdi></strong> },
-  { key: "service", label: "سرویس", render: (project) => project.service === "datasaz" ? "داده‌ساز" : "پروژه" },
+  { key: "service", label: "سرویس", render: (project) => project.service === "datasaz" ? "دیتابیس" : "پروژه" },
   { key: "status", label: "وضعیت", render: (project) => projectStatusLabels[project.status] ?? project.status },
   { key: "updated", label: "آخرین تغییر", render: (project) => formatAccountDate(project.updated_at) },
 ]

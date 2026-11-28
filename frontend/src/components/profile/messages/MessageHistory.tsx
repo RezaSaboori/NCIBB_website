@@ -47,9 +47,9 @@ export function MessageHistory({ messages, userId, showSender, onReply, replyDis
                 {mine && message.read_by_other != null && <MessageDelivery status={message.read_by_other ? "read" : "sent"} />}
                 <time dateTime={message.created_at}>{formatAccountDate(message.created_at)}</time>
               </span>
-              {onReply && <GlassButton size="sm" type="button" className="account-messages__message-action"
+              {onReply && <GlassButton size="sm" type="button" inset className="account-messages__message-action"
                 aria-label={`پاسخ به پیام ${message.sender_name}`} isDisabled={replyDisabled} onPress={() => onReply(message)}>پاسخ</GlassButton>}
-              {selection && <GlassButton size="sm" type="button" aria-pressed={selected} color={selected ? "primary" : undefined}
+              {selection && <GlassButton size="sm" type="button" inset aria-pressed={selected} color={selected ? "primary" : undefined}
                 aria-label={`انتخاب پیام ${message.sender_name} برای ارسال مجدد`}
                 className="account-messages__message-action"
                 isDisabled={!selected && selection.items.length >= selection.max}

@@ -217,6 +217,12 @@ Back up the source database and rehearse the migration with a staging copy. Run 
 
 Schedule `python manage.py rollover_beat_coin` hourly. Wallet reads and new job reservations also reconcile overdue credits. Purchases require a future checkout integration.
 
+### Automatic frontend publishing on the NCIBB host
+
+The host checks the saved frontend sources every minute by running `deploy/frontend/publish.py` from the deployment user's crontab. The job needs Python 3, Node.js, npm, rsync, and write access to `frontend/dist`. Run the same script manually to publish sooner. It builds with TypeScript and Vite in a staging directory, copies the built assets, and replaces the live `index.html` after the build succeeds. If a build fails or its inputs change while it is running, the previous page stays live and the job retries on the next scheduled run.
+
+Nginx serves `frontend/dist`. The most recent build log and successful release details are in `frontend/.publish/last-build.log` and `frontend/.publish/release.json`.
+
 ## 🧪 Testing
 
 ### Backend Tests

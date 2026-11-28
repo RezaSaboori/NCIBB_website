@@ -179,21 +179,17 @@ const CardioBackground = forwardRef(({
       onError?.('The WebGL context was lost');
     };
 
-    let pixelRatio;
-    const handleResize = () => {
-      pixelRatio = window.devicePixelRatio;
-      resize(canvas, compact ? 1.5 : Infinity);
-    };
+    let resizePending = true;
 
     canvas.addEventListener(
       'webglcontextlost',
       handleContextLost
     );
 
-    const sizeObserver = new ResizeObserver(handleResize);
+    const sizeObserver = new ResizeObserver(() => {
+      resizePending = true;
+    });
     sizeObserver.observe(canvas);
-
-    handleResize();
 
     const initialize = async () => {
       try {
@@ -371,7 +367,19 @@ const CardioBackground = forwardRef(({
         }
 
         rendererRef.current = renderer;
-        renderer.render(performance.now());
+
+        let pixelRatio;
+        const renderFrame = (time) => {
+          if (resizePending || window.devicePixelRatio !== pixelRatio) {
+            resizePending = false;
+            pixelRatio = window.devicePixelRatio;
+            // Resizing clears the drawing buffer, so draw again in the same frame.
+            resize(canvas, compact ? 1.5 : Infinity);
+          }
+          renderer.render(time);
+        };
+
+        renderFrame(performance.now());
 
         onLoadingProgress?.(100);
         onInitialized?.();
@@ -387,14 +395,13 @@ const CardioBackground = forwardRef(({
           }
 
           if (!pausedRef.current) {
-            if (window.devicePixelRatio !== pixelRatio) handleResize();
             const elapsed = time - lastFrameTime;
 
-            if (elapsed > frameInterval) {
+            if (resizePending || window.devicePixelRatio !== pixelRatio || elapsed > frameInterval) {
               lastFrameTime =
                 time - (elapsed % frameInterval);
 
-              renderer.render(time);
+              renderFrame(time);
             }
           }
 

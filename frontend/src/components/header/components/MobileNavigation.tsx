@@ -2,6 +2,7 @@ import type { NavigationItem } from "../types";
 
 import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
+import { MobileMenuToggle } from "./MobileMenuToggle";
 import { MobileProfileItem } from "./MobileProfileItem";
 import { MobileThemeSwitch } from "./MobileThemeSwitch";
 import { NavigationLinks } from "./NavigationLinks";
@@ -77,21 +78,12 @@ export function MobileNavigation({
 
   return (
     <div ref={disclosure} className="header-mobile-nav" data-open={open}>
-      <button
+      <MobileMenuToggle
         ref={trigger}
-        aria-controls={panelId}
-        aria-expanded={open}
-        aria-label={open ? "بستن منو" : "باز کردن منو"}
-        className="header-mobile-nav__toggle header-nav__control"
-        type="button"
-        onClick={() => setOpen((current) => !current)}
-      >
-        <span aria-hidden="true" className="header-mobile-nav__glyph">
-          <span />
-          <span />
-          <span />
-        </span>
-      </button>
+        controls={panelId}
+        expanded={open}
+        onToggle={() => setOpen((current) => !current)}
+      />
       <div className="header-mobile-nav__surface glass-transparent">
         <div className="header-mobile-nav__clip">
           <div

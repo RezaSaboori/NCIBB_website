@@ -106,7 +106,7 @@ const LandingPage = () => {
           />
         </div>
 
-        <div ref={section2Ref} className="landing-services">
+        <div ref={section2Ref} className="page-container landing-services">
           <ServicesSection isVisible={animated && section2InView} />
         </div>
       </div>

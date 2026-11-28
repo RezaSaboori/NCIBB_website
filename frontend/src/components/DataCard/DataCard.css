@@ -7,39 +7,3 @@
 @media (max-width: 768px) {
   .data-card { border-radius: var(--border-radius-6xl); }
 }
-
-.data-container {
-  width: 80vw;
-  margin: 0 auto var(--spacing-5xl) auto;
-  display: flex;
-  gap: var(--spacing-4xl);
-  align-items: flex-start;
-  direction: rtl;
-}
-
-.data-column {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4xl);
-  flex: 1;
-  width: 50%;
-}
-
-@keyframes reveal {
-  from {
-    opacity: 0;
-    transform: translateY(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.data-card.reveal {
-  opacity: 0;
-  animation-name: reveal;
-  animation-duration: 0.8s;
-  animation-fill-mode: forwards;
-  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
-}

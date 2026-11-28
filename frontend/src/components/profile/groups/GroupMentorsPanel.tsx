@@ -1,4 +1,4 @@
-import { SingleLineInput, SelectInput } from "@/components/ui/inputs"
+import { SearchInput, SelectInput } from "@/components/ui/inputs"
 import { GlassButton } from "@/components/ui/GlassButton"
 import { GlassTable, type GlassTableColumn } from "@/components/ui/tables/GlassTable"
 import { useCallback, useState, type FormEvent } from "react"
@@ -16,7 +16,7 @@ function MentorPicker({ group, capability, label, value, choose }: {
   const options = value && !members.some((member) => member.id === value.id) ? [value, ...members] : members
   return (
     <div className="account-workspace__form">
-      <label>{`جستجوی ${label}`}<SingleLineInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+      <label>{`جستجوی ${label}`}<SearchInput className="ui-input-shell--persian" inputProps={{ type: "search" }} value={search} onChange={setSearch} /></label>
       <label>{label}<SelectInput value={value?.id} onChange={(id) => choose(options.find((member) => member.id === Number(id)))} options={[
         { value: "", label: "انتخاب" },
         ...options.map((member) => ({ value: String(member.id), label: member.user_name || member.username })),

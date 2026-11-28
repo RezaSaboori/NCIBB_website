@@ -1,4 +1,4 @@
-import { GlassSwitch, SingleLineInput, SelectInput } from "@/components/ui/inputs"
+import { GlassSwitch, SearchInput, SelectInput } from "@/components/ui/inputs"
 import { GlassButton } from "@/components/ui/GlassButton"
 import { useCallback, useState, type FormEvent } from "react"
 import { accountApi, accountError } from "@/dataset_services/accountApi"
@@ -37,7 +37,7 @@ export function GroupMemberForm({ group, member, roles, close, onSaved }: {
     <form className="account-workspace__form" onSubmit={submit}>
       {member ? <h3>{member.user_name || member.username}</h3> : (
         <div className="account-workspace__fields">
-          <label>جستجوی کاربر<SingleLineInput value={search} onChange={(event) => { setSearch(event.target.value); setUser(0) }} placeholder="نام یا ایمیل" /></label>
+          <label>جستجوی کاربر<SearchInput className="ui-input-shell--persian" value={search} onChange={(value) => { setSearch(value); setUser(0) }} placeholder="نام یا ایمیل" /></label>
           <AccountStatus loading={users.loading && !!search} error={users.error} retry={users.refresh} />
           <label>کاربر<SelectInput required value={user || ""} placeholder="انتخاب کاربر"
             onChange={(value) => setUser(Number(value))}

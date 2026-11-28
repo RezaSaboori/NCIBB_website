@@ -48,7 +48,6 @@ html:has(.profile-modal) { scrollbar-gutter: auto !important; }
   overflow-wrap: anywhere;
 }
 
-.profile-modal .profile-modal__close { flex: none; }
 
 .profile-modal--with-navigation {
   --profile-modal-radius: calc(var(--profile-detail-radius) + var(--profile-account-group-padding) + var(--profile-modal-padding));
@@ -119,16 +118,9 @@ html:has(.profile-modal) { scrollbar-gutter: auto !important; }
     --profile-modal-default-radius: var(--border-radius-4xl);
     margin: 0;
     max-block-size: 100%;
-    gap: var(--spacing-sm);
   }
 
   .profile-modal .profile-modal__header { gap: var(--spacing-sm); }
-  .profile-modal .profile-modal__close {
-    inline-size: var(--control-touch-target);
-    min-inline-size: var(--control-touch-target);
-    block-size: var(--control-touch-target);
-  }
-  .profile-modal .profile-modal__close svg { inline-size: 18px; block-size: 18px; }
   .profile-modal .profile-modal__body { margin-block: 0; }
   .profile-modal .profile-modal__footer { flex-wrap: wrap; flex-shrink: 0; gap: var(--spacing-sm); }
   .profile-modal :focus-visible:not(:where(.ui-input-shell, .ui-input-field, .ui-dropdown__list)) {

@@ -44,19 +44,7 @@
   font-weight: var(--font-weight-semibold);
 }
 
-.auth-modal-close-btn {
-  flex-shrink: 0;
-  margin: var(--spacing-sm);
-  /* gray-11 in light, gray-2 in dark */
-  background-color: var(--color-gray11) !important;
-  color: var(--color-gray1) !important;
-  border-radius: var(--border-radius-pill) !important;
-}
-
-.dark .auth-modal-close-btn {
-  background-color: var(--color-gray2) !important;
-  color: var(--color-gray11) !important;
-}
+.auth-modal-close-btn { margin: var(--spacing-sm); }
 
 .auth-modal-body {
   padding-top: 0.25rem;
@@ -105,12 +93,7 @@
 }
 
 @media (max-width: 768px) {
-  .auth-modal-close-btn {
-    min-block-size: var(--control-touch-target);
-    min-inline-size: var(--control-touch-target);
-  }
-
-  .auth-modal-panel :is(.auth-modal-tab, .auth-modal-close-btn):focus-visible {
+  .auth-modal-panel .auth-modal-tab:focus-visible {
     outline: var(--border-width-normal) solid var(--color-blue);
     outline-offset: var(--border-width-normal);
   }

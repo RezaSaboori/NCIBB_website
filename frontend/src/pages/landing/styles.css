@@ -42,11 +42,16 @@
 }
 
 .landing-hero {
-  height: 100vh;
   width: 100%;
   position: relative;
   overflow: hidden;
   max-width: 100%;
+}
+
+.landing-container:not(.landing-container--flow) .landing-hero {
+  display: grid;
+  align-items: center;
+  min-height: 100vh;
 }
 
 .landing-hero__track,
@@ -63,8 +68,6 @@
 
 .landing-container--flow {
   --landing-content-width: 760px;
-  --landing-gutter-left: max(var(--spacing-md), env(safe-area-inset-left, 0px));
-  --landing-gutter-right: max(var(--spacing-md), env(safe-area-inset-right, 0px));
   --landing-visual-top: env(safe-area-inset-top, 0px);
   --landing-header-overlap: max(0px, var(--site-header-height, 3.5rem) - var(--landing-visual-top) - var(--spacing-lg));
   --landing-visual-height: calc(min(85vw, 43svh, 25rem) + var(--landing-header-overlap) + var(--landing-visual-top));
@@ -72,20 +75,10 @@
   padding-block-end: var(--spacing-lg);
 }
 
-.landing-container--flow .landing-services {
-  padding-left: var(--landing-gutter-left);
-  padding-right: var(--landing-gutter-right);
-}
-
-.landing-container--flow .services-container {
-  max-inline-size: var(--landing-content-width);
-}
-
 .landing-container--flow .landing-hero {
   display: grid;
-  grid-template-columns: minmax(var(--landing-gutter-right), 1fr) minmax(0, var(--landing-content-width)) minmax(var(--landing-gutter-left), 1fr);
+  grid-template-columns: minmax(var(--page-gutter-right), 1fr) minmax(0, var(--landing-content-width)) minmax(var(--page-gutter-left), 1fr);
   grid-template-rows: [visual] calc(var(--landing-visual-height) + var(--spacing-xl)) [intro] auto [gap] var(--landing-card-gap) [details] auto;
-  height: auto;
   overflow: clip;
   isolation: isolate;
   margin-block-end: var(--spacing-lg);
@@ -111,12 +104,12 @@
 
 .landing-container--flow .landing-hero__visual canvas {
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100lvh;
 }
 
 .landing-hero__poster {
   display: block;
-  inline-size: min(var(--landing-content-width), calc(100% - var(--landing-gutter-left) - var(--landing-gutter-right)));
+  inline-size: min(var(--landing-content-width), calc(100% - var(--page-gutter-left) - var(--page-gutter-right)));
   block-size: 100%;
   margin-inline: auto;
   padding-block-start: var(--landing-visual-top);

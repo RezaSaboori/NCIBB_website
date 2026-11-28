@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react"
 
-const query = "(max-width: 960px), (max-height: 600px), (pointer: coarse), (prefers-reduced-motion: reduce)"
+const query = "(max-width: 960px), (pointer: coarse), (prefers-reduced-motion: reduce)"
 
 function subscribe(notify: () => void) {
   const media = window.matchMedia(query)

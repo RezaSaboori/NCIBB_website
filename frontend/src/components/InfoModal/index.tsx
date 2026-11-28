@@ -9,6 +9,7 @@ import {
 } from "@heroui/react"
 import { DatabaseInfo, DataType } from "../../types/database"
 import { Icon } from "@iconify/react"
+import { CloseButton } from "@/components/ui/iconButtons"
 import "./InfoModal.css"
 
 interface InfoModalProps {
@@ -150,19 +151,19 @@ export const InfoModal: React.FC<InfoModalProps> = ({
       scrollBehavior="inside"
       placement="center"
       backdrop="blur"
+      hideCloseButton
       classNames={{
         backdrop: "bg-gray6/70 backdrop-opacity-95",
         base: "overflow-visible p-10 glass-modal-effect w-full max-w-5xl modal-offset-down",
-        closeButton:
-          "absolute top-[-2.5rem] right-[-2.5rem] z-1 text-[30px] flex items-center justify-center w-12 h-12 text-white bg-[var(--color-red)]/80 hover:bg-[var(--color-red)] cursor-pointer active:bg-[var(--color-red)]",
         header: "p-0 pb-8",
         body: "p-0 custom-scrollbar",
         footer: "p-0 pt-8 boxshadow",
       }}
     >
       <ModalContent className="bg-transparent">
-        <ModalHeader className="w-full bg-[var(--color-gray1)]/80 align-middle rounded-[var(--border-radius-2xl)] font-medium p-8 mb-6 force-ltr">
-          {database.name}
+        <ModalHeader className="w-full bg-[var(--color-gray1)]/80 items-center justify-between rounded-[var(--border-radius-2xl)] font-medium p-8 mb-6 force-ltr">
+          <span>{database.name}</span>
+          <CloseButton size="var(--spacing-3xl)" aria-label="بستن" onClick={onClose} />
         </ModalHeader>
         <ModalBody>
           <div className="grid grid-cols-12 gap-4">
@@ -273,19 +274,9 @@ export const InfoModal: React.FC<InfoModalProps> = ({
             onPress={onClose}
             radius="full"
             size="lg"
-            className="cursor-pointer w-full"
+            className="ui-control-button cursor-pointer w-full"
           >
             درخواست داده
-          </Button>
-          <Button
-            variant="bordered"
-            color="danger"
-            onPress={onClose}
-            radius="full"
-            size="lg"
-            className="cursor-pointer hover:bg-[var(--color-red)]/20 w-full"
-          >
-            بستن
           </Button>
         </ModalFooter>
       </ModalContent>

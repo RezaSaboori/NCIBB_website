@@ -7,6 +7,7 @@ import {
   Button,
   Input,
 } from "@heroui/react"
+import { CloseButton } from "@/components/ui/iconButtons"
 import "./modal.css"
 
 interface ForgotPasswordModalProps {
@@ -23,11 +24,15 @@ export const ForgotPasswordModal = ({
       isOpen={isOpen}
       onOpenChange={onOpenChange}
       className="modal-container"
+      hideCloseButton
     >
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader>Forgot Password</ModalHeader>
+            <ModalHeader className="justify-between items-center">
+              Forgot Password
+              <CloseButton size="var(--spacing-xl)" className="ui-glass-icon-button--touch" aria-label="Close" onClick={onClose} />
+            </ModalHeader>
             <ModalBody>
               <p>
                 Enter your email address and we&apos;ll send you a link to reset your
@@ -37,6 +42,7 @@ export const ForgotPasswordModal = ({
                 radius="full"
                 isRequired
                 label="Email"
+                labelPlacement="outside"
                 placeholder="Enter your email"
                 type="email"
                 autoComplete="email"
@@ -48,10 +54,10 @@ export const ForgotPasswordModal = ({
               />
             </ModalBody>
             <ModalFooter>
-              <Button variant="light" onPress={onClose}>
+              <Button className="ui-control-button" variant="light" onPress={onClose}>
                 Cancel
               </Button>
-              <Button color="primary" onPress={onClose}>
+              <Button className="ui-control-button" color="primary" onPress={onClose}>
                 Send Reset Link
               </Button>
             </ModalFooter>

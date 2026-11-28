@@ -15,8 +15,6 @@ import "./DataCard.css"
 
 interface DataCardProps {
   database: DatabaseInfo
-  isVisible?: boolean
-  animationDelay?: number
 }
 
 const StarIcon = ({ filled }: { filled: boolean }) => (
@@ -147,11 +145,7 @@ const dataTypeTooltipBg: { [key: string]: string } = {
   signal: "bg-[var(--color-yellow)]",
 }
 
-export const DataCard: React.FC<DataCardProps> = ({
-  database,
-  isVisible,
-  animationDelay,
-}) => {
+export const DataCard: React.FC<DataCardProps> = ({ database }) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [openTooltips, setOpenTooltips] = useState<Record<string, boolean>>({})
   const tooltipTimeoutRef = useRef<Record<string, NodeJS.Timeout>>({})
@@ -193,17 +187,9 @@ export const DataCard: React.FC<DataCardProps> = ({
   const sizeColor = getSizeColor(size)
   const yearColor = getYearColor(year)
 
-  const cardStyle = isVisible
-    ? { animationDelay: `${animationDelay}ms` }
-    : { opacity: 0 }
-
-  const cardClassName = `data-card glass w-full p-6 ${
-    isVisible ? "reveal" : ""
-  }`
-
   return (
     <>
-      <Card className={cardClassName} style={cardStyle}>
+      <Card className="data-card glass w-full p-6">
         <CardHeader className="flex justify-between ">
           <div className="flex" style={{ direction: "ltr" }}>
             {[...Array(5)].map((_, i) => (
@@ -338,7 +324,7 @@ export const DataCard: React.FC<DataCardProps> = ({
             rel="noopener noreferrer"
             color="primary"
             variant="solid"
-            className="w-fit px-8 py-4 rounded-full cursor-pointer"
+            className="ui-control-button w-fit rounded-full cursor-pointer"
             style={{ fontSize: "var(--font-size-sm)" }}
           >
             درخواست داده
@@ -346,7 +332,7 @@ export const DataCard: React.FC<DataCardProps> = ({
           <Button
             color="default"
             variant="solid"
-            className="w-fit px-8 py-4 rounded-full cursor-pointer"
+            className="ui-control-button w-fit rounded-full cursor-pointer"
             style={{ fontSize: "var(--font-size-sm)" }}
             onPress={() => setIsModalOpen(true)}
           >

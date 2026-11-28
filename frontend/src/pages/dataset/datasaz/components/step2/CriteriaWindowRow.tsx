@@ -1,6 +1,7 @@
 import React, { useId } from "react";
 import { TextInput, NumberInput, DropdownInput, RadioToggle } from "../../../../../components/ui/inputs";
-import { ChevronIcon, TrashIcon } from "./icons/Step2Icons";
+import { DeleteButton } from "@/components/ui/iconButtons";
+import { ChevronIcon } from "./icons/Step2Icons";
 
 const NUMERIC_OPERATORS = ["=", "<", ">", "<=", ">="];
 
@@ -93,14 +94,13 @@ export const CriteriaWindowRow: React.FC<CriteriaWindowRowProps> = ({
         onChange={(v) => onChange(row.id, { isRequired: v })}
       />
       {showDelete && (
-        <button
-          className="glass dz-icon-btn s2-icon-btn"
+        <DeleteButton
+          size="var(--s2-criteria-action-target)"
+          className="s2-criteria-icon"
+          inset
           aria-label="Delete rule"
-          type="button"
           onClick={() => onDelete?.(row.id)}
-        >
-          <TrashIcon className="dz-icon-btn__icon dz-icon-btn__icon--trash" />
-        </button>
+        />
       )}
     </div>
   );

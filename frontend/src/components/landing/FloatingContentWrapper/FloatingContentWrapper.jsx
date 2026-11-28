@@ -11,7 +11,7 @@ const FloatingContentWrapper = ({
   detailsRef,
 }) => (
   <div className="floating-content-outer">
-    <div className="floating-content-inner">
+    <div className="page-container floating-content-inner">
       <PrimaryContentContainer
         scrollProgress={scrollProgress}
         animated={animated}

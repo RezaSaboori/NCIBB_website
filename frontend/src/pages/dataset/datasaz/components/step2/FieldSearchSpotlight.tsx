@@ -1,7 +1,7 @@
 /* FieldSearchSpotlight.tsx */
 import React, { useEffect, useRef } from "react";
 import "./fieldSearchSpotlight.css";
-import { SearchIcon } from "./icons/Step2Icons";
+import { SearchInput } from "@/components/ui/inputs";
 import type { SuggestionItem } from "../../types";
 
 interface FieldSearchSpotlightProps {
@@ -57,22 +57,9 @@ export const FieldSearchSpotlight = React.forwardRef<HTMLDivElement, FieldSearch
       >
         <div ref={panelRef} className="s2-spotlight">
           {/* Search Row */}
-          <div className="glass-transparent s2-spotlight__search-row" lang="en" dir="ltr">
-            <input
-              ref={inputRef}
-              className="s2-spotlight__input"
-              type="search"
-              value={query}
-              onChange={(e) => onQueryChange(e.target.value)}
-              placeholder="Search fields…"
-              aria-label="Search fields"
-              autoComplete="off"
-              spellCheck={false}
-            />
-            <span className="glass-transparent s2-spotlight__search-icon-wrap">
-              <SearchIcon className="s2-spotlight__search-icon" />
-            </span>
-          </div>
+          <SearchInput className="s2-spotlight__search-row" value={query} onChange={onQueryChange}
+            placeholder="Search fields…" ariaLabel="Search fields"
+            inputProps={{ ref: inputRef, type: "search", lang: "en", dir: "ltr" }} />
 
           {/* Floating suggestion tabs */}
           {(suggestions.length > 0 || isLoading || error) && (

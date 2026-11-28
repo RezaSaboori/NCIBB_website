@@ -1,8 +1,9 @@
 /* CriteriaWindowAdvanced.tsx */
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import "./criteriaAdvanced.css";
-import { TrashIcon, MinimizeIcon } from "./icons/Step2Icons";
+import { DeleteButton, MinimizeButton } from "@/components/ui/iconButtons";
 import { CriteriaDescriptionHelp } from "./CriteriaDescriptionHelp";
+import { CriteriaWindowButton } from "./CriteriaWindowButton";
 import { CriteriaButton } from "./CriteriaButton";
 import { AddCriteriaTab } from "./AddCriteriaTab";
 import { CriteriaWindowMini } from "./CriteriaWindowMini";
@@ -77,9 +78,10 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   );
   // Per-entry rows snapshot so switching tabs doesn't lose state
   const entryRowsRef = useRef<Map<number, RowState[]>>(
-    new Map(
-      (initialEntries ?? []).map((e) => [e.entryId, (e.rows ?? []) as RowState[]] as [number, RowState[]])
-    )
+    new Map<number, RowState[]>([
+      [firstEntryId, initialRows ?? []],
+      ...(initialEntries ?? []).map((entry): [number, RowState[]] => [entry.entryId, entry.rows ?? []]),
+    ])
   );
 
   // Mirror entries + rows upward so CriteriaPanel can autosave the full definition
@@ -216,40 +218,40 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
   return (
     <div className={`opal-glass dz-glass-container dz-glass-container--sm s2-criteria-window s2-criteria-window--advanced s2-adv-group${spotlightOpen ? " s2-adv-group--spotlight-open" : ""}`}>
       {/* Header */}
-      <div className="dz-glass-container__header s2-criteria-window__header s2-adv-group__header">
-        <TextInput
-          value={groupName}
-          onChange={onGroupNameChange}
-          placeholder="Group name…"
-          className="s2-adv-group__name-input"
-        />
-        <RadioToggle
-          checked={isGroupRequired}
-          onChange={onGroupRequiredChange}
-          label="Required ?"
-        />
+      <div className="dz-glass-container__header s2-criteria-window__header">
+        <div className="s2-adv-group__settings">
+          <TextInput
+            value={groupName}
+            onChange={onGroupNameChange}
+            placeholder="Group name…"
+            className="s2-adv-group__name-input"
+          />
+          <RadioToggle
+            checked={isGroupRequired}
+            onChange={onGroupRequiredChange}
+            label="Required ?"
+          />
+        </div>
         <div className="s2-criteria-window__header-actions">
           <CriteriaDescriptionHelp
             label={helpEntry.label}
             description={helpEntry.description}
             onOpen={onHelp}
           />
-          <button
-            className="orange-glass dz-icon-btn s2-icon-btn"
+          <MinimizeButton
+            size="var(--s2-criteria-action-target)"
+            className="s2-criteria-icon"
+            inset
             aria-label="Minimize"
             onClick={onMinimize}
-            type="button"
-          >
-            <MinimizeIcon className="dz-icon-btn__icon dz-icon-btn__icon--minimize" />
-          </button>
-          <button
-            className="red-glass dz-icon-btn s2-icon-btn"
+          />
+          <DeleteButton
+            size="var(--s2-criteria-action-target)"
+            className="s2-criteria-icon"
+            inset
             aria-label="Delete group"
             onClick={onDelete}
-            type="button"
-          >
-            <TrashIcon className="dz-icon-btn__icon dz-icon-btn__icon--trash" />
-          </button>
+          />
         </div>
       </div>
 
@@ -263,6 +265,12 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
               isSelected={activeEntryId !== null && activeEntryId === entry.entryId}
               isExpanded={expandedEntryIds.has(entry.entryId)}
               isAdvanced={false}
+              getPreview={() => ({
+                fields: [{
+                  ...entry,
+                  rows: entryRowsRef.current.get(entry.entryId),
+                }],
+              })}
               onSelect={() => {
                 setActiveEntryId((prev) =>
                   prev === entry.entryId ? null : entry.entryId
@@ -316,11 +324,7 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
               value_min={entry.value_min}
               value_max={entry.value_max}
               values={entry.values}
-              initialRows={
-                entry.entryId === firstEntryId
-                  ? (entryRowsRef.current.get(firstEntryId) ?? initialRows)
-                  : entryRowsRef.current.get(entry.entryId)
-              }
+              initialRows={entryRowsRef.current.get(entry.entryId)}
               onRowsChange={(rows) => { entryRowsRef.current.set(entry.entryId, rows); notifyEntriesChange(); }}
               onClose={() => handleToggleExpand(entry.entryId)}
               onDelete={() => handleDeleteEntry(entry.entryId)}
@@ -333,20 +337,16 @@ export const CriteriaWindowAdvanced: React.FC<CriteriaWindowAdvancedProps> = ({
       {/* Footer */}
       <div className="s2-criteria-window__footer">
         <div className="s2-criteria-window__footer-left">
-          <button className="blue-glass s2-criteria-window__btn" type="button" onClick={onMinimize}>
+          <CriteriaWindowButton surface="blue-glass" onClick={onMinimize}>
             Submit
-          </button>
-          <button className="red-glass s2-criteria-window__btn" type="button" onClick={onDelete}>
+          </CriteriaWindowButton>
+          <CriteriaWindowButton surface="red-glass" onClick={onDelete}>
             Delete
-          </button>
+          </CriteriaWindowButton>
         </div>
-        <button
-          className="glass s2-criteria-window__btn s2-criteria-window__btn--advanced s2-criteria-window__btn--advanced-active"
-          type="button"
-          onClick={onExitAdvanced}
-        >
+        <CriteriaWindowButton surface="glass" onClick={onExitAdvanced}>
           Enter Simple Mode
-        </button>
+        </CriteriaWindowButton>
       </div>
     </div>
   );

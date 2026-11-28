@@ -4,8 +4,8 @@
   display: inline-flex;
   align-items: center;
   min-inline-size: 0;
-  min-block-size: 2.75rem;
-  padding: var(--spacing-sm) var(--spacing-md);
+  min-block-size: var(--control-height);
+  padding: max(var(--spacing-xs), calc((var(--control-height) - 1lh) / 2));
   gap: var(--spacing-sm);
   border-radius: var(--border-radius-pill);
   color: var(--color-gray12);
@@ -84,12 +84,8 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 768px) {
-  .ui-glass-choice {
-    min-block-size: var(--control-touch-target);
-    min-inline-size: var(--control-touch-target);
-  }
-
+@media (max-width: 768px), (pointer: coarse) {
+  .ui-glass-choice { min-inline-size: var(--control-touch-target); }
 }
 
 @media (forced-colors: active) {

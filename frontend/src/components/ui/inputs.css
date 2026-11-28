@@ -11,11 +11,11 @@
  * Wrap any input variant with this to get the glass-pill look.
  */
 
-/* ── Design token: single source of truth for all input heights ── */
 :root {
-  --ui-input-height: 2.5rem;        /* 40px  — shell fixed height            */
-  --ui-input-icon-size: 1.75rem;    /* 28px  — icon btn inside shell         */
-  --ui-input-max-text-height: 6rem; /* max-height for growable TextInput     */
+  --ui-input-radius: var(--border-radius-2xl);
+  --ui-input-action-size: calc(var(--control-height) - 2 * var(--spacing-xs));
+  --ui-input-action-inset: calc(var(--spacing-xs) - var(--border-width-thin));
+  --ui-input-max-text-height: 6rem;
 }
 
 .ui-input-shell {
@@ -25,33 +25,20 @@
   min-width: 0;
   gap: var(--spacing-xs);
   border: var(--ui-stroke);
-  border-radius: var(--border-radius-2xl);
+  border-radius: var(--ui-input-radius);
   padding: 0 var(--spacing-xs);
-  height: var(--ui-input-height);
-  min-height: var(--ui-input-height);
+  min-block-size: var(--control-height);
   background-color: var(--color-gray1);
   box-sizing: border-box;
 }
 
 /* ── Growable shell: TextInput/SearchInput with multiline prop ── */
-/*
- * The shell expands freely up to max-height.
- * It does NOT scroll — only the inner textarea scrolls.
- * Icon (if any) pins to flex-start so it stays at the top.
- */
 .ui-input-shell--grow {
-  height: auto;
-  min-height: var(--ui-input-height);
-  max-height: var(--ui-input-max-text-height);
-  overflow: visible;
   align-items: flex-start;
-  padding: var(--spacing-xs);
 }
 
-.ui-input-shell--grow .dz-icon-btn {
-  align-self: flex-start;
-  margin-top: 3px;
-  flex-shrink: 0;
+.ui-input-shell--grow > .dz-icon-btn {
+  margin-block-start: var(--ui-input-action-inset);
 }
 
 /* ── Persian locale modifier ─────────────────────────────────── */
@@ -76,10 +63,11 @@
   color: var(--color-gray12);
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
+  line-height: var(--line-height-normal);
   padding: 0 var(--spacing-sm);
   text-align: start;
-  /* Single-line inputs vertically center via the shell's align-items:center */
-  align-self: center;
+  align-self: stretch;
+  min-block-size: 0;
 }
 
 .ui-input-field::placeholder,
@@ -87,15 +75,18 @@
 
 /* Textarea variant for growable TextInput / SearchInput */
 .ui-input-field--textarea {
+  box-sizing: border-box;
   resize: none;
   overflow-y: auto;
-  line-height: var(--line-height-normal);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  align-self: stretch;
-  /* Height is driven by JS autosize in the component — no static height here */
-  height: auto;
-  max-height: calc(var(--ui-input-max-text-height) - 2 * var(--spacing-xs));
-  min-height: calc(var(--ui-input-height) - 2 * var(--spacing-xs));
+  padding-block: max(var(--spacing-xs), calc((var(--control-height) - 2 * var(--border-width-thin) - 1lh) / 2));
+  max-block-size: calc(var(--ui-input-max-text-height) - 2 * var(--border-width-thin));
+  min-block-size: calc(var(--control-height) - 2 * var(--border-width-thin));
+}
+
+.ui-input-field--textarea[rows="1"]:placeholder-shown {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 
@@ -104,9 +95,42 @@
 .ui-input-shell .dz-icon-btn {
   background-color: var(--color-gray2);
   flex-shrink: 0;
-  width: var(--ui-input-icon-size);
-  height: var(--ui-input-icon-size);
-  --dz-icon-btn-size: var(--ui-input-icon-size);
+  --dz-icon-btn-size: var(--ui-input-action-size);
+}
+
+.ui-input-shell--with-action { padding-inline-end: 0; }
+
+.ui-input-shell > .ui-input-action-slot {
+  /* The inset surface sits inside the border while the button spans the full height. */
+  margin-block: calc(-1 * var(--border-width-thin));
+  margin-inline-end: calc(-1 * var(--border-width-thin));
+}
+
+.ui-search-input { align-items: center; }
+
+.ui-search-input__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  inline-size: var(--control-height);
+  block-size: var(--control-height);
+}
+
+.ui-search-input__glyph {
+  display: grid;
+  place-items: center;
+  inline-size: var(--ui-input-action-size);
+  block-size: var(--ui-input-action-size);
+  border-radius: var(--border-radius-pill);
+  color: var(--color-gray11);
+}
+
+.ui-search-input .ui-search-input__icon > button { color: var(--color-gray11); }
+
+.ui-search-input__glyph > svg,
+.ui-search-input .ui-search-input__icon .ui-glass-button__inset > svg {
+  inline-size: 55%;
+  block-size: 55%;
 }
 
 /* ── Dropdown ────────────────────────────────────────────────── */
@@ -137,8 +161,9 @@
   display: grid;
   flex: none;
   place-items: center;
-  inline-size: var(--ui-input-icon-size);
-  block-size: var(--ui-input-icon-size);
+  inline-size: var(--ui-input-action-size);
+  block-size: var(--ui-input-action-size);
+  margin-block: var(--ui-input-action-inset);
   border-radius: var(--border-radius-pill);
   background-color: var(--color-gray2);
 }
@@ -152,18 +177,17 @@
 .ui-chevron-icon--open { transform: rotate(180deg); }
 
 .ui-dropdown__panel {
-  --dropdown-option-radius: var(--border-radius-2xl);
-  --dropdown-panel-inset: var(--spacing-sm);
-  --dropdown-list-inset: var(--spacing-xs);
+  --dropdown-panel-inset: var(--spacing-xs);
+  --dropdown-option-radius: calc(var(--ui-input-radius) - var(--dropdown-panel-inset));
   display: flex;
   flex-direction: column;
   position: fixed;
   z-index: 9999;
   box-sizing: border-box;
   padding: var(--dropdown-panel-inset);
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
   border: var(--ui-stroke);
-  border-radius: calc(var(--dropdown-option-radius) + var(--dropdown-panel-inset) + var(--dropdown-list-inset));
+  border-radius: var(--ui-input-radius);
   background: var(--color-gray1);
   box-shadow: var(--elevation-4);
   overflow: hidden;
@@ -171,8 +195,7 @@
 
 .ui-dropdown__search-shell {
   flex: none;
-  height: 2rem;
-  min-height: 2rem;
+  border-radius: var(--dropdown-option-radius);
   background: var(--color-gray2);
 }
 
@@ -189,16 +212,15 @@
   gap: var(--spacing-xs);
   overflow-y: auto;
   max-block-size: 250px;
-  padding: var(--dropdown-list-inset);
 }
 
-.ui-dropdown__list:empty { padding: 0; }
 .ui-dropdown__list:focus-visible { outline: none; }
 
 .ui-dropdown__item {
   display: flex;
   align-items: center;
-  padding: var(--spacing-sm) var(--spacing-md);
+  min-block-size: var(--control-height);
+  padding: max(var(--spacing-xs), calc((var(--control-height) - 1lh) / 2));
   border-radius: var(--dropdown-option-radius);
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
@@ -242,6 +264,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
+  min-block-size: var(--control-height-compact);
   cursor: pointer;
   font-size: var(--font-size-sm);
   font-family: var(--font-family-base);
@@ -298,27 +321,12 @@
   outline-offset: var(--border-width-normal);
 }
 
-@media (max-width: 768px) {
-  :root { --ui-input-height: var(--control-touch-target); }
-
-  .ui-input-shell { height: auto; }
-
+@media (max-width: 768px), (pointer: coarse) {
   .ui-input-field,
   .ui-input-shell--persian .ui-input-field,
   .ui-dropdown__text {
     font-size: var(--font-size-base);
     line-height: var(--line-height-relaxed);
-  }
-
-  .ui-input-field:not(.ui-input-field--textarea) {
-    align-self: stretch;
-    min-block-size: var(--control-touch-target);
-  }
-
-  .ui-input-shell button.dz-icon-btn {
-    inline-size: var(--control-touch-target);
-    block-size: var(--control-touch-target);
-    --dz-icon-btn-size: var(--control-touch-target);
   }
 
   .ui-input-shell button.dz-icon-btn .dz-icon-btn__icon {
@@ -332,19 +340,10 @@
     overflow-wrap: anywhere;
   }
 
-  .ui-dropdown__chevron.glass {
-    inline-size: 35px;
-    block-size: 35px;
-  }
-
   .ui-chevron-icon {
     inline-size: 18px;
     block-size: 18px;
   }
 
-  .ui-dropdown__item[role="option"],
-  .ui-radio-toggle {
-    min-block-size: var(--control-touch-target);
-    min-inline-size: var(--control-touch-target);
-  }
+  .ui-radio-toggle { min-inline-size: var(--control-touch-target); }
 }

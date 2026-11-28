@@ -10,7 +10,7 @@ export const TaahodCard: React.FC = () => {
       <div className="dz-glass-container__body s1-taahod-body custom-scrollbar scrollbar-inline-start">
         <p className="s1-taahod-intro">
           اینجانب با آگاهی کامل از مفاد این تعهدنامه و به‌منظور استفاده از خدمات
-          سامانه داده‌ساز، موارد زیر را متعهد می‌شوم:
+          سامانه دیتابیس، موارد زیر را متعهد می‌شوم:
         </p>
         <ol className="s1-taahod-list" dir="rtl">
           <li>

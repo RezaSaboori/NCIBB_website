@@ -42,7 +42,7 @@ export function useTabFocusScroll({
       if (!target) return;
 
       const clickedInteractiveTab = target.closest(
-        ".s2-criteria-tab, .s2-add-criteria-tab"
+        ".s2-criteria-tab, .s2-add-criteria-tab, [data-criteria-preview]"
       );
       if (clickedInteractiveTab) return;
 

@@ -16,6 +16,24 @@
   gap: 0;
 }
 
+:is(.s2-criteria-panel, .s2-criteria-description) {
+  --s2-criteria-action-size: 2rem;
+  --s2-criteria-action-target: var(--s2-criteria-action-size);
+  --s2-criteria-icon-size: calc(var(--s2-criteria-action-size) - 2 * var(--spacing-xs));
+  --s2-criteria-group-gap: var(--spacing-md);
+}
+
+.ui-glass-icon-button.s2-criteria-icon {
+  --glass-icon-button-surface-size: var(--s2-criteria-icon-size);
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  :is(.s2-criteria-panel, .s2-criteria-description) {
+    --s2-criteria-action-target: var(--control-touch-target);
+    --s2-criteria-group-gap: var(--spacing-lg);
+  }
+}
+
 .s2-criteria-panel {
   min-inline-size: 0;
   overflow: hidden !important;
@@ -91,119 +109,67 @@
 
 
 /* ── Shared Criteria Tab ───────────────────────────────────────── */
-/*
- * Both CriteriaButton and AddCriteriaTab use this base.
- * Internal structure:
- *   .dz-criteria-tab
- *     .dz-criteria-tab__title   ← truncates with ellipsis
- *     .dz-criteria-tab__actions ← icon buttons or single add btn
- */
-
 .dz-criteria-tab {
+  --s2-criteria-tab-size: max(var(--s2-criteria-action-target), var(--control-height));
   display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
   border-radius: var(--border-radius-pill);
-  height: 2.25rem;
+  min-block-size: var(--s2-criteria-tab-size);
+  max-inline-size: 100%;
   box-sizing: border-box;
-  min-width: 0;
-
+  min-inline-size: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
 }
 
 .dz-criteria-tab__title {
-  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-gray11);
   font-family: var(--font-family-base);
   flex: 1;
   min-width: 0;
   max-width: 8rem;
-  /* overflow/ellipsis removed: scroll-wrapper handles clipping and fade */
-  padding: 1px var(--spacing-xs) 0 var(--spacing-xs);
-}
-
-.dz-criteria-tab__actions {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs) !important;
-  flex-shrink: 0;
-  --dz-icon-btn-size: 1.3rem;
-}
-
-/* Datasaz labels use a fade at the edge of the shared scrolling surface. */
-.dz-scroll-wrapper:is(.dz-criteria-tab__title, .s2-criteria-window__title) {
-  --dz-scroll-padding: 1rem;
-}
-
-.dz-scroll-wrapper:is(.dz-criteria-tab__title, .s2-criteria-window__title)[data-scroll-overflow="true"] {
-  mask-image: linear-gradient(to right, black calc(100% - 1.5rem), transparent);
-}
-
-.dz-scroll-wrapper:is(.dz-criteria-tab__title, .s2-criteria-window__title):dir(rtl)[data-scroll-overflow="true"] {
-  mask-image: linear-gradient(to left, black calc(100% - 1.5rem), transparent);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .dz-scroll-wrapper:is(.dz-criteria-tab__title, .s2-criteria-window__title):hover,
-  .s2-criteria-tab__select:focus-visible .dz-scroll-wrapper {
-    mask-image: none;
-  }
-  .dz-scroll-wrapper:is(.dz-criteria-tab__title, .s2-criteria-window__title)[data-scroll-overflow="true"]:hover .dz-scroll-inner,
-  .s2-criteria-tab__select:focus-visible [data-scroll-overflow="true"] .dz-scroll-inner {
-    animation: dz-text-scroll 3s linear forwards;
-  }
-}
-
-
-
-/* ── Add criteria tab color overrides ──────────────────────────── */
-.s2-criteria-window__header-actions .s2-icon-btn {
-  width:1.5rem;
-  height: 1.5rem;
-  color: var(--color-gray10);
-}
-
-.s2-icon-btn:hover {
-  color: var(--color-gray12);
 }
 
 .s2-add-criteria-tab {
+  justify-content: center;
   cursor: pointer;
   border: none;
+  padding: 0;
 }
 
-.s2-add-criteria-tab__title {
-  max-width: 7rem;
-  color: inherit;
-}
-
-/* ── Criteria action button colors ──────────────────────────────── */
-.dz-criteria-tab__actions .s2-icon-btn,
-.s2-criteria-window__header .s2-icon-btn {
-  color: var(--color-gray1);
-}
-
-.dz-criteria-tab__actions .s2-icon-btn,
-.s2-criteria-window__header .s2-icon-btn,
-.s2-add-criteria-tab__icon,
-.s2-add-criteria-tab__title {
+.s2-add-criteria-tab__surface {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-block-size: var(--s2-criteria-tab-size);
+  padding: calc((var(--s2-criteria-tab-size) - var(--s2-criteria-icon-size)) / 2);
+  border-radius: inherit;
   transition: opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
-.s2-criteria-tab .s2-icon-btn:hover,
-.s2-criteria-window__header .s2-icon-btn:hover,
-.s2-add-criteria-tab__icon:hover,
-.s2-add-criteria-tab__title:hover {
-  opacity: 85%;
+.blue-glass-transparent.s2-add-criteria-tab__icon {
+  --dz-icon-btn-size: var(--s2-criteria-icon-size);
+  display: grid;
+  place-items: center;
+  background-color: color-mix(in srgb, var(--color-blue) 48%, transparent);
+  background-image: radial-gradient(circle, color-mix(in srgb, currentColor 16%, transparent), transparent);
+  box-shadow: inset 0 0 0 var(--border-width-thin) color-mix(in srgb, currentColor 42%, transparent);
 }
 
-.dark .dz-criteria-tab__actions .s2-icon-btn,
-.dark .s2-criteria-window__header .s2-icon-btn {
-  color: var(--color-gray12);
+.s2-add-criteria-tab__icon > .dz-icon-btn__icon {
+  inline-size: var(--spacing-md);
+  block-size: var(--spacing-md);
 }
 
+.s2-add-criteria-tab__title {
+  font-weight: var(--font-weight-medium);
+  overflow-wrap: anywhere;
+}
+
+.s2-add-criteria-tab:hover .s2-add-criteria-tab__surface {
+  opacity: 0.88;
+}
 
 /* ── Criteria Window ────────────────────────────────────────────── */
 
@@ -245,8 +211,9 @@
 }
 
 
-.s2-criteria-window__header {
+.s2-criteria-panel .s2-criteria-window__header {
   justify-content: space-between;
+  gap: var(--s2-criteria-group-gap);
   margin: var(--spacing-sm) var(--spacing-sm) 0 var(--spacing-sm) !important;
 }
 
@@ -261,15 +228,6 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  padding-left: var(--spacing-xs);
-  /* flex+gap for the unit suffix are moved to .dz-scroll-text override below */
-}
-
-/* The unit suffix layout lives inside .dz-scroll-inner now */
-.s2-criteria-window__title .dz-scroll-inner {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--spacing-xs);
 }
 
 /* Default (simple) window title: no pointer cursor on hover */
@@ -291,9 +249,22 @@
 .s2-criteria-window__header-actions {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
   flex-shrink: 0;
-  --dz-icon-btn-size: var(--ui-input-icon-size);
+}
+
+:is(.s2-criteria-tab, .s2-criteria-window__header-actions) {
+  --s2-criteria-group-action-width: calc(var(--s2-criteria-action-target) - var(--spacing-xs));
+}
+
+:is(.s2-criteria-tab__actions, .s2-criteria-window__header-actions) .s2-criteria-icon {
+  inline-size: var(--s2-criteria-group-action-width);
+}
+
+@media (max-width: 768px), (pointer: coarse) {
+  :is(.s2-criteria-tab, .s2-criteria-window__header-actions) {
+    --s2-criteria-group-action-width: var(--s2-criteria-action-target);
+    --s2-criteria-icon-size: calc(var(--s2-criteria-action-size) - var(--spacing-xs));
+  }
 }
 
 /* ── Window Body row (input + required toggle) ──────────────────── */
@@ -313,10 +284,6 @@
     justify-content: space-between;
     align-items: center;
     gap: var(--spacing-sm);
-}
-
-.s2-criteria-window__row .s2-icon-btn{
-  color: var(--color-red);
 }
 
 .s2-criteria-window__field {
@@ -346,32 +313,35 @@
   margin: var(--spacing-sm);
 }
 
+.s2-criteria-window__footer,
+.s2-criteria-window__footer-left {
+  flex-wrap: wrap;
+}
+
+.s2-criteria-window__footer { gap: var(--s2-criteria-group-gap); }
+
 .s2-criteria-window__footer-left {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
 }
 
-.s2-criteria-window__btn--advanced {
-  color: var(--color-gray10) !important;
-}
-
-
-
 .s2-criteria-window__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-radius: var(--border-radius-pill);
-  padding: calc(var(--spacing-sm) + 1px) var(--spacing-lg) var(--spacing-sm)var(--spacing-lg);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   font-family: var(--font-family-base);
   cursor: pointer;
-  color: var(--color-gray1);
+  color: var(--color-gray10);
   transition: opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
-.dark .s2-criteria-window__btn:not(.blue-glass) {
-  color: var(--color-gray12);
+.s2-criteria-window__btn.red-glass {
+  color: var(--color-on-blue-glass);
 }
 
 .s2-criteria-window__btn:hover {
@@ -380,16 +350,10 @@
 
 
 
-.dz-icon-btn__icon--minimize {
-  margin-bottom: 1px;
-}
-
 /* ── CriteriaButton expand-on-select animation ──────────────────── */
 
 .s2-criteria-tab {
-  gap: 0;
-  padding-block: 0;
-  padding-inline-start: 0;
+  --s2-criteria-tab-label-padding: calc((var(--s2-criteria-tab-size) - 1lh) / 2);
 }
 
 .s2-criteria-tab__select {
@@ -397,31 +361,51 @@
   align-items: center;
   flex: 1 1 auto;
   align-self: stretch;
-  min-inline-size: 0;
-  padding-inline: var(--spacing-sm);
+  min-inline-size: min(var(--s2-criteria-action-target), 100%);
+  padding: var(--s2-criteria-tab-label-padding);
   border-radius: var(--border-radius-pill);
   cursor: pointer;
+}
+
+.s2-criteria-tab--selected {
+  padding-inline-end: calc((var(--s2-criteria-tab-size) - var(--s2-criteria-group-action-width)) / 2);
+}
+
+.s2-criteria-tab--selected .s2-criteria-tab__select {
+  padding-inline-end: var(--s2-criteria-group-gap);
 }
 
 .s2-criteria-tab__actions {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  align-self: stretch;
   flex-shrink: 0;
-  overflow: hidden;
-  max-width: 0;
+  overflow: clip;
+  max-inline-size: 0;
   opacity: 0;
   pointer-events: none;
-  border-radius: var(--border-radius-pill);
   transition:
-    max-width var(--motion-duration-slow) var(--motion-easing-easeInOut),
+    max-inline-size var(--motion-duration-slow) var(--motion-easing-easeInOut),
     opacity var(--motion-duration-normal) var(--motion-easing-easeInOut);
 }
 
 .s2-criteria-tab--selected .s2-criteria-tab__actions {
-  max-width: 7rem;
+  max-inline-size: calc(3 * var(--s2-criteria-group-action-width));
   opacity: 1;
   pointer-events: auto;
+}
+
+.s2-criteria-tab__actions .ui-glass-icon-button__inset {
+  clip-path: circle(closest-side);
+}
+
+.s2-criteria-tab__actions .ui-glass-icon-button:focus-visible {
+  outline-offset: calc(-1 * var(--border-width-normal));
+}
+
+:is(.s2-criteria-tab__select, .s2-add-criteria-tab, .s2-criteria-window__btn, .s2-criteria-window__add-rule-btn):focus-visible {
+  outline: var(--border-width-normal) solid var(--color-blue);
+  outline-offset: calc(-1 * var(--border-width-normal));
 }
 
 /* ── Add criteria tab — active (spotlight open) state ──────────── */
@@ -453,10 +437,10 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-xs);
-  padding: var(--spacing-md);
+  padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--border-radius-pill);
   border: none;
-  height: 2.25rem;
+  min-block-size: var(--control-height);
   box-sizing: border-box;
   cursor: default;
 }
@@ -516,7 +500,7 @@
 
 .s2-counter-tab--start {
   font-weight: var(--font-weight-bold);
-  padding: var(--spacing-md) var(--spacing-3xl);
+  padding-inline: var(--spacing-3xl);
 
 }
 
@@ -542,6 +526,7 @@
   margin: var(--spacing-sm) 0 0 var(--spacing-xs);
   cursor: pointer;
   padding: 0;
+  min-block-size: var(--s2-criteria-action-target);
   color: var(--color-blue);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
@@ -555,16 +540,19 @@
 }
 
 .s2-criteria-window__add-rule-btn-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   width: 1rem;
   height: 1rem;
   border-radius: var(--border-radius-circle);
   border: 1.5px solid var(--color-blue);
-  font-size: var(--font-size-xs);
-  line-height: 1;
   flex-shrink: 0;
+}
+
+.s2-criteria-window__add-rule-btn-icon svg {
+  display: block;
+  inline-size: calc(1rem - var(--spacing-xs));
+  block-size: calc(1rem - var(--spacing-xs));
 }
 
 @media (max-width: 768px) {
@@ -601,11 +589,8 @@
     mask-image: none;
   }
 
-  .s2-criteria-window .s2-criteria-window__header,
-  .s2-criteria-window__footer,
-  .s2-criteria-window__footer-left {
+  .s2-criteria-window .s2-criteria-window__header {
     flex-wrap: wrap;
-    gap: var(--spacing-sm);
   }
 
   .s2-criteria-window .s2-criteria-window__title {
@@ -613,47 +598,17 @@
     max-inline-size: none;
   }
 
-  .s2-adv-group .s2-adv-group__name-input.ui-input-shell {
-    flex: 1 0 100%;
-    height: auto;
-    min-height: var(--control-touch-target);
-  }
-
-  .s2-criteria-panel :is(.dz-criteria-tab__title, .s2-criteria-window__title, .dz-scroll-inner) {
+  .s2-criteria-panel :is(.dz-criteria-tab__title, .s2-criteria-window__title):not(.ui-scroll-text) {
     max-inline-size: none;
     white-space: normal;
     overflow-wrap: anywhere;
-    animation: none;
-    mask-image: none;
   }
 
-  .s2-criteria-panel .dz-scroll-wrapper[data-scroll-overflow="true"] { mask-image: none; }
-  .s2-criteria-panel .dz-scroll-wrapper[data-scroll-overflow="true"] .dz-scroll-inner { animation: none; }
-
-  .s2-criteria-tab__select,
   .s2-add-criteria-tab,
-  .s2-criteria-window :is(.s2-icon-btn, .s2-criteria-window__btn, .s2-criteria-window__add-rule-btn),
+  .s2-criteria-window .s2-criteria-window__add-rule-btn,
   .s2-criteria-window .ui-radio-toggle {
-    min-block-size: var(--control-touch-target);
     min-inline-size: var(--control-touch-target);
   }
-
-  .s2-criteria-tab,
-  .s2-add-criteria-tab {
-    height: auto;
-    max-inline-size: 100%;
-  }
-
-  .s2-criteria-tab__actions .s2-icon-btn {
-    inline-size: var(--control-touch-target);
-    block-size: var(--control-touch-target);
-  }
-
-  .s2-criteria-tab--selected .s2-criteria-tab__actions {
-    max-width: calc(2 * var(--control-touch-target) + var(--spacing-xs));
-  }
-
-  .s2-criteria-tab__actions .s2-icon-btn:focus-visible { outline-offset: -2px; }
 
   .s2-criteria-window__body {
     max-block-size: none;
@@ -682,13 +637,23 @@
   .s2-criteria-window__field { flex-basis: min(100%, 7rem); }
   .s2-criteria-window__operator { flex-basis: min(100%, 5rem); }
 
-  .s2-counters-bar { gap: var(--spacing-sm); }
-  .s2-counter-tab { height: auto; padding: var(--spacing-sm); }
-  .s2-counter-tab--start {
-    justify-content: center;
-    flex: 0 0 100%;
-    min-block-size: var(--spacing-3xl);
+  .s2-counters-bar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    /* Let the step tabs set the toolbar width. */
+    contain: inline-size;
   }
+  .s2-counter-tab {
+    justify-content: center;
+    padding-inline: var(--spacing-xs);
+    text-align: center;
+  }
+  .s2-counter-tab__value { overflow-wrap: anywhere; }
+  .s2-counter-tab--start {
+    grid-column: 1 / -1;
+  }
+  .s2-process-error { grid-column: 1 / -1; }
 
 }
 

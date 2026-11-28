@@ -7,7 +7,7 @@ import type { Page, Thread, TicketOwnerFilter, TicketStatus } from "@/types/acco
 import { AccountStatus } from "../shared/AccountStatus"
 import { PageControls } from "../shared/PageControls"
 import { formatAccountDate, formatCoins } from "../shared/accountFormat"
-import { MessagingIcon } from "./MessagingIcon"
+import { SearchIcon } from "@/components/icons"
 import { TicketBadge } from "./TicketBadge"
 import { ticketStatusOptions } from "./ticketStatus"
 
@@ -62,8 +62,8 @@ export function ConversationList({
               setSearch(value)
               if (!value && filters.search) onChange({ ...filters, search: "" })
             }}
-            icon={<GlassButton type="submit" size="sm" isIconOnly aria-label="جستجو" className="account-messages__search-button">
-              <MessagingIcon name="search" />
+            icon={<GlassButton type="submit" isIconOnly inset aria-label="جستجو">
+              <SearchIcon />
             </GlassButton>} />
         </form>
         {queue && <div className="account-messages__filters">
@@ -88,7 +88,7 @@ export function ConversationList({
               onClick={() => onSelect(item)}>
               <span className="account-messages__panel-heading">
                 <bdi className="account-messages__counterpart" title={item.counterpart}>{item.counterpart}</bdi>
-                <strong className="account-messages__subject"><ScrollText text={item.subject} /></strong>
+                <strong className="account-messages__subject"><ScrollText text={item.subject} stopTouchPropagation /></strong>
                 <span className="account-messages__heading-actions">
                   {item.unread_count > 0 && <span className="red-glass account-messages__unread"
                     aria-label={`${formatCoins(item.unread_count)} پیام خوانده‌نشده`}>{formatCoins(item.unread_count)}</span>}

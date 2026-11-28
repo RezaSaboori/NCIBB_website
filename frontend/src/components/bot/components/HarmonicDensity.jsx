@@ -86,7 +86,13 @@ const EnvironmentMap = memo(({ color }) => (
     </Environment>
 ));
 
-export const HarmonicDensity = memo(({ theme, isGlass, isCoreVisible, ignition, setIntroActive }) => {
+export const HarmonicDensity = memo(/** @param {{
+    theme: { themeKey: string, currentTheme: typeof import('../config/themeConfig').THEMES.dark, isDarkMode: boolean },
+    isGlass: boolean,
+    isCoreVisible: boolean,
+    ignition: number,
+    setIntroActive: (active: boolean) => void,
+}} props */ ({ theme, isGlass, isCoreVisible, ignition, setIntroActive }) => {
     const { css: cssBackground } = useCssBackground();
     const pixelRatio = useBotPixelRatio();
 

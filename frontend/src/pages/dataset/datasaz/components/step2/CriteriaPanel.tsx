@@ -7,7 +7,6 @@ import { AddCriteriaTab } from "./AddCriteriaTab";
 import { CriteriaWindow } from "./CriteriaWindow";
 import { CriteriaWindowAdvanced } from "./CriteriaWindowAdvanced";
 import { FieldSearchSpotlight } from "./FieldSearchSpotlight";
-import { SearchIcon } from "./icons/Step2Icons";
 import { SearchInput } from "../../../../../components/ui/inputs";
 import { useFieldSearch } from "../../hooks/useFieldSearch";
 import { useCriteriaSearch } from "../../hooks/useCriteriaSearch";
@@ -320,11 +319,6 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
             placeholder="Search criteria…"
             ariaLabel={`Search ${title.toLowerCase()}`}
             multiline
-            icon={
-              <span className="glass dz-icon-btn s2-icon-btn--search" aria-hidden="true">
-                <SearchIcon className="dz-icon-btn__icon dz-icon-btn__icon--search" />
-              </span>
-            }
           />
         </div>
       </div>
@@ -339,6 +333,15 @@ export const CriteriaPanel: React.FC<CriteriaPanelProps> = ({ type, onCountChang
               isSelected={selectedId === c.id}
               isExpanded={expandedIds.has(c.id)}
               isAdvanced={advancedIds.has(c.id)}
+              getPreview={() => {
+                const field = { ...c, rows: simpleRowsRef.current.get(c.id) };
+                if (!advancedIds.has(c.id)) return { fields: [field] };
+                const entries = advancedEntriesRef.current.get(c.id);
+                return {
+                  fields: entries?.length ? entries : [field],
+                  groupRequired: groupRequired.get(c.id) ?? false,
+                };
+              }}
               onSelect={() => handleSelect(c.id)}
               onExpand={() => handleToggleExpand(c.id)}
               onDelete={() => handleRequestDelete(c.id)}

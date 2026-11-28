@@ -62,7 +62,7 @@
   align-items: center;
   gap: var(--spacing-md);
   flex-shrink: 0;
-  --dz-icon-btn-size: 2rem;
+  --dz-icon-btn-size: var(--control-height-compact);
 }
 
 .dz-glass-container--lg .dz-glass-container__header {
@@ -118,3 +118,6 @@
 }
 
 .ui-glass-card > :is(header, footer):empty { display: none; }
+
+.ui-glass-card:is(.dz-glass-container--sm, .dz-glass-container--xs) { gap: var(--spacing-md); }
+.ui-glass-card.dz-glass-container--lg { gap: var(--spacing-xl); }

@@ -1,602 +1,148 @@
-// @ts-nocheck
-import { useState, useRef, useEffect, useMemo, useCallback } from "react"
-import { DatasazMode } from "../dataset/datasaz"
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Button,
-  Input,
-} from "@heroui/react"
-import { AnimatePresence, motion } from "framer-motion"
-import { useTheme } from "../../components/theme/ThemeContext"
-import { ChatInput } from "../../components/ChatInput"
-import { DataCard } from "../../components/DataCard"
-import { useDataFinderModeIndicator } from "./hooks/useDataFinderModeIndicator"
-import { getDatabases } from "../../dataset_services/databaseCatalog"
-import { DatabaseInfo } from "../../types/database"
-import { searchInCsv } from "../../components/Search"
-import { searchDatayabStream } from "../../dataset_services/datayabService"
-import { refreshButtonVariants } from "../../components/ChatInput/animations"
-import { RefreshIcon } from "../../components/ChatInput/icons/RefreshIcon"
-import { HarmonicDensity } from "../../components/bot/components/HarmonicDensity"
-import { THEMES } from "../../components/bot/config/themeConfig";
-import "./styles.css"
+import type { SmartDatasetSort } from "./datasetSearchOptions";
 
-const chatInputConfig = {
-  datasaz: {
-    buttonText: "داده‌ای که می‌خواهید جستجو کنید رو توصیف کنید.",
-    placeholderText: "مثال: داده‌ای با ۱۰۰۰ سطر و ستون‌های سن، جنسیت و تحصیلات",
-  },
-  datayab: {
-    buttonText: "ویژگی‌های داده مورد نظر خود را برای ساخت وارد کنید.",
-    placeholderText:
-      "مثال: داده ای برای پیش بینی نارسایی قلب از روی داده نوار قلب",
-  },
-  manual: {
-    buttonText: "کلیدواژه‌های داده‌ای که می‌خواهید جستجو کنید رو وارد کنید.",
-    placeholderText: 'مثال: "ECG" AND "Heart Failure" OR "Heart Disease"',
-  },
-}
+import { useMemo, useRef, useState } from "react";
 
-export const PortalPage = () => {
-  const { theme: appTheme } = useTheme()
-  // Use app theme directly for bot instead of separate botTheme hook
-  const botTheme = useMemo(() => ({
-    themeKey: appTheme === 'dark' ? 'dark' : 'light',
-    currentTheme: appTheme === 'dark' ? THEMES.dark : THEMES.light,
-    isDarkMode: appTheme === 'dark',
-    toggleTheme: () => {}
-  }), [appTheme])
-  const [isTextVisible, setIsTextVisible] = useState(false)
-  const [isDataVisible, setIsDataVisible] = useState(false)
-  const [activeMode, setActiveMode] = useState("datayab")
-  const [chatInputStep, setChatInputStep] = useState(1)
-  const [databases, setDatabases] = useState<DatabaseInfo[]>([])
-  const [chatInputAnimationClass, setChatInputAnimationClass] = useState("")
-  const [dataContainerAnimationClass, setDataContainerAnimationClass] =
-    useState("")
-  const [searchResults, setSearchResults] = useState<DatabaseInfo[]>([])
-  const [searchAttempted, setSearchAttempted] = useState(false)
-  const [resultsReady, setResultsReady] = useState(false)
-  const [datayabStatus, setDatayabStatus] = useState("")
-  const [datayabStatusContent, setDatayabStatusContent] = useState("")
-  const [selectedFilters, setSelectedFilters] = useState<"all" | Set<string>>(
-    new Set()
-  )
-  const [selectedSort, setSelectedSort] = useState<"all" | Set<string>>(
-    new Set(["سال"])
-  )
-  const [selectedSearchSubject, setSelectedSearchSubject] = useState<
-    "all" | Set<string>
-  >(new Set(["همه"]))
-  const [manualSort, setManualSort] = useState<"all" | Set<string>>(
-    new Set(["سال"])
-  )
-  const [filterSearch, setFilterSearch] = useState("")
-  const [isCoreVisible, setIsCoreVisible] = useState(true)
-  const [isGlass, setIsGlass] = useState(true)
-  const [ignition, setIgnition] = useState(0)
-  const [isIntroActive, setIsIntroActive] = useState(true)
-  const modesContainerRef = useRef(null)
+import { DatasazMode } from "../dataset/datasaz";
 
-  useDataFinderModeIndicator(modesContainerRef, activeMode)
+import { DatasetSearchForm } from "./components/DatasetSearchForm";
+import { DatasetResults } from "./components/DatasetResults";
+import { useDataFinderModeIndicator } from "./hooks/useDataFinderModeIndicator";
+import { useDatasetCatalog } from "./hooks/useDatasetCatalog";
+import { useDatasetSearch } from "./hooks/useDatasetSearch";
 
-  useEffect(() => {
-    const loadDatabases = async () => {
-      const data = await getDatabases()
-      setDatabases(data)
-    }
-    loadDatabases()
-  }, [])
+import { THEMES } from "@/components/bot/config/themeConfig";
+import { HarmonicDensity } from "@/components/bot/components/HarmonicDensity";
+import { useTheme } from "@/components/theme/ThemeContext";
+import { useNavigationFade } from "@/components/ui/motion/useNavigationFade";
+import "./styles.css";
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setIsTextVisible(true)
-      setIsDataVisible(true)
-      setChatInputAnimationClass("fade-in-up")
-    }, 2000)
-    return () => clearTimeout(t)
-  }, [])
+type FinderMode = "datasets" | "database";
 
-  const handleModeChange = useCallback(
-    (mode: string) => {
-      if (mode === activeMode) return
+const finderModes = [
+  { id: "datasets", label: "پکیج آماده" },
+  { id: "database", label: "پکیج شخصی" },
+] as const;
 
-      setChatInputAnimationClass("fade-out")
-      setDataContainerAnimationClass("fade-out")
-      setTimeout(() => {
-        switch (mode) {
-          case "manual":
-            setIsCoreVisible(false)
-            break
-          case "datasaz":
-            setIsCoreVisible(true)
-            setIsGlass(false)
-            break
-          case "datayab":
-            setIsCoreVisible(true)
-            setIsGlass(true)
-            break
-          default:
-            break
-        }
-        setActiveMode(mode)
-        if (mode === "datasaz" || mode === "datayab") {
-          setSelectedSort(new Set(["سال"]))
-        } else if (mode === "manual") {
-          setSelectedSort(manualSort)
-        }
-        if (mode !== "manual") {
-          setSearchAttempted(false)
-          setSearchResults([])
-          setResultsReady(false)
-          setDatayabStatus("")
-          setDatayabStatusContent("")
-        }
-        setTimeout(() => {
-          setChatInputAnimationClass("fade-in")
-        }, 400)
-        setDataContainerAnimationClass("fade-in")
-      }, 300) // This duration should match the CSS animation duration
-    },
-    [activeMode, manualSort]
-  )
+const ignoreIntro = () => {};
 
-  const handleSearch = async (query: string) => {
-    setSearchAttempted(true)
-    const searchStartTime = Date.now()
-    const minAnimationTime = 2000 // Corresponds to ChatInput's animation
-    const fadeAnimationTime = 300
+export function PortalPage() {
+  const { theme } = useTheme();
+  const botTheme = useMemo(() => {
+    const themeKey = theme === "dark" ? "dark" : "light";
 
-    // Fade out current results and wait for the animation to finish.
-    setDataContainerAnimationClass("fade-out")
-    await new Promise((resolve) => setTimeout(resolve, fadeAnimationTime))
+    return {
+      themeKey,
+      currentTheme: THEMES[themeKey],
+      isDarkMode: themeKey === "dark",
+    };
+  }, [theme]);
+  const [activeMode, setActiveMode] = useState<FinderMode>("datasets");
+  const [smartSort, setSmartSort] = useState<SmartDatasetSort>("شباهت");
+  const modesRef = useRef<HTMLDivElement>(null);
+  const contentRef = useNavigationFade(activeMode);
 
-    const subject =
-      selectedSearchSubject instanceof Set
-        ? selectedSearchSubject.values().next().value
-        : "همه"
-    const results = await searchInCsv(query, subject)
-    const searchDuration = Date.now() - searchStartTime
+  useDataFinderModeIndicator(modesRef, activeMode);
 
-    // Ensure the loading animation is visible for a minimum duration.
-    if (searchDuration < minAnimationTime) {
-      await new Promise((resolve) =>
-        setTimeout(resolve, minAnimationTime - searchDuration)
-      )
-    }
+  const { catalog, reload } = useDatasetCatalog();
+  const catalogData = catalog.phase === "ready" ? catalog.data : undefined;
+  const search = useDatasetSearch(catalogData);
+  const tags = useMemo(() => {
+    const values = new Set(
+      catalogData?.flatMap((dataset) => dataset.datasetVariables),
+    );
 
-    setSearchResults(results)
+    return Array.from(values).sort((a, b) => a.localeCompare(b, "fa"));
+  }, [catalogData]);
+  const databaseMode = activeMode === "database";
+  const manualMode = search.mode === "manual";
+  const resultData = search.state.results;
+  const pending = search.state.phase === "pending";
 
-    // Fade in new results.
-    setDataContainerAnimationClass("fade-in")
-    setResultsReady(true)
-  }
-
-  const handleDatayabSearch = async (query: string) => {
-    setSearchAttempted(true)
-    setDatayabStatus("")
-    setDatayabStatusContent("")
-    const fadeAnimationTime = 300
-
-    // Fade out current results and wait for the animation to finish.
-    setDataContainerAnimationClass("fade-out")
-    await new Promise((resolve) => setTimeout(resolve, fadeAnimationTime))
-
-    let results: DatabaseInfo[] = []
-    try {
-      const data = await searchDatayabStream(query, (message, content) => {
-        setDatayabStatus(message)
-        setDatayabStatusContent(content ?? "")
-      })
-      results = data.results
-      console.groupCollapsed(`Datayab RAG trace: "${query}"`)
-      console.log("LLM raw response:", data.trace.llm_raw)
-      console.log("Parsed intent:", data.trace.intent)
-      console.log("Chroma where filter:", data.trace.where)
-      console.log("Verify raw response:", data.trace.verify_raw)
-      if (data.trace.retries > 0) {
-        console.log(`Refined query (retry ${data.trace.retries}):`, data.trace.refined_query)
-      }
-      console.table(data.trace.candidates)
-      console.log(
-        `Kept ${data.trace.kept_count}/${data.trace.candidates.length} candidates (threshold ${data.trace.max_distance})`
-      )
-      console.groupEnd()
-    } catch (error) {
-      console.error("Datayab search failed:", error)
-    }
-    // Cards take priority: render as soon as the stream delivers results.
-    setSearchResults(results)
-    setDataContainerAnimationClass("fade-in")
-    setResultsReady(true)
-  }
-
-  const handleClearSearch = async () => {
-    console.log("Refresh button clicked")
-    const fadeAnimationTime = 300
-    setDataContainerAnimationClass("fade-out")
-    await new Promise((resolve) => setTimeout(resolve, fadeAnimationTime))
-    setSearchAttempted(false)
-    setSearchResults([])
-    setResultsReady(false)
-    setDatayabStatus("")
-    setDatayabStatusContent("")
-    setDataContainerAnimationClass("fade-in")
-  }
-
-  const filterTags = useMemo(() => {
-    const allTags = new Set<string>()
-    databases.forEach((db) => {
-      db.datasetVariables.forEach((tag) => {
-        allTags.add(tag)
-      })
-    })
-    return Array.from(allTags).sort((a, b) => a.localeCompare(b, "fa"))
-  }, [databases])
-
-  const displayedDatabases =
-    (activeMode === "manual" || activeMode === "datayab") && searchAttempted
-      ? searchResults
-      : databases
-
-  const processedDatabases = useMemo(() => {
-    let filtered = displayedDatabases
-
-    // Filtering logic
-    if (selectedFilters instanceof Set && selectedFilters.size > 0) {
-      filtered = displayedDatabases.filter((db) =>
-        db.datasetVariables.some((tag) => selectedFilters.has(tag))
-      )
-    }
-
-    // Sorting logic
-    const sortKey =
-      selectedSort instanceof Set
-        ? selectedSort.values().next().value
-        : selectedSort
-
-    if (sortKey && !(activeMode === "datayab" && searchAttempted)) {
-      return [...filtered].sort((a, b) => {
-        switch (sortKey) {
-          case "امتیاز":
-            return b.rating - a.rating
-          case "الفبا":
-            return a.name.localeCompare(b.name)
-          case "سال":
-            return b.year - a.year
-          case "حجم":
-            return b.fileSizeKB - a.fileSizeKB
-          default:
-            return 0
-        }
-      })
-    }
-
-    return filtered
-  }, [displayedDatabases, selectedFilters, selectedSort, activeMode, searchAttempted])
+  const selectFinderMode = (mode: FinderMode) => {
+    if (mode === activeMode) return;
+    if (mode === "database") search.clearResults();
+    setActiveMode(mode);
+  };
 
   return (
-    <div className="holistic-page-wrapper">
-      <div className="spline-container">
+    <div className="portal-finder">
+      <div aria-hidden="true" className="portal-finder__scene">
         <HarmonicDensity
+          ignition={0}
+          isCoreVisible={databaseMode || !manualMode}
+          isGlass={!databaseMode}
+          setIntroActive={ignoreIntro}
           theme={botTheme}
-          isGlass={isGlass}
-          isCoreVisible={isCoreVisible}
-          ignition={ignition}
-          setIntroActive={setIsIntroActive}
         />
       </div>
-
-      <div className={`robot-container ${activeMode === "datasaz" ? "datasaz-mode" : ""}`}>
-        <div
-          className={`holistic-input-container ${
-            isTextVisible ? "fade-in-up" : ""
-          } ${activeMode === "datasaz" ? "datasaz-expanded" : ""}`}
-        >
-          <div ref={modesContainerRef} className="data-finder-modes-container glass-navigation glass-navigation__indicator glass-transparent">
-            <button
-              id="manual"
-              onClick={() => handleModeChange("manual")}
-              aria-pressed={activeMode === "manual"}
-              className="data-finder-mode glass-navigation__item"
-            >
-              دستی
-            </button>
-            <button
-              id="datayab"
-              onClick={() => handleModeChange("datayab")}
-              aria-pressed={activeMode === "datayab"}
-              className="data-finder-mode glass-navigation__item"
-            >
-              داده‌یاب
-            </button>
-
-            <button
-              id="datasaz"
-              onClick={() => handleModeChange("datasaz")}
-              aria-pressed={activeMode === "datasaz"}
-              className="data-finder-mode glass-navigation__item"
-            >
-              داده‌ساز
-            </button>
-          </div>
-          {activeMode === "datasaz" && (
-            <div className={`datasaz-inline-container ${chatInputAnimationClass}`}>
-              <DatasazMode />
-            </div>
-          )}
-          {activeMode !== "datasaz" && (
-          <div className={`search-controls ${chatInputAnimationClass}`}>
-            {activeMode === "manual" && (
-              <div className="controls-container">
-                <Dropdown
-                  showArrow={true}
-                  classNames={{
-                    content: "rounded-[var(--border-radius-2xl)]",
-                  }}
-                >
-                  <DropdownTrigger>
-                    <Button
-                      variant="solid"
-                      className="sort-dropdown-trigger rounded-full"
-                      style={{
-                        backgroundColor: "var(--color-gray1)",
-                        fontFamily: "var(--font-family-persian)",
-                        fontWeight: "var(--font-weight-medium)",
-                        fontSize: "var(--font-size-sm)",
-                        cursor: "pointer",
-                      }}
-                    >
-                      موضوع جستجو:{" "}
-                      {typeof selectedSearchSubject === "string"
-                        ? selectedSearchSubject
-                        : selectedSearchSubject.values().next().value}
-                    </Button>
-                  </DropdownTrigger>
-                  <DropdownMenu
-                    aria-label="Single selection for search subject"
-                    variant="flat"
-                    disallowEmptySelection
-                    selectionMode="single"
-                    selectedKeys={selectedSearchSubject}
-                    onSelectionChange={(keys) => {
-                      const newSearchSubject = keys as "all" | Set<string>
-                      setSelectedSearchSubject(newSearchSubject)
-                    }}
-                    itemClasses={{
-                      base: [
-                        "text-[var(--color-gray11)]",
-                        "data-[hover=true]:bg-default-100",
-                        "rounded-full",
-                        "px-3",
-                        "font-family: var(--font-family-persian);",
-                        "font-weight: var(--font-weight-medium);",
-                        "font-size: var(--font-size-sm);",
-                      ],
-                    }}
-                  >
-                    <DropdownItem key="همه">همه</DropdownItem>
-                    <DropdownItem key="عنوان">عنوان</DropdownItem>
-                    <DropdownItem key="توضیحات">توضیحات</DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-                <Dropdown
-                  showArrow={true}
-                  classNames={{
-                    content: "rounded-[var(--border-radius-2xl)] bg-gray1",
-                  }}
-                >
-                  <DropdownTrigger>
-                    <Button
-                      variant="solid"
-                      className="filter-dropdown-trigger rounded-full"
-                      style={{
-                        backgroundColor: "var(--color-gray1)",
-                        color: "var(--color-gray11)",
-                        fontFamily: "var(--font-family-persian)",
-                        fontWeight: "var(--font-weight-medium)",
-                        fontSize: "var(--font-size-sm)",
-                        cursor: "pointer",
-                      }}
-                    >
-                      {selectedFilters instanceof Set && selectedFilters.size > 0
-                        ? Array.from(selectedFilters).join(", ")
-                        : "فیلتر"}
-                    </Button>
-                  </DropdownTrigger>
-                  <DropdownMenu
-                    aria-label="Multiple selection for filtering"
-                    variant="flat"
-                    closeOnSelect={false}
-                    selectionMode="multiple"
-                    selectedKeys={selectedFilters}
-                    onSelectionChange={(keys) =>
-                      setSelectedFilters(keys as "all" | Set<string>)
-                    }
-                    topContent={
-                      <Input
-                        isClearable
-                        radius="full"
-                        placeholder="جستجوی فیلتر"
-                        value={filterSearch}
-                        onValueChange={setFilterSearch}
-                        onClear={() => setFilterSearch("")}
-                        className="filter-search-input"
-                        color="primary"
-                      />
-                    }
-                    classNames={{
-                      list: "max-h-60 overflow-y-auto custom-scrollbar",
-                    }}
-                    itemClasses={{
-                      base: [
-                        "text-[var(--color-gray11)]",
-                        "data-[hover=true]:bg-[var(--color-gray3)]",
-                        "rounded-full",
-                        "px-3",
-                        "ltr-direction",
-                        "flex-row-reverse",
-                      ],
-                    }}
-                  >
-                    {filterTags
-                      .filter((tag) =>
-                        tag.toLowerCase().includes(filterSearch.toLowerCase())
-                      )
-                      .map((tag) => (
-                        <DropdownItem key={tag}>{tag}</DropdownItem>
-                      ))}
-                  </DropdownMenu>
-                </Dropdown>
-
-                <Dropdown
-                  showArrow={true}
-                  classNames={{
-                    content: "rounded-[var(--border-radius-2xl)]",
-                  }}
-                >
-                  <DropdownTrigger>
-                    <Button
-                      variant="solid"
-                      className="sort-dropdown-trigger rounded-full"
-                      style={{
-                        backgroundColor: "var(--color-gray1)",
-                        fontFamily: "var(--font-family-persian)",
-                        fontWeight: "var(--font-weight-medium)",
-                        fontSize: "var(--font-size-sm)",
-                        cursor: "pointer",
-                      }}
-                    >
-                      مرتب‌سازی بر اساس:{" "}
-                      {typeof selectedSort === "string"
-                        ? selectedSort
-                        : selectedSort.values().next().value}
-                    </Button>
-                  </DropdownTrigger>
-                  <DropdownMenu
-                    aria-label="Single selection for sorting"
-                    variant="flat"
-                    disallowEmptySelection
-                    selectionMode="single"
-                    selectedKeys={selectedSort}
-                    onSelectionChange={(keys) => {
-                      const newSort = keys as "all" | Set<string>
-                      setSelectedSort(newSort)
-                      if (activeMode === "manual") {
-                        setManualSort(newSort)
-                      }
-                    }}
-                    itemClasses={{
-                      base: [
-                        "text-[var(--color-gray11)]",
-                        "data-[hover=true]:bg-default-100",
-                        "rounded-full",
-                        "px-3",
-                        "font-family: var(--font-family-persian);",
-                        "font-weight: var(--font-weight-medium);",
-                        "font-size: var(--font-size-sm);",
-                      ],
-                    }}
-                  >
-                    <DropdownItem key="امتیاز">امتیاز</DropdownItem>
-                    <DropdownItem key="الفبا">الفبا</DropdownItem>
-                    <DropdownItem key="سال">سال</DropdownItem>
-                    <DropdownItem key="حجم">حجم</DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </div>
-            )}
-            <div className={`input-refresh-container step-${chatInputStep}`}>
-              {(activeMode === "manual" || activeMode === "datayab") && (
-                <AnimatePresence>
-                  {resultsReady && (
-                    <motion.div
-                      key="refresh-fab"
-                      className="refresh-fab"
-                      variants={refreshButtonVariants(false)}
-                      initial="hidden"
-                      animate={"visibleStep1"}
-                      exit="hidden"
-                      onClick={handleClearSearch}
-                      onMouseDown={(e) => e.preventDefault()}
-                      role="button"
-                      aria-label="Refresh results"
-                    >
-                      <RefreshIcon />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              )}
-              <ChatInput
-                className="chat-input-override"
-                buttonText={chatInputConfig[activeMode].buttonText}
-                placeholderText={chatInputConfig[activeMode].placeholderText}
-                onSubmit={
-                  activeMode === "manual"
-                    ? handleSearch
-                    : activeMode === "datayab"
-                      ? handleDatayabSearch
-                      : undefined
-                }
-                statusText={activeMode === "datayab" ? datayabStatus : undefined}
-                statusContent={
-                  activeMode === "datayab" ? datayabStatusContent : undefined
-                }
-                onStepChange={setChatInputStep}
-              />
-            </div>
-          </div>
-          )}
-        </div>
-      </div>
       <div
-        className={`data-container ${dataContainerAnimationClass} ${
-          activeMode === "manual" ? "manual-mode" : ""
-        }`}
+        className={`page-container portal-finder__stage${databaseMode ? " portal-finder__stage--database" : ""}`}
       >
-        {activeMode !== "datasaz" && (
-          <>
-            {processedDatabases.length === 0 &&
-            (searchAttempted ||
-              (selectedFilters instanceof Set && selectedFilters.size > 0)) ? (
-              <div className="no-results-message">
-                <p>متاسفانه داده‌ای مطابق با جستجوی شما یافت نشد.</p>
-                <p>لطفاً کلیدواژه‌های دیگری را امتحان کنید.</p>
-              </div>
-            ) : (
-              <>
-                <div className="data-column">
-                  {processedDatabases
-                    .filter((_, index) => index % 2 === 0)
-                    .map((db, index) => (
-                      <DataCard
-                        key={db.name}
-                        database={db}
-                        isVisible={isDataVisible}
-                        animationDelay={index * 300} // Adjusted delay for column-based animation
-                      />
-                    ))}
-                </div>
-                <div className="data-column">
-                  {processedDatabases
-                    .filter((_, index) => index % 2 !== 0)
-                    .map((db, index) => (
-                      <DataCard
-                        key={db.name}
-                        database={db}
-                        isVisible={isDataVisible}
-                        animationDelay={150 + index * 300} // Adjusted delay for column-based animation
-                      />
-                    ))}
-                </div>
-              </>
-            )}
-          </>
-        )}
+        <div
+          ref={modesRef}
+          aria-label="نوع داده"
+          className="data-finder-modes-container glass-navigation glass-navigation__indicator glass-transparent"
+          role="group"
+        >
+          {finderModes.map(({ id, label }) => (
+            <button
+              key={id}
+              aria-pressed={activeMode === id}
+              className="data-finder-mode glass-navigation__item"
+              id={id}
+              type="button"
+              onClick={() => selectFinderMode(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <section
+          ref={contentRef}
+          aria-label={databaseMode ? "دیتابیس" : "دیتاست"}
+          className="portal-finder__content"
+        >
+          {databaseMode ? (
+            <DatasazMode />
+          ) : (
+            <DatasetSearchForm
+              catalogReady={Boolean(catalogData)}
+              manual={search.manual}
+              mode={search.mode}
+              query={search.query}
+              smartSort={smartSort}
+              state={search.state}
+              tags={tags}
+              onManualChange={search.setManual}
+              onModeChange={search.selectMode}
+              onQueryChange={search.changeQuery}
+              onReset={search.reset}
+              onSmartSortChange={setSmartSort}
+              onSubmit={search.submit}
+            />
+          )}
+        </section>
       </div>
+      {!databaseMode && (
+        <DatasetResults
+          data={resultData ?? catalogData}
+          error={!resultData && !pending && catalog.phase === "error"}
+          loading={!resultData && !pending && catalog.phase === "loading"}
+          pending={pending}
+          sort={
+            manualMode
+              ? search.manual.sort
+              : !resultData && smartSort === "شباهت"
+                ? "سال"
+                : smartSort
+          }
+          variables={manualMode ? search.manual.variables : undefined}
+          onReload={reload}
+          onSmartSortChange={
+            !manualMode && resultData?.length ? setSmartSort : undefined
+          }
+        />
+      )}
     </div>
-  )
+  );
 }

@@ -13,18 +13,18 @@ export const AddCriteriaTab: React.FC<AddCriteriaTabProps> = ({ label, isActive 
   return (
     <button
       type="button"
-      className={`blue-glass dz-criteria-tab s2-add-criteria-tab${isActive ? " s2-add-criteria-tab--active" : ""}`}
+      className={`dz-criteria-tab s2-add-criteria-tab${isActive ? " s2-add-criteria-tab--active" : ""}`}
       onClick={onClick}
       aria-label={label}
       aria-pressed={isActive}
       lang="en"
     >
-      <span className="dz-criteria-tab__title s2-add-criteria-tab__title">{label}</span>
-      <div className="dz-criteria-tab__actions">
-        <span className="glass-transparent dz-icon-btn s2-add-criteria-tab__icon">
-          <AddIcon className="dz-icon-btn__icon dz-icon-btn__icon--add" />
+      <span className="blue-glass s2-add-criteria-tab__surface">
+        <span className="s2-add-criteria-tab__title">{label}</span>
+        <span className="blue-glass-transparent dz-icon-btn s2-add-criteria-tab__icon" aria-hidden="true">
+          <AddIcon className="dz-icon-btn__icon" />
         </span>
-      </div>
+      </span>
     </button>
   );
 };

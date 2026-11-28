@@ -59,7 +59,8 @@ export function ComposeDialog({ isOpen, source, selected, userId, onClose, onSen
       footer={(
         <>
           <GlassButton variant="flat" isDisabled={saving} onPress={onClose}>انصراف</GlassButton>
-          <StatefulGlassButton type="submit" form={formId} color={saving ? "pending" : "primary"}
+          <StatefulGlassButton type="submit" form={formId} className="account-messages__compose-send"
+            color={saving ? "pending" : "primary"}
             state={saving ? "sending" : "ready"} label={saving ? "در حال ارسال…" : "ارسال"}
             busy={saving} disabled={!recipient || !subject.trim() || (!source && !content.trim())} />
         </>

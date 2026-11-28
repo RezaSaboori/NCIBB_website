@@ -1,6 +1,4 @@
 .primary-content-wrapper {
-  flex: 0 0 40vw;
-  width: 40vw;
   border-radius: var(--border-radius-10xl);
   transition:
     transform 0.08s ease-out,
@@ -8,7 +6,6 @@
     filter 0.1s linear,
     background-image 0.5s ease;
   min-height: 60vh;
-  max-height: 80vh;
   will-change: transform, opacity;
   contain: content;
   background-image: linear-gradient(
@@ -70,7 +67,6 @@
   container-type: inline-size;
   width: 100%;
   min-height: 60vh;
-  max-height: 80vh;
   background: transparent;
   border: none;
   border-radius: var(--border-radius-10xl);
@@ -196,7 +192,6 @@
 .landing-container--flow :is(.primary-content-wrapper, .primary-content-container) {
   inline-size: 100%;
   min-block-size: 0;
-  max-block-size: none;
   border-radius: var(--border-radius-8xl);
   padding: var(--spacing-sm);
 }
@@ -212,7 +207,6 @@
 }
 
 .landing-container--flow .primary-content-wrapper {
-  flex: none;
   contain: none;
   transition-property: background-image;
   will-change: auto;
@@ -271,8 +265,7 @@
 
 .landing-container--flow .rotating-border-btn {
   flex: 1 1 auto;
-  min-block-size: var(--spacing-3xl);
-  padding: var(--spacing-sm) var(--spacing-md);
+  padding-inline: var(--spacing-md);
 }
 
 .landing-container--flow .title-logo {

@@ -1,7 +1,7 @@
 import { GlassCard } from "@/components/ui/GlassCard"
 import { GlassTable, type GlassTableColumn } from "@/components/ui/tables/GlassTable"
 import { GlassTabs } from "@/components/ui/GlassTabs"
-import { SingleLineInput } from "@/components/ui/inputs"
+import { SearchInput } from "@/components/ui/inputs"
 import { GlassButton } from "@/components/ui/GlassButton"
 import { useCallback, useState } from "react"
 import { Tab } from "@heroui/react"
@@ -79,8 +79,8 @@ export function GroupDetails({ group, admin }: { group: Group; admin: boolean })
           <GlassTable label="اعضای گروه" rows={members.data?.results ?? []} columns={columns} rowKey={(member) => member.id}
             controls={<div className="account-workspace__section">
               <div className="account-workspace__toolbar">
-                <label className="account-workspace__form">جستجوی اعضا<SingleLineInput value={search} type="search" onChange={(event) => {
-                  setSearch(event.target.value)
+                <label className="account-workspace__form">جستجوی اعضا<SearchInput className="ui-input-shell--persian" inputProps={{ type: "search" }} value={search} onChange={(value) => {
+                  setSearch(value)
                   setPage(1)
                 }} /></label>
                 {admin && <GlassButton color="primary" isDisabled={!roles.data} onPress={() => setEditedMember(null)}>افزودن عضو</GlassButton>}

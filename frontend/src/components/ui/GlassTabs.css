@@ -4,9 +4,8 @@
   display: flex;
   align-items: center;
   width: fit-content;
-  block-size: var(--spacing-2xl);
   box-sizing: border-box;
-  padding-inline: var(--spacing-xs);
+  padding: var(--spacing-xs);
   border-radius: var(--border-radius-pill);
   gap: var(--spacing-xs);
   font-family: var(--font-family-persian);
@@ -19,7 +18,7 @@
   justify-content: center;
   align-items: center;
   padding-inline: var(--spacing-md);
-  block-size: calc(var(--spacing-2xl) - 2 * var(--spacing-xs));
+  min-block-size: var(--control-height-compact);
   box-sizing: border-box;
   border-radius: var(--border-radius-pill);
   color: var(--color-gray10);
@@ -59,7 +58,7 @@
 .datasaz-step-tab.ui-glass-tabs__tab {
   border-radius: var(--border-radius-pill);
   flex: 0 0 auto;
-  padding: 0 var(--spacing-md);
+  padding: 0 var(--glass-tab-padding-inline, var(--spacing-md));
   width: auto;
 }
 .ui-glass-tabs__label { color: inherit; white-space: nowrap; }
@@ -69,7 +68,6 @@
 @media (max-width: 960px) {
   .glass-navigation .datasaz-step-tabs {
     block-size: 100%;
-    padding: var(--spacing-xs);
   }
 
   .ui-glass-tabs__tab:focus-visible {
@@ -79,5 +77,5 @@
 }
 
 @media (max-width: 620px) {
-  .datasaz-step-tab.ui-glass-tabs__tab { padding-inline: var(--spacing-sm); }
+  .datasaz-step-tab.ui-glass-tabs__tab { padding-inline: var(--glass-tab-padding-inline, var(--spacing-sm)); }
 }

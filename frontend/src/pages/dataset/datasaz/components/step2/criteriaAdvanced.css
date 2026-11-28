@@ -2,16 +2,22 @@
 
 /* ── Advanced Group: header layout ─────────────────────────────── */
 
-.s2-adv-group__header {
-  gap: var(--spacing-sm) !important;
+.s2-adv-group__settings {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-inline-size: 0;
 }
 
-/* Keep the shared input compact inside the group header. */
 .s2-adv-group__name-input.ui-input-shell {
-  flex: 1;
-  min-width: 0;
-  height: 2rem;
-  min-height: 2rem;
+  flex: 1 1 7rem;
+  min-inline-size: 0;
+}
+
+@media (max-width: 768px) {
+  .s2-adv-group__settings { flex-basis: 100%; }
 }
 
 /* ── Tabs inside advanced group ─────────────────────────────────── */

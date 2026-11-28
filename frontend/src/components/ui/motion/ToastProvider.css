@@ -37,7 +37,6 @@
 
 .ui-toast:not([aria-hidden="true"]) .ui-toast__surface { pointer-events: auto; }
 .ui-toast__surface p { flex: 1; min-inline-size: 0; overflow-wrap: anywhere; text-align: start; }
-.ui-toast__surface .ui-glass-button { flex: none; }
 .ui-toast__icon { inline-size: 1.25rem; block-size: 1.25rem; flex: none; color: var(--color-green); }
 .ui-toast__surface[data-tone="error"] .ui-toast__icon { color: var(--color-red); }
 

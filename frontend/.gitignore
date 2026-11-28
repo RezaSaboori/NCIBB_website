@@ -27,3 +27,5 @@ pnpm-lock.yaml
 yarn.lock
 package-lock.json
 bun.lockb
+# Local frontend publisher state, staging builds and cached dependencies
+/.publish/

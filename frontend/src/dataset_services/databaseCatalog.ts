@@ -57,53 +57,48 @@ const parseDatasetVariables = (variables: string): string[] => {
   return result.filter(Boolean)
 }
 
-export const getDatabases = async (): Promise<DatabaseInfo[]> => {
-  try {
-    const response = await fetch(catalogUrl)
-    if (!response.ok) {
-      throw new Error("Failed to fetch database infos")
-    }
-    const text = await response.text()
-    const lines = text.split("\n").slice(1) // Skip header
-
-    return lines
-      .map((line) => {
-        if (!line.trim()) return null
-
-        const columns = parseCsvRow(line)
-        if (columns.length < 11) return null
-
-        const dataTypes = cleanString(columns[7])
-          .split(/, ?/)
-          .map((s) => s.trim().toLowerCase())
-          .filter(isValidDataType)
-
-        const topics = cleanString(columns[8])
-          .split(/, ?/)
-          .map((s) => s.trim())
-          .filter(Boolean)
-
-        const datasetVariables = parseDatasetVariables(cleanString(columns[6]))
-
-        const rating = parseInt(columns[10], 10)
-
-        return {
-          name: cleanString(columns[0]),
-          shortDescription: cleanString(columns[1]),
-          year: parseInt(columns[2], 10) || 0,
-          reference: cleanString(columns[3]),
-          fileSize: cleanString(columns[4]),
-          fileSizeKB: parseFloat(columns[5]) || 0,
-          datasetVariables,
-          dataTypes,
-          topics,
-          description: cleanString(columns[9]),
-          rating: !isNaN(rating) ? rating : 0,
-        }
-      })
-      .filter((item): item is DatabaseInfo => item !== null)
-  } catch (error) {
-    console.error("Error fetching or parsing database info:", error)
-    return []
+export const getDatabases = async (signal?: AbortSignal): Promise<DatabaseInfo[]> => {
+  const response = await fetch(catalogUrl, { signal })
+  if (!response.ok) {
+    throw new Error("Failed to fetch database infos")
   }
+  const text = await response.text()
+  const lines = text.split("\n").slice(1) // Skip header
+
+  return lines
+    .map((line) => {
+      if (!line.trim()) return null
+
+      const columns = parseCsvRow(line)
+      if (columns.length < 11) return null
+
+      const dataTypes = cleanString(columns[7])
+        .split(/, ?/)
+        .map((s) => s.trim().toLowerCase())
+        .filter(isValidDataType)
+
+      const topics = cleanString(columns[8])
+        .split(/, ?/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+
+      const datasetVariables = parseDatasetVariables(cleanString(columns[6]))
+
+      const rating = parseInt(columns[10], 10)
+
+      return {
+        name: cleanString(columns[0]),
+        shortDescription: cleanString(columns[1]),
+        year: parseInt(columns[2], 10) || 0,
+        reference: cleanString(columns[3]),
+        fileSize: cleanString(columns[4]),
+        fileSizeKB: parseFloat(columns[5]) || 0,
+        datasetVariables,
+        dataTypes,
+        topics,
+        description: cleanString(columns[9]),
+        rating: !isNaN(rating) ? rating : 0,
+      }
+    })
+    .filter((item): item is DatabaseInfo => item !== null)
 }

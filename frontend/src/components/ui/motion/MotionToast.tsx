@@ -1,6 +1,6 @@
 import { motion, useIsPresent } from "framer-motion"
 import { forwardRef, useEffect, useState } from "react"
-import { GlassButton } from "../GlassButton"
+import { CloseButton } from "../iconButtons"
 import { motionSettle } from "./motionPresets"
 import { useMotionVariants } from "./useMotionVariants"
 import type { ToastItem } from "./useToast"
@@ -40,12 +40,8 @@ export const MotionToast = forwardRef<HTMLLIElement, MotionToastProps>(
             <path d={tone === "success" ? "m8 12 2.5 2.5L16 9" : "M12 8v4m0 4h.01"} />
           </svg>
           <p dir="auto">{message}</p>
-          <GlassButton size="sm" isIconOnly isDisabled={!isPresent} aria-label="بستن اعلان" onPress={() => onDismiss(id)}>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
-              strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-              <path d="m6 6 12 12M18 6 6 18" />
-            </svg>
-          </GlassButton>
+          <CloseButton size="var(--spacing-xl)" className="ui-glass-icon-button--touch" disabled={!isPresent}
+            aria-label="بستن اعلان" onClick={() => onDismiss(id)} />
         </div>
       </motion.li>
     )

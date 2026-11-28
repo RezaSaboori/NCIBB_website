@@ -1,5 +1,6 @@
 import { cloneElement, forwardRef, useCallback, useEffect, useId, useRef, useState, type AriaAttributes, type KeyboardEvent, type ReactElement } from "react"
 import { createPortal } from "react-dom"
+import { SearchInput } from "./SearchInput"
 import { useDropdownPosition } from "./useDropdownPosition"
 import "../inputs.css"
 
@@ -90,12 +91,28 @@ export const DropdownInput = forwardRef<HTMLButtonElement, SingleDropdownProps |
       const focusTarget = searchRef.current ?? listRef.current
       focusTarget?.focus({ preventScroll: true })
 
+      const isTriggerTarget = (target: Node) => {
+        const trigger = triggerRef.current
+        return trigger?.contains(target) ||
+          Array.from(trigger?.labels ?? []).some((label) => label.contains(target))
+      }
       const dismissOutside = (event: PointerEvent) => {
-        const target = event.target as Node
-        if (!triggerRef.current?.contains(target) && !panelRef.current?.contains(target)) setPortalContainer(null)
+        const { target } = event
+        if (!(target instanceof Node) || isTriggerTarget(target) || panelRef.current?.contains(target)) return
+        setPortalContainer(null)
+      }
+      const preserveFocusUntilClick = (event: MouseEvent) => {
+        // A label can move focus out of the menu before forwarding its click.
+        if (event.button === 0 && event.target instanceof Node && isTriggerTarget(event.target)) {
+          event.preventDefault()
+        }
       }
       document.addEventListener("pointerdown", dismissOutside, true)
-      return () => document.removeEventListener("pointerdown", dismissOutside, true)
+      document.addEventListener("mousedown", preserveFocusUntilClick, true)
+      return () => {
+        document.removeEventListener("pointerdown", dismissOutside, true)
+        document.removeEventListener("mousedown", preserveFocusUntilClick, true)
+      }
     }, [open, searchable])
 
     const close = (restoreFocus = false) => {
@@ -197,7 +214,7 @@ export const DropdownInput = forwardRef<HTMLButtonElement, SingleDropdownProps |
           aria-describedby={props["aria-describedby"]}
           data-invalid={props["aria-invalid"]}
           disabled={disabled}
-          onClick={() => open ? close() : show()}
+          onClick={() => open ? close(true) : show()}
           onKeyDown={(event) => {
             if (event.key === "ArrowDown" || event.key === "ArrowUp") {
               event.preventDefault()
@@ -217,37 +234,21 @@ export const DropdownInput = forwardRef<HTMLButtonElement, SingleDropdownProps |
         {portalContainer && createPortal(
           <div className="ui-dropdown__panel" dir={rtl ? "rtl" : "ltr"} ref={panelRef}>
             {searchable && (
-              <div className="ui-input-shell ui-dropdown__search-shell">
-                <input
-                  ref={searchRef}
-                  className="ui-input-field"
-                  type="text"
-                  role="combobox"
-                  aria-expanded="true"
-                  aria-label={searchLabel}
-                  aria-invalid={props["aria-invalid"]}
-                  aria-controls={listId}
-                  aria-activedescendant={activeId}
-                  aria-autocomplete="list"
-                  autoComplete="off"
-                  inputMode="search"
-                  placeholder={searchLabel}
-                  value={remoteSearch?.value ?? search}
-                  onKeyDown={handlePanelKey}
-                  onChange={(event) => {
-                    const value = event.target.value
-                    if (remoteSearch) {
-                      remoteSearch.onChange(value)
-                      setActiveValue(undefined)
-                    } else {
-                      const term = value.trim().toLocaleLowerCase()
-                      setSearch(value)
-                      setActiveValue(options.find((option) => !option.disabled && option.label.toLocaleLowerCase().includes(term))?.value)
-                    }
-                    if (listRef.current) listRef.current.scrollTop = 0
-                  }}
-                />
-              </div>
+              <SearchInput className="ui-dropdown__search-shell" placeholder={searchLabel} ariaLabel={searchLabel}
+                value={remoteSearch?.value ?? search} inputProps={{
+                  ref: searchRef, role: "combobox", "aria-expanded": true, "aria-invalid": props["aria-invalid"],
+                  "aria-controls": listId, "aria-activedescendant": activeId, "aria-autocomplete": "list", onKeyDown: handlePanelKey,
+                }} onChange={(value) => {
+                  if (remoteSearch) {
+                    remoteSearch.onChange(value)
+                    setActiveValue(undefined)
+                  } else {
+                    const term = value.trim().toLocaleLowerCase()
+                    setSearch(value)
+                    setActiveValue(options.find((option) => !option.disabled && option.label.toLocaleLowerCase().includes(term))?.value)
+                  }
+                  if (listRef.current) listRef.current.scrollTop = 0
+                }} />
             )}
             <div className="ui-dropdown__list custom-scrollbar" id={listId} ref={listRef} role="listbox" aria-labelledby={triggerId}
               tabIndex={searchable ? -1 : 0} aria-required={required} aria-multiselectable={props.multiple || undefined}

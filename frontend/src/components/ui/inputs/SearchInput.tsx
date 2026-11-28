@@ -1,64 +1,99 @@
-import React, { useRef, useEffect } from "react";
+import {
+  useRef,
+  type ComponentPropsWithRef,
+  type ComponentPropsWithoutRef,
+  type ReactNode,
+  type RefObject,
+} from "react";
+
+import { SearchIcon } from "../../icons";
+import { useAutosizeTextarea } from "./useAutosizeTextarea";
 import "../inputs.css";
 
-interface SearchInputProps {
+interface SearchInputBase {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   ariaLabel?: string;
   className?: string;
-  icon: React.ReactNode;
-  multiline?: boolean;
+  icon?: ReactNode;
+  shellRef?: RefObject<HTMLSpanElement>;
 }
 
-export const SearchInput: React.FC<SearchInputProps> = ({
-  value,
-  onChange,
-  placeholder = "Search...",
-  ariaLabel,
-  className = "",
-  icon,
-  multiline = false,
-}) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+type SearchInputProps = SearchInputBase &
+  (
+    | {
+        multiline?: false;
+        inputProps?: Omit<
+          ComponentPropsWithRef<"input">,
+          "value" | "onChange" | "placeholder" | "className"
+        >;
+      }
+    | {
+        multiline: true;
+        textareaProps?: Omit<
+          ComponentPropsWithoutRef<"textarea">,
+          "value" | "onChange" | "placeholder" | "className"
+        > & {
+          enterKeyHint?: HTMLTextAreaElement["enterKeyHint"];
+        };
+        textareaRef?: RefObject<HTMLTextAreaElement>;
+      }
+  );
 
-  useEffect(() => {
-    if (!multiline || !textareaRef.current) return;
-    const el = textareaRef.current;
-    el.style.height = "1px";
-    el.style.height = `${el.scrollHeight}px`;
-  }, [value, multiline]);
+export function SearchInput(props: SearchInputProps) {
+  const {
+    value,
+    onChange,
+    placeholder,
+    ariaLabel,
+    className = "",
+    icon,
+    shellRef,
+  } = props;
+  const internalRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = (props.multiline && props.textareaRef) || internalRef;
 
-  const shellClass = `ui-input-shell${multiline ? " ui-input-shell--grow" : ""} ${className}`.trim();
+  useAutosizeTextarea(textareaRef, value, Boolean(props.multiline));
+
+  const shellClass =
+    `ui-input-shell ui-input-shell--with-action ui-search-input${props.multiline ? " ui-input-shell--grow" : ""} ${className}`.trim();
+  const fieldProps = {
+    value,
+    placeholder,
+    "aria-label": ariaLabel,
+    autoComplete: "off",
+    spellCheck: false,
+  };
 
   return (
-    <div className={shellClass}>
-      {multiline ? (
+    <span ref={shellRef} className={shellClass}>
+      {props.multiline ? (
         <textarea
+          {...fieldProps}
+          {...props.textareaProps}
           ref={textareaRef}
-          className="ui-input-field ui-input-field--textarea"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          aria-label={ariaLabel}
-          autoComplete="off"
-          spellCheck={false}
+          className="ui-input-field ui-input-field--textarea custom-scrollbar"
           rows={1}
+          onChange={(event) => onChange(event.target.value)}
         />
       ) : (
         <input
-          className="ui-input-field"
-          type="text"
           inputMode="search"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          aria-label={ariaLabel}
-          autoComplete="off"
-          spellCheck={false}
+          type="text"
+          {...fieldProps}
+          {...props.inputProps}
+          className="ui-input-field"
+          onChange={(event) => onChange(event.target.value)}
         />
       )}
-      {icon}
-    </div>
+      <span className="ui-input-action-slot ui-search-input__icon">
+        {icon ?? (
+          <span aria-hidden="true" className="glass ui-search-input__glyph">
+            <SearchIcon />
+          </span>
+        )}
+      </span>
+    </span>
   );
-};
+}

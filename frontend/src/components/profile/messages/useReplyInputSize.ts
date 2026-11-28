@@ -10,7 +10,7 @@ export function useReplyInputSize(input: RefObject<HTMLTextAreaElement>, content
       const scrollOffset = field.scrollTop
       field.style.blockSize = "0px"
       field.style.maxBlockSize = "var(--reply-collapsed-limit)"
-      const naturalSize = field.scrollHeight
+      const naturalSize = field.value ? field.scrollHeight : 0
       const cap = Number.parseFloat(getComputedStyle(field).maxBlockSize)
       const overflowing = naturalSize > cap
       field.style.maxBlockSize = ""
@@ -28,9 +28,12 @@ export function useReplyInputSize(input: RefObject<HTMLTextAreaElement>, content
       measure()
     })
     resize.observe(field)
+    const touchSizing = window.matchMedia("(max-width: 768px), (pointer: coarse)")
+    touchSizing.addEventListener("change", measure)
     document.fonts?.addEventListener("loadingdone", measure)
     return () => {
       resize.disconnect()
+      touchSizing.removeEventListener("change", measure)
       document.fonts?.removeEventListener("loadingdone", measure)
     }
   }, [input, content, expanded, onExpand])

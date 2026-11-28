@@ -1,4 +1,4 @@
-import { SingleLineInput, SelectInput } from "@/components/ui/inputs"
+import { SearchInput, SelectInput } from "@/components/ui/inputs"
 import { GlassButton } from "@/components/ui/GlassButton"
 import { useCallback, useId, useState } from "react"
 import { GlassTable, type GlassTableColumn } from "@/components/ui/tables/GlassTable"
@@ -38,7 +38,7 @@ export function UsersTab({ viewerId, initialStatus = "", onAccessChanged }: {
       <GlassTable label="کاربران" rows={users.data?.results ?? []} columns={columns} rowKey={(user) => user.id}
         controls={<>
           <div className="account-workspace__form account-workspace__fields">
-            <label htmlFor={`${filterId}-search`}>جستجو<SingleLineInput id={`${filterId}-search`} type="search" value={search} onChange={(event) => { setSearch(event.target.value); setPage(1) }} placeholder="نام، ایمیل یا نام کاربری" /></label>
+            <label htmlFor={`${filterId}-search`}>جستجو<SearchInput className="ui-input-shell--persian" inputProps={{ id: `${filterId}-search`, type: "search" }} value={search} onChange={(value) => { setSearch(value); setPage(1) }} placeholder="نام، ایمیل یا نام کاربری" /></label>
             <label htmlFor={`${filterId}-role`}>نقش<SelectInput id={`${filterId}-role`} value={role} onChange={(value) => { setRole(value); setPage(1) }} options={[
               { value: "", label: "همه نقش‌ها" },
               ...(roles.data ?? []).filter((item) => item.scope === "platform").map((item) => ({ value: item.code, label: item.label })),

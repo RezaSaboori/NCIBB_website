@@ -1,6 +1,6 @@
 import { Modal, ModalContent, ModalFooter, ModalHeader, type ModalProps } from "@heroui/react"
 import type { CSSProperties, Key, ReactNode, Ref } from "react"
-import { GlassButton } from "@/components/ui/GlassButton"
+import { CloseButton } from "@/components/ui/iconButtons"
 import { dialogResizeDuration } from "@/components/ui/motion/motionPresets"
 import { useMotionVariants } from "@/components/ui/motion/useMotionVariants"
 import { ProfileModalBody } from "./ProfileModalBody"
@@ -44,11 +44,8 @@ export function ProfileModal({
           <>
             <div className="profile-modal__header">
               <ModalHeader><h2>{title}</h2></ModalHeader>
-              <GlassButton type="button" size="sm" color="danger" isIconOnly className="profile-modal__close" aria-label="بستن" onPress={onClose}>
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
-                  <path d="m6 6 12 12M18 6 6 18" />
-                </svg>
-              </GlassButton>
+              <CloseButton size="var(--spacing-xl)" className="profile-modal__close ui-glass-icon-button--touch"
+                aria-label="بستن" onClick={onClose} />
               {headerNavigationRef && <div className="profile-modal__navigation" ref={headerNavigationRef} />}
             </div>
             <ProfileModalBody resize={animateSize} pending={contentPending} contentKey={bodyKey} estimatedBodySize={estimatedBodySize}>
